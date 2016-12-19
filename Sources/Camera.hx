@@ -23,4 +23,8 @@ class Camera {
 	public function restore (g:kha.graphics2.Graphics) {
 		g.popTransformation();
 	}
+	//Remember, this might screw up if called inside camera.transform and restore.
+	public function screenToWorld (screen:kha.math.Vector2){
+		return new kha.math.Vector2(pos.x+(screen.x/8),pos.y+(screen.y/8));
+	}
 }

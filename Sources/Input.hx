@@ -7,15 +7,29 @@ class Input {
 	public var right: Bool;
 	public var up: Bool;
 	public var down: Bool;
+	public var mousePos:kha.math.Vector2 = new kha.math.Vector2(0,0);
 
 	public function new() {
 		kha.input.Keyboard.get().notify(keyDown,keyUp);
-		//kha.input.Mouse.get().notify()
+		kha.input.Mouse.get().notify(mouseDown,mouseUp,mouseMove,mouseWheel);
+
+	}
+	public function mouseDown(x,y,z){
+
+	}
+	public function mouseUp(x,y,z){
+
+	}
+	public function mouseMove(x,y,z,w){
+		mousePos.x = x;
+		mousePos.y = y;
+	}
+	public function mouseWheel(direction){
 
 	}
 
+
 	public function keyDown(char:Key,letter) {
-		trace(char+"down");
 
 		if (char == LEFT || letter == "D")
 			left = true;
@@ -31,7 +45,6 @@ class Input {
 	}
 
 	public function keyUp(char: Key,letter) {
-		trace(char+"up");
 		switch (char) {
 			case LEFT:
 				left = false;

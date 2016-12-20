@@ -10,6 +10,7 @@ class Player extends Entity {
 	var game:Project;
 
 	var bullets = new Array<Bullet>();
+	var particles = new Array<Particle>();
 	
 	public function new (input,game:Project) {
 		super();
@@ -31,6 +32,7 @@ class Player extends Entity {
 	
 		
 		for (bullet in bullets) bullet.draw(g);
+		for (particle in particles) particle.draw(g);
 		
 		sprite.draw(g,pos.x,pos.y);
 		components.callEvent("draw",g);
@@ -40,9 +42,16 @@ class Player extends Entity {
 	}
 	var frame = 0;
 	override public function update (delta:Float) {
-		frame++;
+		
+		if (!input.mouseButtons.left){
+			frame = -1;
+		}else{
+			frame++;
+		}
+
 		super.update(delta);
 		for (bullet in bullets) bullet.update(delta);
+		for (particle in particles) particle.update(delta);
 
 		var speed = 1;
 		if (input.left) velocity.x = -speed;
@@ -50,9 +59,12 @@ class Player extends Entity {
 		if (input.up) velocity.y = -speed;
 		if (input.down) velocity.y = speed;
 
-		if (frame%10 == 0){
+		if (frame%6 == 0 && input.mouseButtons.left){
 			var dir = pos.sub(game.camera.screenToWorld(input.mousePos.sub(new kha.math.Vector2(32,32))));
 			var a = Math.round(Math.atan2(-dir.y,-dir.x)*(180/Math.PI));
+
+			
+			kha.audio1.Audio.play(kha.Assets.sounds.RapidFire);
 
 			bullets.push(
 				new Bullet(this,game.entities,a,
@@ -60,10 +72,13 @@ class Player extends Entity {
 					bullets.remove(entity);
 				})
 			);
+
+			var knockback = .5+Math.random();
+			velocity.x -= Math.cos(a*(Math.PI/180))*knockback;
+			velocity.y -= Math.sin(a*(Math.PI/180))*knockback;
 		}
 		
-
-
+		
 		var newPos = new Vector2(pos.x,pos.y);
 
 		//x collision wave

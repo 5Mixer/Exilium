@@ -21,8 +21,8 @@ class Project {
 		input = new Input();
 		entities = new Array<Entity>();
 
-		level = new Level();
 		camera = new Camera();
+		level = new Level(camera);
 		player = new Player(input,this);
 		
 		entities.push(level);

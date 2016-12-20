@@ -8,16 +8,23 @@ class Input {
 	public var up: Bool;
 	public var down: Bool;
 	public var mousePos:kha.math.Vector2 = new kha.math.Vector2(0,0);
+	public var mouseButtons:{left:Bool, right:Bool} = {
+		left: false,
+		right: false
+	};
 
 	public function new() {
 		kha.input.Keyboard.get().notify(keyDown,keyUp);
 		kha.input.Mouse.get().notify(mouseDown,mouseUp,mouseMove,mouseWheel);
 
 	}
-	public function mouseDown(x,y,z){
-
+	public function mouseDown(button,y,z){
+		if (button==0) mouseButtons.left=true;
+		if (button==1) mouseButtons.right=true;
 	}
-	public function mouseUp(x,y,z){
+	public function mouseUp(button,y,z){
+		if (button==0) mouseButtons.left=false;
+		if (button==1) mouseButtons.right=false;
 
 	}
 	public function mouseMove(x,y,z,w){
@@ -29,32 +36,30 @@ class Input {
 	}
 
 
-	public function keyDown(char:Key,letter) {
+	public function keyDown(char:Key,letter:String) {
+		
 
-		if (char == LEFT || letter == "D")
+		if (char == LEFT || letter == "a")
 			left = true;
 
-		if (char == RIGHT || letter == "D")
+		if (char == RIGHT || letter == "d")
 			right = true;
 
-		if (char == UP || letter == "W")
+		if (char == UP || letter == "w")
 			up = true;
 
-		if (char == DOWN || letter == "S")
+		if (char == DOWN || letter == "s")
 			down = true;
 	}
 
 	public function keyUp(char: Key,letter) {
-		switch (char) {
-			case LEFT:
-				left = false;
-			case RIGHT:
-				right = false;
-			case UP:
-				up = false;
-			case DOWN:
-				down = false;
-			default:
-		}
+		if(char == LEFT || letter == 'a')
+			left = false;
+		if(char == RIGHT || letter == 'd')
+			right = false;
+		if(char == UP || letter == 'w')
+			up = false;
+		if(char == DOWN || letter == 's')
+			down = false;
 	}
 }

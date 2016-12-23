@@ -1,19 +1,22 @@
 package ;
 
 class Bullet extends Entity{
-	var angle:Int;
-	var speed = 2;
+	public var angle:Int;
+	var speed = 3;
 	var sprite:Sprite;
 	var colliders:Array<Entity>;
 	var onDeath:Bullet->Void;
-	override public function new (parent:Entity,colliders,angle,onDeath){
+	public var light:Level.Light;
+
+	override public function new (parent:Entity,colliders,angle,onDeath,l){
 		super();
+		this.onDeath = onDeath;
 		this.angle = angle;
 		this.pos = new kha.math.Vector2(parent.pos.x,parent.pos.y);
 		this.colliders = colliders;
 		sprite = new Sprite(kha.Assets.images.Entities,1);
 		sprite.angle = angle;
-		this.onDeath = onDeath;
+		light = l;
 	}
 	override public function draw (g){
 		super.draw(g);
@@ -33,5 +36,6 @@ class Bullet extends Entity{
 				}
 			}
 		}
+		light.pos = pos.div(8);
 	}
 }

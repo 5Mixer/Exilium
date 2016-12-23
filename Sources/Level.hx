@@ -7,6 +7,11 @@ typedef Tile = {
 	@:optional var oncollide:Void -> Void;
 	var id:Int;
 }
+typedef Light = {
+	var colour:kha.Color;
+	var radius:Float;
+	var pos:kha.math.Vector2;
+}
 
 class LevelCollisionShape {
 	public var level:Level;
@@ -23,9 +28,9 @@ class Level extends Entity {
 		0 => { name: "ground", collide: true, id: 0},
 		1 => { name: "wall1", collide: false, id: 1},
 		2 => { name: "wall2", collide: false, id: 2},
-		3 => { name: "wall3", collide: false, id: 4},
-		4 => { name: "wall4", collide: false, id: 5},
-		5 => { name: "wall3", collide: true, id: 6}
+		3 => { name: "wall3", collide: false, id: 3},
+		4 => { name: "wall4", collide: false, id: 4},
+		5 => { name: "wall3", collide: true, id: 5}
 	];
 	var tiles = new Array<Int>();
 
@@ -33,6 +38,8 @@ class Level extends Entity {
 	var height:Int;
 
 	var camera:Camera;
+
+	public var lights:Array<Light>;
 
 	override public function new (camera:Camera) {
 		super();
@@ -42,6 +49,12 @@ class Level extends Entity {
 		//tiles = levelData.tiles;
 
 		var c = new component.Collisions(this);
+
+		lights = [
+			{ pos: new kha.math.Vector2(10,10), radius: 1, colour: kha.Color.Green},
+			{ pos: new kha.math.Vector2(10,5), radius: 1, colour: kha.Color.Red},
+			{ pos: new kha.math.Vector2(5,7.5), radius: 1, colour: kha.Color.Blue},
+		];
 		
 
 		var data = haxe.xml.Parser.parse(kha.Assets.blobs.level1_tmx.toString());
@@ -91,14 +104,36 @@ class Level extends Entity {
 			}
 		}*/
 
+		trace('computing light values for ${lights.length} light\'s');
+
 
 		var camtiley:Int = cast Math.max(Math.floor((camera.pos.y)/8),0);
 		var camtilex:Int = cast Math.max(Math.floor((camera.pos.x)/8),0);
-		var windoww = Math.ceil(((kha.System.windowWidth()+8*42)/8)/8);
-		var windowh = Math.ceil(((kha.System.windowHeight()+8*42)/8)/8);
+		var windoww = Math.ceil(((kha.System.windowWidth()+8*4)/8)/8);
+		var windowh = Math.ceil(((kha.System.windowHeight()+8*4)/8)/8);
 		for (y in camtiley ... cast Math.min(camtiley+windowh,height)){
 			for (x in camtilex ... cast Math.min(camtilex+windoww,width)){
 				//trace('rendering tile $x : $y');
+				
+				var colours:Array<kha.Color> = [];
+				for (light in lights){
+					var lx = light.pos.x;
+					var ly = light.pos.y;
+					var l =	Math.sqrt(((x - lx) * (x - lx)) + ((y - ly) * (y - ly)));
+					l = Math.max(Math.min(light.radius/l,1),0);
+
+
+					colours.push(kha.Color.fromFloats(light.colour.R*l,light.colour.G*l,light.colour.B*l,1));
+				}
+				var c = {r: 0.0, g: 0.0, b:0.0, a: 1.0};
+				for (colour in colours){
+
+					c.r += colour.R;
+					c.g += colour.G;
+					c.b += colour.B;
+				}
+				g.color = kha.Color.fromFloats(Math.min(c.r,1),Math.min(c.g,1),Math.min(c.b,1),1);
+				
 
 				var tileData = tileInfo.get(tiles[(y*width)+x]);
 				var sourcePos = { x: (tileData.id%width)*8, y:Math.floor(tileData.id/height)*8 };
@@ -109,6 +144,7 @@ class Level extends Entity {
 
 			}
 		}
+		g.color = kha.Color.White;
 
 		/*g.color = kha.Color.fromFloats(.2,.3,.7,.9);
 		g.drawRect(camtilex*8,camtiley*8,8,8);

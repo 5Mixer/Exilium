@@ -29,9 +29,12 @@ class Player extends Entity {
 	}
 	override public function draw (g){
 		super.draw(g);
-	
 		
-		for (bullet in bullets) bullet.draw(g);
+		trace('drawing ${bullets.length} bullet/s.');
+		for (bullet in bullets) {
+			bullet.draw(g);
+		}
+
 		for (particle in particles) particle.draw(g);
 		
 		sprite.draw(g,pos.x,pos.y);
@@ -54,10 +57,13 @@ class Player extends Entity {
 		for (particle in particles) particle.update(delta);
 
 		var speed = 1;
-		if (input.left) velocity.x = -speed;
-		if (input.right) velocity.x = speed;
-		if (input.up) velocity.y = -speed;
-		if (input.down) velocity.y = speed;
+		var m = .8;
+		if (input.left && velocity.x > -speed) velocity.x -= m;
+		if (input.right && velocity.x < speed) velocity.x += m;
+		if (input.up && velocity.y > -speed) velocity.y -= m;
+		if (input.down && velocity.y < speed) velocity.y += m;
+
+		
 
 		if (frame%6 == 0 && input.mouseButtons.left){
 			var dir = pos.sub(game.camera.screenToWorld(input.mousePos.sub(new kha.math.Vector2(32,32))));
@@ -66,17 +72,45 @@ class Player extends Entity {
 			
 			kha.audio1.Audio.play(kha.Assets.sounds.RapidFire);
 
+			var l = { pos: new kha.math.Vector2(this.pos.x,this.pos.y), radius: .6, colour: kha.Color.Red};
+
 			bullets.push(
 				new Bullet(this,game.entities,a,
-				function (entity){
+				function (entity:Bullet){
+					game.level.lights.remove(entity.light);
 					bullets.remove(entity);
-				})
+					
+					particles.push(
+						new Particle(entity,6+Math.round(Math.random()*4),Math.floor(entity.angle+180),
+									function (entity) { particles.remove(entity); }
+						)
+					);
+				},l)
+			);
+			game.level.lights.push(l);
+
+			particles.push(
+				new Particle(this,10+Math.round(Math.random()*5),a,
+							function (entity) { particles.remove(entity); }
+				)
 			);
 
-			var knockback = .5+Math.random();
+			var camOffset = dir.mult(1);
+			camOffset.normalize();
+			camOffset = camOffset.mult(6);
+			game.camera.offset.x += camOffset.x;
+			game.camera.offset.y += camOffset.y;
+
+
+			var knockback = .7+Math.random()/2;
 			velocity.x -= Math.cos(a*(Math.PI/180))*knockback;
 			velocity.y -= Math.sin(a*(Math.PI/180))*knockback;
 		}
+
+		
+		var friction = .7;
+		velocity.x *= friction;
+		velocity.y *= friction;
 		
 		
 		var newPos = new Vector2(pos.x,pos.y);
@@ -95,11 +129,9 @@ class Player extends Entity {
 			}
 		}
 		
-		var friction = .7;
 		
 		if (!collides){
 			pos.x += velocity.x;
-			velocity.x *= friction;
 		}
 
 
@@ -118,7 +150,6 @@ class Player extends Entity {
 		}
 		if (!collides){
 			pos.y += velocity.y;
-			velocity.y *= friction;
 		}
 		
 

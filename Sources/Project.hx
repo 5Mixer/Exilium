@@ -4,6 +4,8 @@ import kha.Framebuffer;
 import kha.Scheduler;
 import kha.System;
 
+import entity.Player;
+
 class Project {
 	public var level:Level;
 	public var camera:Camera;
@@ -26,6 +28,17 @@ class Project {
 		player = new Player(input,this);
 		
 		entities.push(level);
+		entities.push(player);
+
+		for (i in 0...150){
+			var x = Math.floor(Math.random()*level.width);
+			var y = Math.floor(Math.random()*level.height);
+			if (level.getTile(x,y) == 0) continue;
+			var skelly = new entity.Skeleton(this,new kha.math.Vector2(x*8,y*8),function (e){
+				entities.remove(e);
+			});
+			entities.push(skelly);
+		}
 
 		lastTime = Scheduler.time();
 
@@ -36,41 +49,32 @@ class Project {
 	function update() {
 		
 		var delta = Scheduler.time() - lastTime;
-		player.update(delta);
+		
+		for (entity in entities)
+			entity.update(delta);
+
 
 		lastTime = Scheduler.time();
-		
 	}
 
 	function render(framebuffer: Framebuffer): Void {
 		frame++;
 
-
 		var g = framebuffer.g2;
-		g.begin(true,kha.Color.fromBytes(84,36,55,255));
-		g.imageScaleQuality = kha.graphics2.ImageScaleQuality.Low;
+		g.begin();
+		g.color = kha.Color.White;
 		
 		camera.pos = new kha.math.Vector2(player.pos.x-kha.System.windowWidth()/2/camera.scale.x,player.pos.y-kha.System.windowHeight()/2/camera.scale.y);
 
-
 		camera.transform(g);
-		level.lights[0].pos = player.pos.div(8);
-		level.draw(g);
-		player.draw(g);
 		
-		
-
-		var e = camera.screenToWorld(input.mousePos);
-		g.color = kha.Color.Blue;
-		//g.fillRect(e.x,e.y,1,1);
-		g.color = kha.Color.White;
-
-
+		for (entity in entities)
+			entity.draw(g);
 
 		camera.restore(g);
-		g.drawSubImage(kha.Assets.images.Entities,input.mousePos.x/8 -4,input.mousePos.y/8 -4,2*8,0,8,8);
 
-		
+		//Draw mouse cursor.
+		g.drawSubImage(kha.Assets.images.Entities,input.mousePos.x/8 -4,input.mousePos.y/8 -4,2*8,0,8,8);
 
 		g.end();
 	}

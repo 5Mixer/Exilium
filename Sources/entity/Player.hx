@@ -1,4 +1,4 @@
-package ;
+package entity;
 
 import component.Collisions;
 import kha.math.Vector2;
@@ -11,6 +11,8 @@ class Player extends Entity {
 
 	var bullets = new Array<Bullet>();
 	var particles = new Array<Particle>();
+
+	var light:Level.Light;
 	
 	public function new (input,game:Project) {
 		super();
@@ -26,11 +28,13 @@ class Player extends Entity {
 		this.components.set("collider",c);
 
 		this.game = game;
+
+		light = { pos: pos.div(8), radius: .7, colour: kha.Color.Green};
+		game.level.lights.push(light);
 	}
 	override public function draw (g){
 		super.draw(g);
 		
-		trace('drawing ${bullets.length} bullet/s.');
 		for (bullet in bullets) {
 			bullet.draw(g);
 		}
@@ -38,9 +42,8 @@ class Player extends Entity {
 		for (particle in particles) particle.draw(g);
 		
 		sprite.draw(g,pos.x,pos.y);
-		components.callEvent("draw",g);
 
-		
+		light.pos = pos.div(8);		
 		
 	}
 	var frame = 0;
@@ -72,7 +75,7 @@ class Player extends Entity {
 			
 			kha.audio1.Audio.play(kha.Assets.sounds.RapidFire);
 
-			var l = { pos: new kha.math.Vector2(this.pos.x,this.pos.y), radius: .6, colour: kha.Color.Red};
+			var l = { pos: pos, radius: .6, colour: kha.Color.Red};
 
 			bullets.push(
 				new Bullet(this,game.entities,a,
@@ -120,6 +123,7 @@ class Player extends Entity {
 		
 		var collides = false;
 		for (entity in game.entities){
+			if (entity == this) continue;
 			if (entity.components.hasComponent("collider")){
 				 if (cast (entity.components.components.get("collider"),component.Collisions).doesShapeCollide(newCollider)){
 					 collides = true;
@@ -140,6 +144,7 @@ class Player extends Entity {
 		
 		collides = false;
 		for (entity in game.entities){
+			if (entity == this) continue;
 			if (entity.components.hasComponent("collider")){
 				 if (cast (entity.components.components.get("collider"),component.Collisions).doesShapeCollide(newCollider)){
 					 collides = true;
@@ -152,7 +157,5 @@ class Player extends Entity {
 			pos.y += velocity.y;
 		}
 		
-
 	}
-
 }

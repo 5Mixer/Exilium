@@ -1,4 +1,4 @@
-package ;
+package entity;
 
 using kha.graphics2.GraphicsExtension;
 

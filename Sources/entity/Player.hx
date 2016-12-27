@@ -23,7 +23,7 @@ class Player extends Entity {
 		sprite = new Sprite(kha.Assets.images.Entities,0);
 		this.input = input;
 		
-		var c = new Collisions(this);
+		var c = new Collisions();
 		c.registerCollisionRegion(this);
 		this.components.set("collider",c);
 
@@ -78,13 +78,13 @@ class Player extends Entity {
 			var l = { pos: pos, radius: .6, colour: kha.Color.Red};
 
 			bullets.push(
-				new Bullet(this,game.entities,a,
+				new Bullet(this,this.pos,game.entities,a,
 				function (entity:Bullet){
 					game.level.lights.remove(entity.light);
 					bullets.remove(entity);
 					
 					particles.push(
-						new Particle(entity,6+Math.round(Math.random()*4),Math.floor(entity.angle+180),
+						new Particle(entity,entity.pos,6+Math.round(Math.random()*4),Math.floor(entity.angle+180),
 									function (entity) { particles.remove(entity); }
 						)
 					);
@@ -93,7 +93,7 @@ class Player extends Entity {
 			game.level.lights.push(l);
 
 			particles.push(
-				new Particle(this,10+Math.round(Math.random()*5),a,
+				new Particle(this,this.pos,10+Math.round(Math.random()*5),a,
 							function (entity) { particles.remove(entity); }
 				)
 			);
@@ -124,7 +124,7 @@ class Player extends Entity {
 		var collides = false;
 		for (entity in game.entities){
 			if (entity == this) continue;
-			if (entity.components.hasComponent("collider")){
+			if (entity.components.has("collider")){
 				 if (cast (entity.components.components.get("collider"),component.Collisions).doesShapeCollide(newCollider)){
 					 collides = true;
 					 //pos.x = Math.round(pos.x/8)*8;
@@ -145,7 +145,7 @@ class Player extends Entity {
 		collides = false;
 		for (entity in game.entities){
 			if (entity == this) continue;
-			if (entity.components.hasComponent("collider")){
+			if (entity.components.has("collider")){
 				 if (cast (entity.components.components.get("collider"),component.Collisions).doesShapeCollide(newCollider)){
 					 collides = true;
 					 //pos.y = Math.round(pos.y/8)*8;

@@ -5,6 +5,8 @@ typedef Tile = {
 	var name:String;
 	var collide:Bool;
 	@:optional var oncollide:Void -> Void;
+	@:optional var specularity:Float;
+	@:optional var ambient:kha.Color;
 	var id:Int;
 }
 typedef Light = {
@@ -25,7 +27,7 @@ class Level extends Entity {
 
 	];
 	public var tileInfo:Map<Int,Tile> = [
-		0 => { name: "ground", collide: true, id: 0},
+		0 => { name: "ground", collide: true, id: 0, ambient: kha.Color.fromFloats(.1,.1,.1), specularity: 1.3},
 		1 => { name: "wall1", collide: false, id: 1},
 		2 => { name: "wall2", collide: false, id: 2},
 		3 => { name: "wall3", collide: false, id: 3},
@@ -47,7 +49,7 @@ class Level extends Entity {
 
 		//var levelData = haxe.Json.parse(kha.Assets.blobs.Level_json.toString());
 
-		var c = new component.Collisions(this);
+		var c = new component.Collisions();
 
 		lights = [
 			{ pos: new kha.math.Vector2(10,10), radius: 1, colour: kha.Color.Green},
@@ -99,6 +101,10 @@ class Level extends Entity {
 
 		for (y in camtiley ... cast Math.min(camtiley+windowh,height)){
 			for (x in camtilex ... cast Math.min(camtilex+windoww,width)){
+
+				
+				var tileData = tileInfo.get(tiles[(y*width)+x]);
+				var spec = tileData.specularity==null ? 1.0 : tileData.specularity;
 				
 				//In the rendering loop of tilemaps, where x,y is tile location.
 				var colours:Array<kha.Color> = []; //Stores all effecting colours from light sources.
@@ -112,16 +118,20 @@ class Level extends Entity {
 				}
 				//Now add these colours togethor and store in one variable.
 				var c = {r: 0.0, g: 0.0, b:0.0, a: 1.0};
+				if (tileData.ambient != null){
+					c.r = tileData.ambient.R;
+					c.g = tileData.ambient.G;
+					c.b = tileData.ambient.B;
+				}
 				for (colour in colours){
 
-					c.r += colour.R;
-					c.g += colour.G;
-					c.b += colour.B;
+					c.r += colour.R * spec;
+					c.g += colour.G * spec;
+					c.b += colour.B * spec;
 				}
 				//Now actually apply the tint, again, within a range.
 				g.color = kha.Color.fromFloats(Math.min(c.r,1),Math.min(c.g,1),Math.min(c.b,1),1);
 				
-				var tileData = tileInfo.get(tiles[(y*width)+x]);
 				var sourcePos = { x: (tileData.id%width)*8, y:Math.floor(tileData.id/height)*8 };
 				
 				g.drawScaledSubImage(kha.Assets.images.Tileset,sourcePos.x,sourcePos.y,8,8,x*8,y*8,8,8);

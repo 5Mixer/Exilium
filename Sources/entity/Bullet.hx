@@ -9,11 +9,11 @@ class Bullet extends Entity{
 	public var light:Level.Light;
 	var parent:Entity;
 
-	override public function new (parent:Entity,colliders,angle,onDeath,l){
+	override public function new (parent:Entity,pos,colliders,angle,onDeath,l){
 		super();
 		this.onDeath = onDeath;
 		this.angle = angle;
-		this.pos = new kha.math.Vector2(parent.pos.x,parent.pos.y);
+		this.pos = pos;
 		this.colliders = colliders;
 		this.parent = parent;
 		sprite = new Sprite(kha.Assets.images.Entities,1);
@@ -32,7 +32,7 @@ class Bullet extends Entity{
 
 		for (entity in colliders){
 			if (entity == parent) continue;
-			if (entity.components.hasComponent("collider")){
+			if (entity.components.has("collider")){
 				if (cast (entity.components.components.get("collider"),component.Collisions).doesShapeCollide(this)){
 					entity.events.callEvent("shot",this);
 					onDeath(this);

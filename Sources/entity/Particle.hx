@@ -10,11 +10,11 @@ class Particle extends Entity{
 	var maxLife:Int;
 	var onDeath:Particle->Void;
 
-	override public function new (parent:Entity,life:Int,angle,onDeath){
+	override public function new (parent:Entity,pos:kha.math.Vector2,life:Int,angle,onDeath){
 		super();
 		this.onDeath = onDeath;
 		this.angle = angle;
-		this.pos = new kha.math.Vector2(parent.pos.x+4+Math.cos(angle* (Math.PI / 180))*4,parent.pos.y+4+Math.sin(angle* (Math.PI / 180))*4);
+		this.pos = new kha.math.Vector2(pos.x+4+Math.cos(angle* (Math.PI / 180))*4,pos.y+4+Math.sin(angle* (Math.PI / 180))*4);
 		this.maxLife = life;
 		sprite = new Sprite(kha.Assets.images.Entities,1);
 		sprite.angle = angle;

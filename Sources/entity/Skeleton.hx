@@ -17,7 +17,7 @@ class Skeleton extends SubEntity {
 		velocity = new Vector2(0,0);
 		sprite = new Sprite(kha.Assets.images.Entities,3);
 		
-		var c = new Collisions(this);
+		var c = new Collisions();
 		c.registerCollisionRegion(this);
 		this.components.set("collider",c);
 
@@ -39,7 +39,7 @@ class Skeleton extends SubEntity {
 		for (entity in game.entities){
 			if (entity == this) continue;
 			
-			if (entity.components.hasComponent("collider")){
+			if (entity.components.has("collider")){
 				if (cast (entity.components.components.get("collider"),component.Collisions).doesShapeCollide(this)){
 					 if (Std.is(entity,Bullet)){
 						 this.onDeath(this);

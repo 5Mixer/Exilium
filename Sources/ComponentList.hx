@@ -7,7 +7,7 @@ class ComponentList {
 
 	}
 	
-	public function hasComponent(identifier:String){
+	public function has(identifier:String){
 		return components.exists(identifier);
 	}
 	public function get(identifier){
@@ -18,11 +18,5 @@ class ComponentList {
 	}
 	public function removeComponent(identifier){
 		components.remove(identifier);
-	}
-	public function draw (g){
-		for (component in components) component.draw(g);
-	}
-	public function update (delta:Float) {
-		for (component in components) component.update(delta);
 	}
 }

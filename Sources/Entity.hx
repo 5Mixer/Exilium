@@ -10,10 +10,8 @@ class Entity implements component.Collisions.CollisionShape implements component
 	}
 	public function draw (g){
 		events.callEvent("draw",g);
-		components.draw(g);
 	}
 	public function update (delta:Float) {
 		events.callEvent("update",delta);
-		components.update(delta);
 	}
 }

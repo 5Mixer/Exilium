@@ -14,6 +14,9 @@ class RectangleCollisionShape implements CollisionShape implements RectangleColl
 		this.pos = pos;
 		this.size = size;
 	}
+	public function offset(off:kha.math.Vector2){
+		return new RectangleCollisionShape(pos.add(off),size);
+	}
 }
 
 @:enum abstract Side(Int) from Int to Int
@@ -34,12 +37,13 @@ class RectangleCollisionShape implements CollisionShape implements RectangleColl
 
 class Collisions extends Component{
 	public var collisionRegions:Array<CollisionShape>;
-	override public function new (parent) {
+	override public function new () {
 		collisionRegions = new Array<CollisionShape>();
-		super(parent);
+		super();
 	}
 	public function registerCollisionRegion(collisionShape){
 		collisionRegions.push(collisionShape);
+		return this;
 	}
 	public function doesShapeGroupCollide(a:Collisions,?mask:Int){
 		if (mask == null) mask = Side.All;

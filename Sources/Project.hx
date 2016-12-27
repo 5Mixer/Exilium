@@ -13,39 +13,44 @@ class Project {
 	var input:Input;
 
 	var lastTime:Float;
-	public var entities:Array<Entity>;
+	public var entities:eskimo.EntityManager;
 
-	var systems:Array<System>;
+	var systems:eskimo.systems.SystemManager;
 	
-	var p = new Entity();
+	var p:eskimo.Entity;
 
 	public function new() {
 		kha.System.notifyOnRender(render);
 		Scheduler.addTimeTask(update, 0, 1 / 60);
 
+		var components = new eskimo.ComponentManager();
+		entities = new eskimo.EntityManager(components);
+		systems = new eskimo.systems.SystemManager(entities);
+		
+
 		input = new Input();
-		entities = new Array<Entity>();
 
 		camera = new Camera();
 		level = new Level(camera);
 
-		systems = new Array<System>();
-		systems.push(new system.Renderer());
-		systems.push(new system.KeyMovement(input));
-		systems.push(new system.Physics(entities));
-		systems.push(new system.Gun(input,camera,level.lights));
+		systems.add(new system.Renderer());
+		systems.add(new system.KeyMovement(input));
+		systems.add(new system.Physics(entities));
+		systems.add(new system.Gun(input,camera,level.lights));
 
 		player = new Player(input,this);
 
-		p.components.set("transformation",new component.Transformation(new kha.math.Vector2(20,20)));
-		p.components.set("sprite",new component.Sprite(0));
-		p.components.set("keymovement",new component.KeyMovement());
-		p.components.set("physics",new component.Physics());
-		p.components.set("gun",new component.Gun());
-		p.components.set("collider",new component.Collisions().registerCollisionRegion(new component.Collisions.RectangleCollisionShape(new kha.math.Vector2(),new kha.math.Vector2(8,8))));
-		entities.push(p);
+		p = entities.create();
 		
-		entities.push(level);
+		p.set(new component.Transformation(new kha.math.Vector2(20,20)));
+		p.set(new component.Sprite(0));
+		p.set(new component.KeyMovement());
+		p.set(new component.Physics());
+		p.set(new component.Gun());
+		p.set(new component.Collisions().registerCollisionRegion(new component.Collisions.RectangleCollisionShape(new kha.math.Vector2(),new kha.math.Vector2(8,8))));
+		
+		
+		//entities.push(level);
 		//entities.push(player);
 
 		for (i in 0...150){
@@ -53,9 +58,9 @@ class Project {
 			var y = Math.floor(Math.random()*level.height);
 			if (level.getTile(x,y) == 0) continue;
 			var skelly = new entity.Skeleton(this,new kha.math.Vector2(x*8,y*8),function (e){
-				entities.remove(e);
+				//entities.remove(e);
 			});
-			entities.push(skelly);
+			//entities.push(skelly);
 		}
 
 		lastTime = Scheduler.time();
@@ -68,11 +73,11 @@ class Project {
 		
 		var delta = Scheduler.time() - lastTime;
 		
-		for (entity in entities)
-			entity.update(delta);
+		//for (entity in entities)
+		//	entity.update(delta);
 
-		for (system in systems)
-			system.update(delta,entities);
+		for (system in systems.)
+		system.update(delta);
 
 
 		lastTime = Scheduler.time();
@@ -86,12 +91,12 @@ class Project {
 		g.color = kha.Color.White;
 		
 		//camera.pos = new kha.math.Vector2(player.pos.x-kha.System.windowWidth()/2/camera.scale.x,player.pos.y-kha.System.windowHeight()/2/camera.scale.y);
-		camera.pos = new kha.math.Vector2((cast p.components.get("transformation")).pos.x-kha.System.windowWidth()/2/camera.scale.x,(cast p.components.get("transformation")).pos.y-kha.System.windowHeight()/2/camera.scale.y);
+		camera.pos = new kha.math.Vector2(p.get(component.Transformation).pos.x-kha.System.windowWidth()/2/camera.scale.x,p.get(component.Transformation).pos.y-kha.System.windowHeight()/2/camera.scale.y);
 		//camera.pos = new kha.math.Vector2(60,60);
 		camera.transform(g);
 		
-		for (entity in entities)
-			entity.draw(g);
+		//for (entity in entities)
+		//	entity.draw(g);
 		
 		for (system in systems)
 			system.render(g,entities);

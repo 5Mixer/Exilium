@@ -4,8 +4,8 @@ import kha.math.FastMatrix3;
 
 class Renderer extends System {
 
-	override public function render (g:kha.graphics2.Graphics,entities:Array<Entity>){
-		super.render(g,entities);
+	override public function render (g:kha.graphics2.Graphics){
+		super.render(g);/*
 
 		for (entity in entities){
 			if (entity.components.has("sprite") && entity.components.has("transformation")){
@@ -26,6 +26,6 @@ class Renderer extends System {
 				
 				g.popTransformation();
 			}
-		}
+		}*/
 	}
 }

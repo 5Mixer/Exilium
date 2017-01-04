@@ -1,13 +1,13 @@
 package ;
 
-class System {
+class System extends eskimo.systems.System{
 	public function new (){
-
+		super();
 	}
-	public function update(delta:Float,entities:Array<Entity>){
-
+	override public function onUpdate(delta:Float){
+		super.onUpdate(delta);
 	}
-	public function render(g:kha.graphics2.Graphics,entites:Array<Entity>){
+	public function render(g:kha.graphics2.Graphics){
 
 	}
 }

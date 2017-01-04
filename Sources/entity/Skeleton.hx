@@ -36,7 +36,7 @@ class Skeleton extends SubEntity {
 	override public function update (delta:Float){
 		super.update(delta);
 
-		for (entity in game.entities){
+		for (entity in game.entities.entities){
 			if (entity == this) continue;
 			
 			if (entity.components.has("collider")){

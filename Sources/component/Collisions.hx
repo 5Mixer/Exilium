@@ -34,11 +34,28 @@ class RectangleCollisionShape implements CollisionShape implements RectangleColl
     static inline function value(index:Int) return 1 << index;
 }
  
+enum CollisionGroup {
+	Friendly;
+	Enemy;
+	Level;
+	Bullet;
+	Particle;
+}
 
 class Collisions extends Component{
 	public var collisionRegions:Array<CollisionShape>;
-	override public function new () {
+	var ignoreGroups = new Array<CollisionGroup>();//Will ignore collisions with entities having, at minimum, ALL these fields.
+	var collisionGroups = new Array<CollisionGroup>(); //Groups that this entity resides in. Could be multiple.
+
+	override public function new (?collisionGroups:Array<CollisionGroup>,?ignoreCollisionGroups:Array<CollisionGroup>) {
 		collisionRegions = new Array<CollisionShape>();
+
+		if (collisionGroups != null)
+			this.collisionGroups = collisionGroups;
+		
+		if (ignoreCollisionGroups != null)
+			this.ignoreGroups = ignoreCollisionGroups;
+		
 		super();
 	}
 	public function registerCollisionRegion(collisionShape){
@@ -47,6 +64,15 @@ class Collisions extends Component{
 	}
 	public function doesShapeGroupCollide(a:Collisions,?mask:Int){
 		if (mask == null) mask = Side.All;
+		
+		var validCollision = false;
+		for (othersIgnore in a.ignoreGroups){
+			if (collisionGroups.indexOf(othersIgnore) == -1){
+				//The other entity is not ignoring one of our groups, this is a valid collision.
+				validCollision = true;
+			}
+		}
+
 		for (region in a.collisionRegions){
 			if (doesShapeCollide(region,mask))
 				return true;

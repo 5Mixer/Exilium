@@ -3,8 +3,10 @@ using kha.graphics2.GraphicsExtension;
 
 class CollisionDebugView extends System {
 	var view:eskimo.views.View;
+	var draw:util.KhaShapeDrawer;
 	public function new (entities:eskimo.EntityManager){
 		super();
+		draw = new util.KhaShapeDrawer();
 		view = new eskimo.views.View(new eskimo.filters.Filter([component.Transformation,component.Collisions]),entities);
 	}
 
@@ -12,15 +14,14 @@ class CollisionDebugView extends System {
 		super.render(g);
 
 		g.color = kha.Color.Red;
+		draw.SetGraphics(g);
+		
 
 		for (entity in view.entities){
 			var transform = entity.get(component.Transformation);
 			var collisions = entity.get(component.Collisions);
 			for (region in collisions.collisionRegions){
-				if (Std.is(region,component.Collisions.RectangleCollisionShape)){
-					var r = cast (region,component.Collisions.RectangleCollisionShape);
-					g.drawRect(r.pos.x,r.pos.y,r.size.x,r.size.y);
-				}	
+				draw.drawShape(region);
 			}
 		}
 

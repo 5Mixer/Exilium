@@ -20,8 +20,8 @@ class TilemapRenderer extends System {
 
 			var camtiley:Int = cast Math.max(Math.floor((camera.pos.y)/8),0);
 			var camtilex:Int = cast Math.max(Math.floor((camera.pos.x)/8),0);
-			var windoww = Math.ceil(((kha.System.windowWidth()+8*4)/8)/8);
-			var windowh = Math.ceil(((kha.System.windowHeight()+8*4)/8)/8);
+			var windoww = Math.ceil(((kha.System.windowWidth()+8*8)/8)/8);
+			var windowh = Math.ceil(((kha.System.windowHeight()+8*8)/8)/8);
 
 			for (y in camtiley ... cast Math.min(camtiley+windowh,map.height)){
 				for (x in camtilex ... cast Math.min(camtilex+windoww,map.width)){

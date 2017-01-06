@@ -9,14 +9,12 @@ class Gun extends System {
 	var frame = 0;
 	var input:Input;
 	var camera:Camera;
-	var lights:Array<Level.Light>;
 	var view:eskimo.views.View;
 	var entities:eskimo.EntityManager;
 
-	override public function new (input:Input,camera:Camera,lights:Array<Level.Light>,entities:eskimo.EntityManager){
+	override public function new (input:Input,camera:Camera,entities:eskimo.EntityManager){
 		this.input = input;
 		this.camera = camera;
-		this.lights = lights;
 		this.entities = entities;
 		view = new eskimo.views.View(new eskimo.filters.Filter([component.Gun,component.Transformation]),entities);
 		super();
@@ -67,7 +65,7 @@ class Gun extends System {
 	public function shoot (parent:eskimo.Entity,angle){
 
 		
-		kha.audio1.Audio.play(kha.Assets.sounds.RapidFire);
+		//kha.audio1.Audio.play(kha.Assets.sounds.RapidFire);
 		
 		var l = { pos: parent.get(component.Transformation).pos.mult(1), radius: .6, colour: kha.Color.Red};
 	
@@ -89,8 +87,8 @@ class Gun extends System {
 		bullet.set(new component.Light());
 		bullet.get(component.Light).colour = kha.Color.Red;
 		bullet.get(component.Light).strength = .5;
-		bullet.set(new component.Collisions([component.Collisions.CollisionGroup.Friendly],[component.Collisions.CollisionGroup.Bullet]));
-		bullet.get(component.Collisions).registerCollisionRegion(new component.Collisions.RectangleCollisionShape(bullet.get(component.Transformation).pos,new kha.math.Vector2(8,8)));
+		bullet.set(new component.Collisions([component.Collisions.CollisionGroup.Bullet,component.Collisions.CollisionGroup.Friendly],[component.Collisions.CollisionGroup.Bullet,component.Collisions.CollisionGroup.Friendly]));
+		bullet.get(component.Collisions).registerCollisionRegion(differ.shapes.Polygon.rectangle(bullet.get(component.Transformation).pos.x,bullet.get(component.Transformation).pos.y,8,8,false));
 
 		var particle = entities.create();
 		particle.set(new component.VisualParticle(component.VisualParticle.Effect.Smoke));
@@ -110,7 +108,6 @@ class Gun extends System {
 		/*bullets.push(
 			new Bullet(parent,cast(parent.components.get("transformation"),component.Transformation).pos.mult(1),entities,angle,
 			function (entity:Bullet){
-				lights.remove(entity.light);
 				bullets.remove(entity);
 				
 				particles.push(
@@ -127,9 +124,6 @@ class Gun extends System {
 			)
 		);*/
 
-		
-
-		//lights.push(l);
 	
 	}
 }

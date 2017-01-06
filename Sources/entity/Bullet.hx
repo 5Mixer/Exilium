@@ -6,10 +6,9 @@ class Bullet extends Entity{
 	var sprite:Sprite;
 	var colliders:Array<Entity>;
 	var onDeath:Bullet->Void;
-	public var light:Level.Light;
 	var parent:Entity;
 
-	override public function new (parent:Entity,pos,colliders,angle,onDeath,l){
+	override public function new (parent:Entity,pos,colliders,angle,onDeath){
 		super();
 		this.onDeath = onDeath;
 		this.angle = angle;
@@ -18,7 +17,6 @@ class Bullet extends Entity{
 		this.parent = parent;
 		sprite = new Sprite(kha.Assets.images.Entities,1);
 		sprite.angle = angle;
-		light = l;
 	}
 	override public function draw (g){
 		super.draw(g);
@@ -30,7 +28,7 @@ class Bullet extends Entity{
 		pos.x += Math.cos(angle * (Math.PI / 180)) * speed;
 		pos.y += Math.sin(angle * (Math.PI / 180)) * speed;
 
-		for (entity in colliders){
+		/*for (entity in colliders){
 			if (entity == parent) continue;
 			if (entity.components.has("collider")){
 				if (cast (entity.components.components.get("collider"),component.Collisions).doesShapeCollide(this)){
@@ -41,5 +39,6 @@ class Bullet extends Entity{
 			}
 		}
 		light.pos = pos.div(8);
+		*/
 	}
 }

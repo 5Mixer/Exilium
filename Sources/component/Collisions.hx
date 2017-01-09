@@ -16,6 +16,7 @@ class Collisions extends Component{
 	var ignoreGroups = new Array<CollisionGroup>();//Will ignore collisions with entities having, at minimum, ALL these fields.
 	var collisionGroups = new Array<CollisionGroup>(); //Groups that this entity resides in. Could be multiple.
 	public var lockShapesToEntityTransform = true;
+	var overlaps:differ.Collision.Results<differ.data.ShapeCollision>;
 
 	override public function new (?collisionGroups:Array<CollisionGroup>,?ignoreCollisionGroups:Array<CollisionGroup>) {
 		collisionRegions = new Array<Shape>();
@@ -50,18 +51,22 @@ class Collisions extends Component{
 		//This loops through all the tiles in a map.
 		//If we find a collision, a return, we haven't tried following tiles.
 		//We might have tried a tile which isn't being entered, just intersecting on the edge.
-		var overlaps = new Array<differ.data.ShapeCollision>();
+		//var overlaps = new Array<differ.data.ShapeCollision>();
+		overlaps = new differ.Collision.Results<differ.data.ShapeCollision>(collisionRegions.length + other.collisionGroups.length);
 		for (shape in collisionRegions){
 			for (otherShape in other.collisionRegions){
-				var c = differ.Collision.shapeWithShape(shape,otherShape);
-				if (c != null && (c.separationX != 0 || c.separationY != 0) && (c.otherOverlap>0 || c.overlap>0)){
-					overlaps.push(c);
+				if (Math.abs(shape.position.x-otherShape.position.x) < 16 &&
+					Math.abs(shape.position.y-otherShape.position.y) < 16){
+
+					overlaps.push(differ.Collision.shapeWithShape(shape,otherShape));
 				}
+				//if (shape.position.subtract(otherShape.position).length > 32) continue;
+				//var c = differ.Collision.shapeWithShape(shape,otherShape);
+				//if (c != null && (c.separationX != 0 || c.separationY != 0) && (c.otherOverlap>0 || c.overlap>0)){
+				//	overlaps.push(c);
+				//}
 			}
 		}
-		if (overlaps.length != 0)
-			return overlaps;
-		
-		return null;
+		return overlaps;
 	}
 }

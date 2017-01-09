@@ -35,21 +35,17 @@ class Physics extends System {
 			
 				for (otherCollider in colliders.entities){
 					if (otherCollider == entity) continue;
+					
 					var c = otherCollider.get(component.Collisions).getCollisionWithCollider(collider);
 					if (c != null && c.length != 0){
-						//trace(c.length)
 						for (correction in c){
-							//trace('Seperation x: ${correction.separationX}, seperation y: ${correction.separationY}');
-								
-							//transformation.pos.x -= physics.velocity.x;
-							//transformation.pos.y -= physics.velocity.y;
-							transformation.pos.x -= correction.separationX;
+							if (correction != null){
+								transformation.pos.x -= correction.separationX;
 
-							if (correction.separationX != 0) break;
+								if (correction.separationX != 0) break;
 
-							//physics.velocity = physics.velocity.mult(0);
-							//break;
-							
+							}
+	
 						}
 					}
 				}
@@ -67,19 +63,12 @@ class Physics extends System {
 					if (otherCollider == entity) continue;
 					var c = otherCollider.get(component.Collisions).getCollisionWithCollider(collider);
 					if (c != null && c.length != 0){
-						//trace(c.length)
+						
 						for (correction in c){
-							//trace('Seperation x: ${correction.separationX}, seperation y: ${correction.separationY}');
-								
-							//transformation.pos.x -= physics.velocity.x;
-							//transformation.pos.y -= physics.velocity.y;
-							transformation.pos.y -= correction.separationY;
-							if (correction.separationY != 0) break;
-							//break;
-
-							//physics.velocity = physics.velocity.mult(0);
-							//break;
-							
+							if (correction != null){
+								transformation.pos.y -= correction.separationY;
+								if (correction.separationY != 0) break;
+							}
 						}
 					
 					}

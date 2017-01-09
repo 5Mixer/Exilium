@@ -87,7 +87,7 @@ class Project {
 
 		//entities.push(player);
 
-		for (i in 0...70){
+		/*for (i in 0...70){
 			var x = 20+Math.floor(Math.random()*80);
 			var y = 20+Math.floor(Math.random()*80);
 			//if (map.get(component.Tilemap).getTile(x,y) == 0) continue;
@@ -99,7 +99,7 @@ class Project {
 			b.position.x = skelly.get(component.Transformation).pos.x;
 			skelly.get(component.Collisions).registerCollisionRegion(b);
 			//entities.push(skelly);
-		}
+		}*/
 		
 
 		lastTime = Scheduler.time();

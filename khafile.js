@@ -3,6 +3,7 @@ project.addAssets('Assets/**');
 project.addSources('Sources');
 project.addLibrary("eskimo");
 project.addLibrary("differ");
+project.addLibrary("zui");
 // project.addLibrary('hxtelemetry');
 // project.addCDefine('HXCPP_TELEMETRY');
 // project.addCDefine('HXCPP_STACK_TRACE');

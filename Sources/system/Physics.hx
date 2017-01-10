@@ -32,6 +32,8 @@ class Physics extends System {
 						shape.position = new differ.math.Vector(transformation.pos.x,transformation.pos.y);
 					}
 				}
+
+				var collision = false;
 			
 				for (otherCollider in colliders.entities){
 					if (otherCollider == entity) continue;
@@ -42,7 +44,10 @@ class Physics extends System {
 							if (correction != null){
 								transformation.pos.x -= correction.separationX;
 
-								if (correction.separationX != 0) break;
+								if (correction.separationX != 0){
+									if (!collision) collision = true;
+									break;
+								}
 
 							}
 	
@@ -67,10 +72,19 @@ class Physics extends System {
 						for (correction in c){
 							if (correction != null){
 								transformation.pos.y -= correction.separationY;
-								if (correction.separationY != 0) break;
+								if (correction.separationY != 0){
+									if (!collision) collision = true;
+									break;
+								}
 							}
 						}
 					
+					}
+				}
+
+				if (collision){
+					if (entity.has(component.DieOnCollision)){
+						entity.destroy();
 					}
 				}
 			

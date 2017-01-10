@@ -2,7 +2,8 @@ package;
 
 import kha.Framebuffer;
 import kha.Scheduler;
-
+import zui.Zui;
+import zui.Id;
 //import entity.Player;
 
 class Project {
@@ -21,10 +22,16 @@ class Project {
 	var p:eskimo.Entity;
 
 	var renderview:eskimo.views.View;
+	
+	var ui:Zui;
 
 	public function new() {
 		kha.System.notifyOnRender(render);
 		Scheduler.addTimeTask(update, 0, 1 / 60);
+
+		kha.SystemImpl.requestFullscreen();
+
+		ui = new Zui(kha.Assets.fonts.OpenSans, 17, 16, 0, 1.5);
 
 		var components = new eskimo.ComponentManager();
 		entities = new eskimo.EntityManager(components);
@@ -43,15 +50,15 @@ class Project {
 		var dbsys = new system.CollisionDebugView(entities);
 		//renderSystems.push(dbsys);
 		//systems.add(dbsys);
+		var renderer = new system.Renderer(entities);
+		renderSystems.push(renderer);
+		systems.add(renderer);
 
-		systems.add(new system.Renderer());
 		systems.add(new system.KeyMovement(input,entities));
 		systems.add(new system.Physics(entities));
 		systems.add(new system.TimedLife(entities));
 		systems.add(new system.Gun(input,camera,entities));
 		
-		renderview = new eskimo.views.View(new eskimo.filters.Filter([component.Sprite,component.Transformation]), entities);
-
 		var map = entities.create();
 		map.set(new component.Transformation(new kha.math.Vector2()));
 		map.set(new component.Tilemap());
@@ -134,30 +141,24 @@ class Project {
 		for (system in renderSystems)
 			system.render(g);
 
-		for (entity in renderview.entities){
-			
-
-			var sprite:component.Sprite = entity.get(component.Sprite);
-			var transformation:component.Transformation = entity.get(component.Transformation);
-
-			var originX = 4;
-			var originY = 4;
-			var x = transformation.pos.x;
-			var y = transformation.pos.y;
-			var angle = transformation.angle;
-
-			g.pushTransformation(g.transformation.multmat(kha.math.FastMatrix3.translation(x + originX, y + originY)).multmat(kha.math.FastMatrix3.rotation(angle*(Math.PI / 180))).multmat(kha.math.FastMatrix3.translation(-x - originX, -y - originY)));
-					
-			g.drawScaledSubImage(sprite.spriteMap,Math.floor((sprite.textureId%8)*8),Math.floor(Math.floor(sprite.textureId/8)*8),8,8,x,y,8,8);
-			
-			g.popTransformation();
-		}
-
+	
 		camera.restore(g);
+		
 
 		//Draw mouse cursor.
 		g.drawSubImage(kha.Assets.images.Entities,input.mousePos.x/8 -4,input.mousePos.y/8 -4,2*8,0,8,8);
 
 		g.end();
+
+		//Clear any transformation for the UI.
+		g.transformation = kha.math.FastMatrix3.identity();
+
+		/*ui.begin(g);
+        if (ui.window(Id.window(), 0, 0, 100, 100, Zui.LAYOUT_VERTICAL)) {
+            if (ui.button("Hello")) {
+                trace("World");
+            }
+        }
+        ui.end();*/
 	}
 }

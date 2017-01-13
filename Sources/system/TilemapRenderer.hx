@@ -41,14 +41,14 @@ class TilemapRenderer extends System {
 						//Can a path to the light be drawn from this tile without hitting an occluder?
 						for (ox in -1...1){
 							for (oy in -1...1){
-							if (map.tileInfo.get(map.get(x,y)).collide || !map.raycast(g,Math.floor((lightTransform.pos.x)/8 +ox),Math.floor((lightTransform.pos.y)/8 +oy),x,y)){
-								var lx = lightTransform.pos.x/8;
-								var ly = lightTransform.pos.y/8;
-								var l =	Math.sqrt(((x - lx) * (x - lx)) + ((y - ly) * (y - ly))); //Distance to light.
-								l = Math.max(Math.min(light.strength/l,1),0)/4; //This is the lights effect, kept in range.
+								if (map.tileInfo.get(map.get(x,y)).collide || !map.raycast(g,Math.floor((lightTransform.pos.x)/8 +ox),Math.floor((lightTransform.pos.y)/8 +oy),x,y)){
+									var lx = lightTransform.pos.x/8;
+									var ly = lightTransform.pos.y/8;
+									var l =	Math.sqrt(((x - lx) * (x - lx)) + ((y - ly) * (y - ly))); //Distance to light.
+									l = Math.max(Math.min(light.strength/l,1),0)/4; //This is the lights effect, kept in range.
 
-								colours.push(kha.Color.fromFloats(light.colour.R*l,light.colour.G*l,light.colour.B*l,1)); //Add to colours
-							}
+									colours.push(kha.Color.fromFloats(light.colour.R*l,light.colour.G*l,light.colour.B*l,1)); //Add to colours
+								}
 							}	
 						}
 						

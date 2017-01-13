@@ -13,8 +13,8 @@ enum CollisionGroup {
 class Collisions extends Component{
 	public var collisionRegions:Array<Shape>;
 	
-	var ignoreGroups = new Array<CollisionGroup>();//Will ignore collisions with entities having, at minimum, ALL these fields.
-	var collisionGroups = new Array<CollisionGroup>(); //Groups that this entity resides in. Could be multiple.
+	public var ignoreGroups = new Array<CollisionGroup>();//Will ignore collisions with entities having, at minimum, ALL these fields.
+	public var collisionGroups = new Array<CollisionGroup>(); //Groups that this entity resides in. Could be multiple.
 	public var lockShapesToEntityTransform = true;
 	var overlaps:differ.Collision.Results<differ.data.ShapeCollision>;
 
@@ -33,6 +33,11 @@ class Collisions extends Component{
 		collisionRegions.push(collisionShape);
 		return this;
 	}
+	public function shapeToAABB(shape:Shape){
+		if (Std.is(shape,differ.shapes.Polygon)){
+			var polygon:differ.shapes.Polygon = cast shape;
+		}
+	}
 	public function getCollisionWithCollider(other:Collisions){
 		
 		var validCollision = false;
@@ -40,6 +45,14 @@ class Collisions extends Component{
 			if (collisionGroups.indexOf(othersIgnore) == -1){
 				//The other entity is not ignoring one of our groups, this is a valid collision.
 				validCollision = true;
+			}
+		}
+		if (validCollision == true){
+			for (ignore in ignoreGroups){
+				if (other.collisionGroups.indexOf(ignore) == -1){
+					//The other entity is not ignoring one of our groups, this is a valid collision.
+					validCollision = true;
+				}
 			}
 		}
 		if (!validCollision)

@@ -9,37 +9,44 @@ typedef Tile = {
 	var id:Int;
 }
 
+
 class Tilemap extends Component{
 	public var tiles = new Array<Int>();
 	public var tileInfo:Map<Int,Tile> = [
-		0 => { name: "ground", collide: true, id: 0, ambient: kha.Color.fromFloats(.1,.1,.1), specularity: 1.3},
-		1 => { name: "wall1", collide: false, id: 1},
-		2 => { name: "wall2", collide: false, id: 2},
-		3 => { name: "wall3", collide: false, id: 3},
+		0 => { name: "empty", collide: false, id: 0},
+		1 => { name: "floor", collide: false, id: 1},
+		2 => { name: "dungeonwall", collide: true, id: 2, ambient: kha.Color.fromFloats(.1,.1,.1), specularity: 1.3},
+		3 => { name: "door", collide: false, id: 3},
 		4 => { name: "wall4", collide: false, id: 4},
 		5 => { name: "wall3", collide: false, id: 5}
 	];
 	public var width:Int;
 	public var height:Int;
+	public var treasure = new Array<{x:Int, y:Int}>();
 
 	override public function new () {
+		super();
+	}
+	inline public function get(x,y){
+		return tiles[y*width+x];
+	}
+	inline public function set(x:Int,y:Int,i:Int){
+		tiles[y*width+x] = i;
+	}
+
+	public function loadFromTiled (){
 		var data = haxe.xml.Parser.parse(kha.Assets.blobs.level1_tmx.toString());
 		var map = data.elementsNamed("map").next();
 		width = Std.parseInt(map.get("width"));
 		height = Std.parseInt(map.get("height"));
-		var layers = map.elementsNamed("layer");
 
-		for (layer in layers){
+		for (layer in map.elementsNamed("layer")){
 			tiles = [];
 			var i = 0;
 			var layerTiles = layer.elementsNamed("data").next().elements();
 			for (tile in layerTiles){
 				var t = Std.parseInt(tile.get("gid"))-1;
 				tiles.push(t);
-				
-				//if (tileInfo.get(t).collide){
-				//	c.registerCollisionRegion(new component.Collisions.RectangleCollisionShape(new kha.math.Vector2((i%width)*8,Math.floor(i/width)*8),new kha.math.Vector2(8,8)));
-				//}
 
 				i++;
 			}
@@ -49,10 +56,6 @@ class Tilemap extends Component{
 			throw "Odd level data - More tiles than width*height";
 		}
 
-		super();
-	}
-	inline public function get(x,y){
-		return tiles[y*width+x];
 	}
 	public function raycast (g:kha.graphics2.Graphics,x0:Int,y0:Int,x1:Int,y1:Int){
 		g.color = kha.Color.Cyan;

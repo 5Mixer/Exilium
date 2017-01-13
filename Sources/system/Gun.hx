@@ -83,11 +83,11 @@ class Gun extends System {
 		bullet.set(new component.Sprite(1));
 
 		bullet.set(new component.TimedLife(3));
-		bullet.set(new component.DieOnCollision());
+		bullet.set(new component.DieOnCollision([component.Collisions.CollisionGroup.Enemy,component.Collisions.CollisionGroup.Level]));
 		
 		bullet.set(new component.Light());
 		bullet.get(component.Light).colour = kha.Color.Red;
-		bullet.get(component.Light).strength = 1.5;
+		bullet.get(component.Light).strength = .9;
 		bullet.set(new component.Collisions([component.Collisions.CollisionGroup.Bullet,component.Collisions.CollisionGroup.Friendly],[component.Collisions.CollisionGroup.Bullet,component.Collisions.CollisionGroup.Friendly]));
 		bullet.get(component.Collisions).registerCollisionRegion(differ.shapes.Polygon.rectangle(bullet.get(component.Transformation).pos.x,bullet.get(component.Transformation).pos.y,8,8,false));
 

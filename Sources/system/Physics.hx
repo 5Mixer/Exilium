@@ -37,11 +37,21 @@ class Physics extends System {
 			
 				for (otherCollider in colliders.entities){
 					if (otherCollider == entity) continue;
+
+					
 					
 					var c = otherCollider.get(component.Collisions).getCollisionWithCollider(collider);
 					if (c != null && c.length != 0){
 						for (correction in c){
 							if (correction != null){
+								
+								if (otherCollider.has(component.DieOnCollision))
+									for (groupThatKills in otherCollider.get(component.DieOnCollision).collisionGroups)
+										if (collider.collisionGroups.indexOf(groupThatKills) != -1)
+											otherCollider.destroy();
+										
+									
+
 								transformation.pos.x -= correction.separationX;
 
 								if (correction.separationX != 0){
@@ -50,7 +60,6 @@ class Physics extends System {
 								}
 
 							}
-	
 						}
 					}
 				}
@@ -66,11 +75,21 @@ class Physics extends System {
 			
 				for (otherCollider in colliders.entities){
 					if (otherCollider == entity) continue;
+
+				
+
 					var c = otherCollider.get(component.Collisions).getCollisionWithCollider(collider);
+					
 					if (c != null && c.length != 0){
 						
 						for (correction in c){
 							if (correction != null){
+
+								if (otherCollider.has(component.DieOnCollision))
+									for (groupThatKills in otherCollider.get(component.DieOnCollision).collisionGroups)
+										if (collider.collisionGroups.indexOf(groupThatKills) != -1)
+											otherCollider.destroy();
+
 								transformation.pos.y -= correction.separationY;
 								if (correction.separationY != 0){
 									if (!collision) collision = true;
@@ -82,9 +101,16 @@ class Physics extends System {
 					}
 				}
 
+				if (collider.lockShapesToEntityTransform){
+					for (shape in collider.collisionRegions){
+						shape.position = new differ.math.Vector(transformation.pos.x,transformation.pos.y);
+					}
+				}
+
 				if (collision){
 					if (entity.has(component.DieOnCollision)){
 						entity.destroy();
+						trace("Destroyed entity because of collision "+Math.floor(Math.random()*999));
 					}
 				}
 			

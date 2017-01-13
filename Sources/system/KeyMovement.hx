@@ -18,10 +18,10 @@ class KeyMovement extends System {
 
 			var speed = keymovement.speed;
 
-			if (input.left && physics.velocity.x > -speed) physics.velocity.x -= speed;
-			if (input.right && physics.velocity.x < speed) physics.velocity.x += speed;
-			if (input.up && physics.velocity.y > -speed) physics.velocity.y -= speed;
-			if (input.down && physics.velocity.y < speed) physics.velocity.y += speed;
+			if (input.left) physics.velocity.x = -speed;
+			if (input.right) physics.velocity.x = speed;
+			if (input.up) physics.velocity.y = -speed;
+			if (input.down) physics.velocity.y = speed;
 
 		}
 	}

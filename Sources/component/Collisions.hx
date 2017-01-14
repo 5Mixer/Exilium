@@ -49,9 +49,9 @@ class Collisions extends Component{
 		}
 		if (validCollision == true){
 			for (ignore in ignoreGroups){
-				if (other.collisionGroups.indexOf(ignore) == -1){
+				if (other.collisionGroups.indexOf(ignore) != -1){
 					//The other entity is not ignoring one of our groups, this is a valid collision.
-					validCollision = true;
+					validCollision = false;
 				}
 			}
 		}

@@ -48,7 +48,7 @@ class Project {
 		renderSystems.push(prsys);
 		systems.add(prsys);
 		var dbsys = new system.CollisionDebugView(entities);
-		renderSystems.push(dbsys);
+		//renderSystems.push(dbsys);
 		systems.add(dbsys);
 		var renderer = new system.Renderer(entities);
 		renderSystems.push(renderer);
@@ -78,18 +78,18 @@ class Project {
 		for (tile in generator.tiles){
 			if (map.get(component.Tilemap).tileInfo.get(tile).collide){
 				map.get(component.Collisions).registerCollisionRegion(differ.shapes.Polygon.rectangle(
-					t%map.get(component.Tilemap).width*8,Math.floor(t/map.get(component.Tilemap).width)*8,
-					8,8,false));
+					t%map.get(component.Tilemap).width*16,Math.floor(t/map.get(component.Tilemap).width)*16,
+					16,16,false));
 			}
 			t++;
 		}
 		for (t in generator.treasure){
 			var treasure = entities.create();
-			treasure.set(new component.Transformation(new kha.math.Vector2(t.x*8,t.y*8)));
+			treasure.set(new component.Transformation(new kha.math.Vector2(t.x*16,t.y*16)));
 			//treasure.set(new component.Physics());
 			treasure.set(new component.Sprite(4));
 			treasure.set(new component.Collisions([component.Collisions.CollisionGroup.Level],[component.Collisions.CollisionGroup.Level]));
-			treasure.get(component.Collisions).registerCollisionRegion(differ.shapes.Polygon.rectangle(treasure.get(component.Transformation).pos.x,treasure.get(component.Transformation).pos.y,8,8,false));
+			treasure.get(component.Collisions).registerCollisionRegion(differ.shapes.Polygon.rectangle(treasure.get(component.Transformation).pos.x,treasure.get(component.Transformation).pos.y,16,16,false));
 			treasure.set(new component.DieOnCollision([component.Collisions.CollisionGroup.Bullet]));
 			
 			//treasure.set(new component.Light());
@@ -99,10 +99,11 @@ class Project {
 		for (e in generator.enemies){
 			//if (map.get(component.Tilemap).getTile(x,y) == 0) continue;
 			var skelly = entities.create();
-			skelly.set(new component.Transformation(new kha.math.Vector2(e.x*8,e.y*8)));
-			skelly.set(new component.Sprite(3));
+			skelly.set(new component.Transformation(new kha.math.Vector2(e.x*16,e.y*16)));
+			skelly.set(new component.Sprite(5));
+			skelly.set(new component.DieOnCollision([component.Collisions.CollisionGroup.Bullet]));
 			skelly.set(new component.Collisions([component.Collisions.CollisionGroup.Enemy]));
-			var b = differ.shapes.Polygon.rectangle(skelly.get(component.Transformation).pos.x,skelly.get(component.Transformation).pos.y,8,8,false);
+			var b = differ.shapes.Polygon.rectangle(skelly.get(component.Transformation).pos.x,skelly.get(component.Transformation).pos.y,16,16,false);
 			skelly.get(component.Collisions).registerCollisionRegion(b);
 		}
 
@@ -110,20 +111,20 @@ class Project {
 
 		p = entities.create();
 		
-		p.set(new component.Transformation(new kha.math.Vector2(31*8,31*8)));
+		p.set(new component.Transformation(new kha.math.Vector2(31*16,31*16)));
 		p.set(new component.Sprite(0));
 		p.set(new component.KeyMovement());
 		p.set(new component.Physics());
 		p.set(new component.Gun());
-		p.set(new component.Collisions([component.Collisions.CollisionGroup.Friendly],[component.Collisions.CollisionGroup.Friendly]));
-		p.get(component.Collisions).registerCollisionRegion(differ.shapes.Polygon.rectangle(p.get(component.Transformation).pos.x,p.get(component.Transformation).pos.y,8,8,false));
+		p.set(new component.Collisions([component.Collisions.CollisionGroup.Friendly],[component.Collisions.CollisionGroup.Friendly,component.Collisions.CollisionGroup.Bullet]));
+		p.get(component.Collisions).registerCollisionRegion(differ.shapes.Polygon.rectangle(p.get(component.Transformation).pos.x,p.get(component.Transformation).pos.y,16,16,false));
 		p.set(new component.Light());
 		
-		p.get(component.Light).colour = kha.Color.fromBytes(130,240,140);//kha.Color.Green;
-		p.get(component.Light).strength = 1.4;
+		p.get(component.Light).colour = kha.Color.fromBytes(255,200,200);//kha.Color.Green;
+		p.get(component.Light).strength = 1.5;
 
 		input.onRUp = function (){
-			p.get(component.Transformation).pos = new kha.math.Vector2(31*8,31*8);
+			p.get(component.Transformation).pos = new kha.math.Vector2(31*16,31*16);
 			
 		}
 
@@ -168,7 +169,7 @@ class Project {
 		
 
 		//Draw mouse cursor.
-		g.drawSubImage(kha.Assets.images.Entities,input.mousePos.x/8 -4,input.mousePos.y/8 -4,2*8,0,8,8);
+		g.drawSubImage(kha.Assets.images.Entities,input.mousePos.x/4 -4,input.mousePos.y/4 -4,2*16,0,16,16);
 
 		g.end();
 

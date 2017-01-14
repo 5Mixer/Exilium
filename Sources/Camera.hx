@@ -4,8 +4,8 @@ class Camera {
 	public var rotation = 0;
 	public var pos:kha.math.Vector2;
 	public var offset:kha.math.Vector2; //For screenshake etc.
-	public var offsetRestore:Float = .2; //Smaller is faster.
-	public var scale = {x : 8.0, y : 8.0};
+	public var offsetRestore:Float = .4; //Smaller is faster.
+	public var scale = {x : 4.0, y : 4.0};
 	public function new (){
 		pos = new kha.math.Vector2(-kha.System.windowWidth()/2,-kha.System.windowHeight()/2);
 		offset = new kha.math.Vector2();
@@ -36,10 +36,10 @@ class Camera {
 				point.x > kha.System.windowWidth() || point.y > kha.System.windowHeight());
 	}
 	public function worldToScreen(world:kha.math.Vector2){
-		return new kha.math.Vector2(world.x*8-pos.x*8,world.y*8-pos.y*8);
+		return new kha.math.Vector2(world.x*4-pos.x*4,world.y*4-pos.y*4);
 	}
 	//Remember, this might screw up if called inside camera.transform and restore.
 	public function screenToWorld (screen:kha.math.Vector2){
-		return new kha.math.Vector2(pos.x+(screen.x/8),pos.y+(screen.y/8));
+		return new kha.math.Vector2(pos.x+(screen.x/4),pos.y+(screen.y/4));
 	}
 }

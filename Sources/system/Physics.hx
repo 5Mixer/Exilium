@@ -34,6 +34,7 @@ class Physics extends System {
 				}
 
 				var collision = false;
+				var thingThatCollided:eskimo.Entity = null;
 			
 				for (otherCollider in colliders.entities){
 					if (otherCollider == entity) continue;
@@ -50,7 +51,7 @@ class Physics extends System {
 										if (collider.collisionGroups.indexOf(groupThatKills) != -1)
 											otherCollider.destroy();
 										
-									
+								thingThatCollided = otherCollider;
 
 								transformation.pos.x -= correction.separationX;
 
@@ -90,6 +91,8 @@ class Physics extends System {
 										if (collider.collisionGroups.indexOf(groupThatKills) != -1)
 											otherCollider.destroy();
 
+								thingThatCollided = otherCollider;
+
 								transformation.pos.y -= correction.separationY;
 								if (correction.separationY != 0){
 									if (!collision) collision = true;
@@ -110,7 +113,6 @@ class Physics extends System {
 				if (collision){
 					if (entity.has(component.DieOnCollision)){
 						entity.destroy();
-						trace("Destroyed entity because of collision "+Math.floor(Math.random()*999));
 					}
 				}
 			

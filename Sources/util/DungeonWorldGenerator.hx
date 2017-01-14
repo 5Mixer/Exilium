@@ -56,7 +56,7 @@ class DungeonWorldGenerator {
 		var thing = {x:room.x+Math.floor(room.width/2),y:room.y+Math.floor(room.height/2)};
 		treasure.push(thing);
 
-		var enemy = {x: room.x+1+Math.floor(Math.random()*(room.width-1)),y: room.y+1+Math.floor(Math.random()*(room.height-1))};
+		var enemy = {x: room.x+2+Math.floor(Math.random()*(room.width-4)),y: room.y+2+Math.floor(Math.random()*(room.height-4))};
 		if (thing.x != enemy.x && thing.y != enemy.y)
 			enemies.push(enemy);
 	}
@@ -134,14 +134,21 @@ class DungeonWorldGenerator {
 					if (get (room.x+x,room.y+y) != 0) continue;
 					set(room.x+x,room.y+y,1);
 
-					if (x==0 || y==0 || x==room.width-1 || y==room.height-1)
-						set(room.x+x,room.y+y,2);					
+					if ((x==0 || x==room.width-1))
+						set(room.x+x,room.y+y,4);
+
+					if ((y==0  || y==room.height-1))
+						set(room.x+x,room.y+y,3);
+
+					//Corner tiles.
+					if ((x==0 || x==room.width-1) && (y==0  || y==room.height-1))
+						set(room.x+x,room.y+y,2);
 				}
 			}
 		}
 		for (room in rooms){
 			for (door in room.doorways){
-				set(door.x,door.y,3);
+				set(door.x,door.y,5);
 			}
 		}
 	}

@@ -5,6 +5,7 @@ import kha.math.FastMatrix3;
 class Sprite {
 	var tileset:kha.Image;
 	var id:Int;
+	var tilesize = 16;
 	public var angle:Int;
 	public function new (tileset:kha.Image,id:Int){
 		this.tileset = tileset;
@@ -19,7 +20,7 @@ class Sprite {
 		//g.rotate(angle / (Math.PI / 180),x+4,y+4);
 
 		
-		g.drawScaledSubImage(this.tileset,Math.floor((id%8)*8),Math.floor(Math.floor(id/8)*8),8,8,x,y,8,8);
+		g.drawScaledSubImage(this.tileset,Math.floor((id%tilesize)*tilesize),Math.floor(Math.floor(id/tilesize)*tilesize),tilesize,tilesize,x,y,tilesize,tilesize);
 		
 		g.popTransformation();
 		

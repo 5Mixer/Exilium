@@ -13,7 +13,7 @@ class Skeleton extends SubEntity {
 		super(onDeath);
 
 		this.pos = pos;
-		size = new Vector2(8,8);
+		size = new Vector2(16,16);
 		velocity = new Vector2(0,0);
 		sprite = new Sprite(kha.Assets.images.Entities,3);
 		

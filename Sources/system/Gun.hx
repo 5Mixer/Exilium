@@ -65,7 +65,7 @@ class Gun extends System {
 	public function shoot (parent:eskimo.Entity,angle){
 
 		
-		//kha.audio1.Audio.play(kha.Assets.sounds.RapidFire);
+		kha.audio1.Audio.play(kha.Assets.sounds.RapidFire);
 		
 		var l = { pos: parent.get(component.Transformation).pos.mult(1), radius: .6, colour: kha.Color.Red};
 	
@@ -76,7 +76,7 @@ class Gun extends System {
 		bullet.set(t);
 		
 		var p = new component.Physics();
-		var speed = 4;
+		var speed = 8;
 		p.friction = 0.999;
 		p.velocity = new kha.math.Vector2(Math.cos(angle * (Math.PI / 180)) * speed,Math.sin(angle * (Math.PI / 180)) * speed);
 		bullet.set(p);
@@ -89,17 +89,17 @@ class Gun extends System {
 		bullet.get(component.Light).colour = kha.Color.Red;
 		bullet.get(component.Light).strength = .9;
 		bullet.set(new component.Collisions([component.Collisions.CollisionGroup.Bullet,component.Collisions.CollisionGroup.Friendly],[component.Collisions.CollisionGroup.Bullet,component.Collisions.CollisionGroup.Friendly]));
-		bullet.get(component.Collisions).registerCollisionRegion(differ.shapes.Polygon.rectangle(bullet.get(component.Transformation).pos.x,bullet.get(component.Transformation).pos.y,8,8,false));
+		bullet.get(component.Collisions).registerCollisionRegion(differ.shapes.Polygon.rectangle(bullet.get(component.Transformation).pos.x,bullet.get(component.Transformation).pos.y,16,16,false));
 
 		var particle = entities.create();
 		particle.set(new component.VisualParticle(component.VisualParticle.Effect.Smoke));
 		
 
-		var t = new component.Transformation(parent.get(component.Transformation).pos.add(new kha.math.Vector2(4,4)));
+		var t = new component.Transformation(parent.get(component.Transformation).pos.add(new kha.math.Vector2(8,8)));
 		t.angle = angle;
 		particle.set(t);
 		var phys = new component.Physics();
-		var speed = 4;
+		var speed = 8;
 		phys.friction = 0.8;
 		var particleAngle = angle - 6 + Math.random()*12;
 		phys.velocity = new kha.math.Vector2(Math.cos(particleAngle * (Math.PI / 180)) * speed,Math.sin(particleAngle * (Math.PI / 180)) * speed);		

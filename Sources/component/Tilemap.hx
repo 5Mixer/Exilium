@@ -16,9 +16,9 @@ class Tilemap extends Component{
 		0 => { name: "empty", collide: false, id: 0},
 		1 => { name: "floor", collide: false, id: 1},
 		2 => { name: "dungeonwall", collide: true, id: 2, ambient: kha.Color.fromFloats(.1,.1,.1), specularity: 1.3},
-		3 => { name: "door", collide: false, id: 3},
-		4 => { name: "wall4", collide: false, id: 4},
-		5 => { name: "wall3", collide: false, id: 5}
+		3 => { name: "dungeonwall.h", collide: false, id: 3},
+		4 => { name: "dungeonwall.v", collide: false, id: 4},
+		5 => { name: "gate", collide: false, id: 5}
 	];
 	public var width:Int;
 	public var height:Int;

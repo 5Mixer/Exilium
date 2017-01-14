@@ -5,6 +5,7 @@ class TilemapRenderer extends System {
 	
 	var lights:eskimo.views.View;
 	var camera:Camera;
+	var tilesize = 16;
 	public function new (camera:Camera,entities:eskimo.EntityManager){
 		super();
 		this.camera = camera;
@@ -19,10 +20,10 @@ class TilemapRenderer extends System {
 			var transform = entity.get(component.Transformation);
 			var map = entity.get(component.Tilemap);
 
-			var camtiley:Int = cast Math.max(Math.floor((camera.pos.y)/8),0);
-			var camtilex:Int = cast Math.max(Math.floor((camera.pos.x)/8),0);
-			var windoww = Math.ceil(((kha.System.windowWidth()+8*8)/8)/8);
-			var windowh = Math.ceil(((kha.System.windowHeight()+8*8)/8)/8);
+			var camtiley:Int = cast Math.max(Math.floor((camera.pos.y)/tilesize),0);
+			var camtilex:Int = cast Math.max(Math.floor((camera.pos.x)/tilesize),0);
+			var windoww = Math.ceil(kha.System.windowWidth()/(16*4));
+			var windowh = Math.ceil(kha.System.windowHeight()/(16*4));
 
 			for (y in camtiley ... cast Math.min(camtiley+windowh,map.height)){
 				for (x in camtilex ... cast Math.min(camtilex+windoww,map.width)){
@@ -41,9 +42,9 @@ class TilemapRenderer extends System {
 						//Can a path to the light be drawn from this tile without hitting an occluder?
 						for (ox in -1...1){
 							for (oy in -1...1){
-								if (map.tileInfo.get(map.get(x,y)).collide || !map.raycast(g,Math.floor((lightTransform.pos.x)/8 +ox),Math.floor((lightTransform.pos.y)/8 +oy),x,y)){
-									var lx = lightTransform.pos.x/8;
-									var ly = lightTransform.pos.y/8;
+								if (map.tileInfo.get(map.get(x,y)).collide || !map.raycast(g,Math.floor((lightTransform.pos.x)/tilesize +ox),Math.floor((lightTransform.pos.y)/tilesize +oy),x,y)){
+									var lx = lightTransform.pos.x/tilesize;
+									var ly = lightTransform.pos.y/tilesize;
 									var l =	Math.sqrt(((x - lx) * (x - lx)) + ((y - ly) * (y - ly))); //Distance to light.
 									l = Math.max(Math.min(light.strength/l,1),0)/4; //This is the lights effect, kept in range.
 
@@ -70,9 +71,9 @@ class TilemapRenderer extends System {
 					g.color = kha.Color.fromFloats(Math.min(c.r,1),Math.min(c.g,1),Math.min(c.b,1),1);
 					
 					
-					var sourcePos = { x: (tileData.id%map.width)*8, y:Math.floor(tileData.id/map.height)*8 };
+					var sourcePos = { x: (tileData.id%map.width)*tilesize, y:Math.floor(tileData.id/map.height)*tilesize };
 					
-					g.drawScaledSubImage(kha.Assets.images.Tileset,sourcePos.x,sourcePos.y,8,8,x*8,y*8,8,8);
+					g.drawScaledSubImage(kha.Assets.images.Tileset,sourcePos.x,sourcePos.y,tilesize,tilesize,x*tilesize,y*tilesize,tilesize,tilesize);
 
 				}
 			}

@@ -1,11 +1,6 @@
 package system;
 
-import entity.Bullet;
-import entity.Particle;
-
 class Gun extends System {
-	var bullets = new Array<Bullet>();
-	var particles = new Array<Particle>();
 	var frame = 0;
 	var input:Input;
 	var camera:Camera;
@@ -20,20 +15,9 @@ class Gun extends System {
 		super();
 	}
 
-	override public function render (g:kha.graphics2.Graphics){
-		super.render(g);
-
-		for (bullet in bullets) bullet.draw(g);
-		for (particle in particles) particle.draw(g);
-	}
-
 	override public function onUpdate (delta:Float){
 		super.onUpdate(delta);
 		frame++;
-
-		for (bullet in bullets) bullet.update(delta);
-		for (particle in particles) particle.update(delta);
-
 		
 		if (frame%6 == 0 && input.mouseButtons.left){
 			for (entity in view.entities){
@@ -104,27 +88,6 @@ class Gun extends System {
 		var particleAngle = angle - 6 + Math.random()*12;
 		phys.velocity = new kha.math.Vector2(Math.cos(particleAngle * (Math.PI / 180)) * speed,Math.sin(particleAngle * (Math.PI / 180)) * speed);		
 		particle.set(phys);
-		particle.set(new component.TimedLife(.2));
-
-		/*bullets.push(
-			new Bullet(parent,cast(parent.components.get("transformation"),component.Transformation).pos.mult(1),entities,angle,
-			function (entity:Bullet){
-				bullets.remove(entity);
-				
-				particles.push(
-					new Particle(entity,entity.pos,6+Math.round(Math.random()*4),Math.floor(entity.angle+180),
-								function (entity) { particles.remove(entity); }
-					)
-				);
-			},l)
-		);
-
-		particles.push(
-			new Particle(parent,(cast parent.components.get("transformation")).pos, 10+Math.round(Math.random()*5),angle,
-						function (entity) { particles.remove(entity); }
-			)
-		);*/
-
-	
+		particle.set(new component.TimedLife(.2));	
 	}
 }

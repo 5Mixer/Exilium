@@ -60,6 +60,7 @@ class Project {
 
 		systems.add(new system.KeyMovement(input,entities));
 		systems.add(new system.Physics(entities));
+		systems.add(new system.AI(entities));
 		systems.add(new system.TimedLife(entities));
 		systems.add(new system.Gun(input,camera,entities));
 		
@@ -101,6 +102,8 @@ class Project {
 			var skelly = entities.create();
 			skelly.set(new component.Transformation(new kha.math.Vector2(e.x*16,e.y*16)));
 			skelly.set(new component.Sprite(5));
+			//skelly.set(new component.Physics());
+			skelly.set(new component.AI());
 			skelly.set(new component.DieOnCollision([component.Collisions.CollisionGroup.Bullet]));
 			skelly.set(new component.Collisions([component.Collisions.CollisionGroup.Enemy]));
 			var b = differ.shapes.Polygon.rectangle(skelly.get(component.Transformation).pos.x,skelly.get(component.Transformation).pos.y,16,16,false);

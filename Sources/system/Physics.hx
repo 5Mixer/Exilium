@@ -37,9 +37,7 @@ class Physics extends System {
 				var thingThatCollided:eskimo.Entity = null;
 			
 				for (otherCollider in colliders.entities){
-					if (otherCollider == entity) continue;
-
-					
+					if (otherCollider == entity) continue;			
 					
 					var c = otherCollider.get(component.Collisions).getCollisionWithCollider(collider);
 					if (c != null && c.length != 0){

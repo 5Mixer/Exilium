@@ -10,6 +10,7 @@ class Main {
 			#if sys 
 			//	kha.Scheduler.addFrameTask(hxt.advance_frame.bind(null), 0);
 			#end
+
 			kha.Assets.loadEverything(function(){
 				new Project();
 			});

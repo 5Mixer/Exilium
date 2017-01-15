@@ -59,9 +59,9 @@ class Project {
 		haxe.Log.trace = debug.traceLog;
 
 		systems.add(new system.KeyMovement(input,entities));
-		systems.add(new system.Physics(entities));
 		systems.add(new system.AI(entities));
 		systems.add(new system.Collisions(entities));
+		systems.add(new system.Physics(entities,systems.get(system.Collisions).grid);
 		systems.add(new system.TimedLife(entities));
 		systems.add(new system.Gun(input,camera,entities));
 		

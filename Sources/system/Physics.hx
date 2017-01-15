@@ -5,14 +5,17 @@ import kha.math.Vector2;
 class Physics extends System {
 	var view:eskimo.views.View;
 	var colliders:eskimo.views.View;
-	public function new (entities:eskimo.EntityManager){
+	var grid:util.SpatialHash;
+	public function new (entities:eskimo.EntityManager,broadPhaseGrid:util.SpatialHash){
 		super();
+		grid = broadPhaseGrid;
 		view = new eskimo.views.View(new eskimo.filters.Filter([component.Transformation, component.Physics]),entities);
 		colliders = new eskimo.views.View(new eskimo.filters.Filter([component.Transformation, component.Collisions]),entities);
 	}
 
 	override public function onUpdate (delta:Float){
 		super.onUpdate(delta);
+
 
 		for (entity in view.entities){
 			var transformation = entity.get(component.Transformation);
@@ -37,6 +40,8 @@ class Physics extends System {
 
 				var collision = false;
 				var thingThatCollided:eskimo.Entity = null;
+
+				collider.collisionRegions[0].gridIndex
 				
 				//Colliders.entities is instead just the entities in this entities' grid cells.
 				for (otherCollider in colliders.entities){

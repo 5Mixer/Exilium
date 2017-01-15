@@ -47,9 +47,9 @@ class Project {
 		var prsys = new system.ParticleRenderer(entities);
 		renderSystems.push(prsys);
 		systems.add(prsys);
-		var dbsys = new system.CollisionDebugView(entities);
+		//var dbsys = new system.CollisionDebugView(entities);
 		//renderSystems.push(dbsys);
-		systems.add(dbsys);
+		//systems.add(dbsys);
 		var renderer = new system.Renderer(entities);
 		renderSystems.push(renderer);
 		systems.add(renderer);
@@ -61,6 +61,7 @@ class Project {
 		systems.add(new system.KeyMovement(input,entities));
 		systems.add(new system.Physics(entities));
 		systems.add(new system.AI(entities));
+		systems.add(new system.Collisions(entities));
 		systems.add(new system.TimedLife(entities));
 		systems.add(new system.Gun(input,camera,entities));
 		
@@ -78,9 +79,9 @@ class Project {
 		var t = 0;
 		for (tile in generator.tiles){
 			if (map.get(component.Tilemap).tileInfo.get(tile).collide){
-				map.get(component.Collisions).registerCollisionRegion(differ.shapes.Polygon.rectangle(
-					t%map.get(component.Tilemap).width*16,Math.floor(t/map.get(component.Tilemap).width)*16,
-					16,16,false));
+				map.get(component.Collisions).registerCollisionRegion({
+					x:t%map.get(component.Tilemap).width*16,y:Math.floor(t/map.get(component.Tilemap).width)*16,
+					width:16,height:16});
 			}
 			t++;
 		}
@@ -90,7 +91,7 @@ class Project {
 			//treasure.set(new component.Physics());
 			treasure.set(new component.Sprite(4));
 			treasure.set(new component.Collisions([component.Collisions.CollisionGroup.Level],[component.Collisions.CollisionGroup.Level]));
-			treasure.get(component.Collisions).registerCollisionRegion(differ.shapes.Polygon.rectangle(treasure.get(component.Transformation).pos.x,treasure.get(component.Transformation).pos.y,16,16,false));
+			treasure.get(component.Collisions).registerCollisionRegion({x:treasure.get(component.Transformation).pos.x,y:treasure.get(component.Transformation).pos.y,width:16,height:16});
 			treasure.set(new component.DieOnCollision([component.Collisions.CollisionGroup.Bullet]));
 			
 			//treasure.set(new component.Light());
@@ -106,7 +107,7 @@ class Project {
 			skelly.set(new component.AI());
 			skelly.set(new component.DieOnCollision([component.Collisions.CollisionGroup.Bullet]));
 			skelly.set(new component.Collisions([component.Collisions.CollisionGroup.Enemy]));
-			var b = differ.shapes.Polygon.rectangle(skelly.get(component.Transformation).pos.x,skelly.get(component.Transformation).pos.y,16,16,false);
+			var b = {x:skelly.get(component.Transformation).pos.x,y:skelly.get(component.Transformation).pos.y,width:16,height:16};
 			skelly.get(component.Collisions).registerCollisionRegion(b);
 		}
 
@@ -120,7 +121,7 @@ class Project {
 		p.set(new component.Physics());
 		p.set(new component.Gun());
 		p.set(new component.Collisions([component.Collisions.CollisionGroup.Friendly],[component.Collisions.CollisionGroup.Friendly,component.Collisions.CollisionGroup.Bullet]));
-		p.get(component.Collisions).registerCollisionRegion(differ.shapes.Polygon.rectangle(p.get(component.Transformation).pos.x,p.get(component.Transformation).pos.y,16,16,false));
+		p.get(component.Collisions).registerCollisionRegion({x:p.get(component.Transformation).pos.x,y:p.get(component.Transformation).pos.y,width:14,height:14});
 		p.set(new component.Light());
 		
 		p.get(component.Light).colour = kha.Color.fromBytes(255,200,200);//kha.Color.Green;

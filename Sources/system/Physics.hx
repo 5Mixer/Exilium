@@ -29,37 +29,38 @@ class Physics extends System {
 				transformation.pos.x += physics.velocity.x;
 				if (collider.lockShapesToEntityTransform){
 					for (shape in collider.collisionRegions){
-						shape.position = new differ.math.Vector(transformation.pos.x,transformation.pos.y);
+						shape.x = transformation.pos.x;
+						shape.y = transformation.pos.y;
+
 					}
 				}
 
 				var collision = false;
 				var thingThatCollided:eskimo.Entity = null;
-			
+				
+				//Colliders.entities is instead just the entities in this entities' grid cells.
 				for (otherCollider in colliders.entities){
 					if (otherCollider == entity) continue;			
 					
-					var c = otherCollider.get(component.Collisions).getCollisionWithCollider(collider);
-					if (c != null && c.length != 0){
-						for (correction in c){
-							if (correction != null){
+					var collideData = otherCollider.get(component.Collisions).getCollisionWithCollider(collider);
+					if (collideData != null){
+						
+						if (otherCollider.has(component.DieOnCollision))
+							for (groupThatKills in otherCollider.get(component.DieOnCollision).collisionGroups)
+								if (collider.collisionGroups.indexOf(groupThatKills) != -1)
+									otherCollider.destroy();
 								
-								if (otherCollider.has(component.DieOnCollision))
-									for (groupThatKills in otherCollider.get(component.DieOnCollision).collisionGroups)
-										if (collider.collisionGroups.indexOf(groupThatKills) != -1)
-											otherCollider.destroy();
-										
-								thingThatCollided = otherCollider;
+						thingThatCollided = otherCollider;
 
-								transformation.pos.x -= correction.separationX;
-
-								if (correction.separationX != 0){
-									if (!collision) collision = true;
-									break;
-								}
-
+						transformation.pos.x -= collideData.separationX;//physics.velocity.x;
+						if (collider.lockShapesToEntityTransform){
+							for (shape in collider.collisionRegions){
+								shape.x = transformation.pos.x;
 							}
 						}
+						
+
+						collision = true;
 					}
 				}
 
@@ -68,45 +69,40 @@ class Physics extends System {
 
 				if (collider.lockShapesToEntityTransform){
 					for (shape in collider.collisionRegions){
-						shape.position = new differ.math.Vector(transformation.pos.x,transformation.pos.y);
+						shape.x = transformation.pos.x;
+						shape.y = transformation.pos.y;
 					}
 				}
 			
 				for (otherCollider in colliders.entities){
 					if (otherCollider == entity) continue;
-
-				
-
-					var c = otherCollider.get(component.Collisions).getCollisionWithCollider(collider);
 					
-					if (c != null && c.length != 0){
-						
-						for (correction in c){
-							if (correction != null){
+					var colData = otherCollider.get(component.Collisions).getCollisionWithCollider(collider);
+					if (colData != null){
+					
+						if (otherCollider.has(component.DieOnCollision))
+							for (groupThatKills in otherCollider.get(component.DieOnCollision).collisionGroups)
+								if (collider.collisionGroups.indexOf(groupThatKills) != -1)
+									otherCollider.destroy();
 
-								if (otherCollider.has(component.DieOnCollision))
-									for (groupThatKills in otherCollider.get(component.DieOnCollision).collisionGroups)
-										if (collider.collisionGroups.indexOf(groupThatKills) != -1)
-											otherCollider.destroy();
+						thingThatCollided = otherCollider;
 
-								thingThatCollided = otherCollider;
-
-								transformation.pos.y -= correction.separationY;
-								if (correction.separationY != 0){
-									if (!collision) collision = true;
-									break;
-								}
+						transformation.pos.y -= colData.separationY; //physics.velocity.y;
+						if (collider.lockShapesToEntityTransform){
+							for (shape in collider.collisionRegions){
+								shape.y = transformation.pos.y;
 							}
 						}
-					
+						
+						collision = true;
 					}
 				}
 
-				if (collider.lockShapesToEntityTransform){
-					for (shape in collider.collisionRegions){
-						shape.position = new differ.math.Vector(transformation.pos.x,transformation.pos.y);
-					}
-				}
+				//if (collider.lockShapesToEntityTransform){
+				//	for (shape in collider.collisionRegions){
+				//		shape.position = new differ.math.Vector(transformation.pos.x,transformation.pos.y);
+				//	}
+				//}
 
 				if (collision){
 					if (entity.has(component.DieOnCollision)){

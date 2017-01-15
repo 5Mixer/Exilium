@@ -1,61 +1,121 @@
 package system;
 
-import component.Collisions.RectangleCollisionShape;
 import kha.math.Vector2;
 
 class Physics extends System {
-	var colliders:Array<Entity>;
-	public function new (colliders:Array<Entity>){
-		this.colliders = colliders;
+	var view:eskimo.views.View;
+	var colliders:eskimo.views.View;
+	var grid:util.SpatialHash;
+	public function new (entities:eskimo.EntityManager,broadPhaseGrid:util.SpatialHash){
 		super();
+		grid = broadPhaseGrid;
+		view = new eskimo.views.View(new eskimo.filters.Filter([component.Transformation, component.Physics]),entities);
+		colliders = new eskimo.views.View(new eskimo.filters.Filter([component.Transformation, component.Collisions]),entities);
 	}
 
-	override public function update (delta:Float,entities:Array<Entity>){
-		super.update(delta,entities);
+	override public function onUpdate (delta:Float){
+		super.onUpdate(delta);
 
-		for (entity in entities){
-			if (entity.components.has("transformation") && entity.components.has("physics") && entity.components.has("collider")){
-				var transformation:component.Transformation = cast entity.components.get("transformation");
-				var physics:component.Physics = cast entity.components.get("physics");
-				var collider:component.Collisions = cast entity.components.get("collider");
+
+		for (entity in view.entities){
+			var transformation = entity.get(component.Transformation);
+			var physics = entity.get(component.Physics);
+			var collider = entity.get(component.Collisions);
+
+			physics.velocity = physics.velocity.mult(physics.friction);
+
+			if (collider == null){
+				transformation.pos.x += physics.velocity.x;
+				transformation.pos.y += physics.velocity.y;
+
+			}else{
+				transformation.pos.x += physics.velocity.x;
+				if (collider.lockShapesToEntityTransform){
+					for (shape in collider.collisionRegions){
+						shape.x = transformation.pos.x;
+						shape.y = transformation.pos.y;
+
+					}
+				}
+
+				var collision = false;
+				var thingThatCollided:eskimo.Entity = null;
+
+				collider.collisionRegions[0].gridIndex
+				
+				//Colliders.entities is instead just the entities in this entities' grid cells.
+				for (otherCollider in colliders.entities){
+					if (otherCollider == entity) continue;			
+					
+					var collideData = otherCollider.get(component.Collisions).getCollisionWithCollider(collider);
+					if (collideData != null){
+						
+						if (otherCollider.has(component.DieOnCollision))
+							for (groupThatKills in otherCollider.get(component.DieOnCollision).collisionGroups)
+								if (collider.collisionGroups.indexOf(groupThatKills) != -1)
+									otherCollider.destroy();
+								
+						thingThatCollided = otherCollider;
+
+						transformation.pos.x -= collideData.separationX;//physics.velocity.x;
+						if (collider.lockShapesToEntityTransform){
+							for (shape in collider.collisionRegions){
+								shape.x = transformation.pos.x;
+							}
+						}
+						
+
+						collision = true;
+					}
+				}
 
 				
-				physics.velocity = physics.velocity.mult(.7);
+				transformation.pos.y += physics.velocity.y;
 
-
-				var newCollider = cast (collider.collisionRegions[0],component.Collisions.RectangleCollisionShape).offset(new Vector2(transformation.pos.x+physics.velocity.x,transformation.pos.y));
-		
-				var collides = false;
-				for (otherCollider in entities){
-					if (otherCollider == entity) continue;
-					if (otherCollider.components.has("collider")){
-						if (cast(otherCollider.components.get("collider"),component.Collisions).doesShapeCollide(newCollider)){
-							collides = true;
-							//pos.x = Math.round(pos.x/8)*8;
-							break;
-						}
+				if (collider.lockShapesToEntityTransform){
+					for (shape in collider.collisionRegions){
+						shape.x = transformation.pos.x;
+						shape.y = transformation.pos.y;
 					}
 				}
-				if (!collides)
-					transformation.pos.x += physics.velocity.x;
-
-
-				var newCollider = cast (collider.collisionRegions[0],component.Collisions.RectangleCollisionShape).offset(new Vector2(transformation.pos.x,transformation.pos.y+physics.velocity.y));
-		
-				var collides = false;
-				for (otherCollider in entities){
+			
+				for (otherCollider in colliders.entities){
 					if (otherCollider == entity) continue;
-					if (otherCollider.components.has("collider")){
-						if (cast(otherCollider.components.get("collider"),component.Collisions).doesShapeCollide(newCollider)){
-							collides = true;
-							//pos.x = Math.round(pos.x/8)*8;
-							break;
+					
+					var colData = otherCollider.get(component.Collisions).getCollisionWithCollider(collider);
+					if (colData != null){
+					
+						if (otherCollider.has(component.DieOnCollision))
+							for (groupThatKills in otherCollider.get(component.DieOnCollision).collisionGroups)
+								if (collider.collisionGroups.indexOf(groupThatKills) != -1)
+									otherCollider.destroy();
+
+						thingThatCollided = otherCollider;
+
+						transformation.pos.y -= colData.separationY; //physics.velocity.y;
+						if (collider.lockShapesToEntityTransform){
+							for (shape in collider.collisionRegions){
+								shape.y = transformation.pos.y;
+							}
 						}
+						
+						collision = true;
 					}
 				}
-				if (!collides)
-					transformation.pos.y += physics.velocity.y;
 
+				//if (collider.lockShapesToEntityTransform){
+				//	for (shape in collider.collisionRegions){
+				//		shape.position = new differ.math.Vector(transformation.pos.x,transformation.pos.y);
+				//	}
+				//}
+
+				if (collision){
+					if (entity.has(component.DieOnCollision)){
+						entity.destroy();
+					}
+				}
+			
+					
 			}
 		}
 	}

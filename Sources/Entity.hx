@@ -1,9 +1,9 @@
 package ;
 
-class Entity implements component.Collisions.CollisionShape implements component.Collisions.RectangleCollider {
+class Entity {
 	public var components = new ComponentList();
 	public var pos:kha.math.Vector2 = new kha.math.Vector2();
-	public var size:kha.math.Vector2 = new kha.math.Vector2(8,8);
+	public var size:kha.math.Vector2 = new kha.math.Vector2(16,16);
 	public var events:EventManager = new EventManager();
 	public function new (){
 		

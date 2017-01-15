@@ -2,61 +2,139 @@ package;
 
 import kha.Framebuffer;
 import kha.Scheduler;
-
-import entity.Player;
+import zui.Zui;
+import zui.Id;
+//import entity.Player;
 
 class Project {
-	public var level:Level;
 	public var camera:Camera;
 	var frame = 0;
-	var player:Player;
+	//var player:Player;
 	var input:Input;
 
 	var lastTime:Float;
-	public var entities:Array<Entity>;
+	public var entities:eskimo.EntityManager;
 
-	var systems:Array<System>;
+	var systems:eskimo.systems.SystemManager;
+
+	var renderSystems = new Array<System>();
 	
-	var p = new Entity();
+	var p:eskimo.Entity;
+
+	var renderview:eskimo.views.View;
+	
+	var ui:Zui;
 
 	public function new() {
 		kha.System.notifyOnRender(render);
 		Scheduler.addTimeTask(update, 0, 1 / 60);
 
+		kha.SystemImpl.requestFullscreen();
+
+		ui = new Zui(kha.Assets.fonts.OpenSans, 17, 16, 0, 1.5);
+
+		var components = new eskimo.ComponentManager();
+		entities = new eskimo.EntityManager(components);
+		systems = new eskimo.systems.SystemManager(entities);		
+
 		input = new Input();
-		entities = new Array<Entity>();
 
 		camera = new Camera();
-		level = new Level(camera);
 
-		systems = new Array<System>();
-		systems.push(new system.Renderer());
-		systems.push(new system.KeyMovement(input));
-		systems.push(new system.Physics(entities));
-		systems.push(new system.Gun(input,camera,level.lights));
+		var lrsys = new system.TilemapRenderer(camera,entities);
+		renderSystems.push(lrsys);
+		systems.add(lrsys);
+		var prsys = new system.ParticleRenderer(entities);
+		renderSystems.push(prsys);
+		systems.add(prsys);
+		//var dbsys = new system.CollisionDebugView(entities);
+		//renderSystems.push(dbsys);
+		//systems.add(dbsys);
+		var renderer = new system.Renderer(entities);
+		renderSystems.push(renderer);
+		systems.add(renderer);
+		var debug = new system.DebugView(entities);
+		renderSystems.push(debug);
+		systems.add(debug);
+		haxe.Log.trace = debug.traceLog;
 
-		player = new Player(input,this);
-
-		p.components.set("transformation",new component.Transformation(new kha.math.Vector2(20,20)));
-		p.components.set("sprite",new component.Sprite(0));
-		p.components.set("keymovement",new component.KeyMovement());
-		p.components.set("physics",new component.Physics());
-		p.components.set("gun",new component.Gun());
-		p.components.set("collider",new component.Collisions().registerCollisionRegion(new component.Collisions.RectangleCollisionShape(new kha.math.Vector2(),new kha.math.Vector2(8,8))));
-		entities.push(p);
+		systems.add(new system.KeyMovement(input,entities));
+		systems.add(new system.AI(entities));
+		systems.add(new system.Collisions(entities));
+		systems.add(new system.Physics(entities,systems.get(system.Collisions).grid);
+		systems.add(new system.TimedLife(entities));
+		systems.add(new system.Gun(input,camera,entities));
 		
-		entities.push(level);
+		var map = entities.create();
+		map.set(new component.Transformation(new kha.math.Vector2()));
+		map.set(new component.Tilemap());
+		map.set(new component.Collisions());
+		map.get(component.Collisions).lockShapesToEntityTransform = false;
+
+		var generator = new util.DungeonWorldGenerator(180,180);
+		map.get(component.Tilemap).tiles = generator.tiles;
+		map.get(component.Tilemap).width = 180;
+		map.get(component.Tilemap).height = 180;
+
+		var t = 0;
+		for (tile in generator.tiles){
+			if (map.get(component.Tilemap).tileInfo.get(tile).collide){
+				map.get(component.Collisions).registerCollisionRegion({
+					x:t%map.get(component.Tilemap).width*16,y:Math.floor(t/map.get(component.Tilemap).width)*16,
+					width:16,height:16});
+			}
+			t++;
+		}
+		for (t in generator.treasure){
+			var treasure = entities.create();
+			treasure.set(new component.Transformation(new kha.math.Vector2(t.x*16,t.y*16)));
+			//treasure.set(new component.Physics());
+			treasure.set(new component.Sprite(4));
+			treasure.set(new component.Collisions([component.Collisions.CollisionGroup.Level],[component.Collisions.CollisionGroup.Level]));
+			treasure.get(component.Collisions).registerCollisionRegion({x:treasure.get(component.Transformation).pos.x,y:treasure.get(component.Transformation).pos.y,width:16,height:16});
+			treasure.set(new component.DieOnCollision([component.Collisions.CollisionGroup.Bullet]));
+			
+			//treasure.set(new component.Light());
+			//treasure.get(component.Light).colour = kha.Color.fromBytes(0,0,140);//kha.Color.Green;
+			//treasure.get(component.Light).strength = 1;
+		}
+		for (e in generator.enemies){
+			//if (map.get(component.Tilemap).getTile(x,y) == 0) continue;
+			var skelly = entities.create();
+			skelly.set(new component.Transformation(new kha.math.Vector2(e.x*16,e.y*16)));
+			skelly.set(new component.Sprite(5));
+			//skelly.set(new component.Physics());
+			skelly.set(new component.AI());
+			skelly.set(new component.DieOnCollision([component.Collisions.CollisionGroup.Bullet]));
+			skelly.set(new component.Collisions([component.Collisions.CollisionGroup.Enemy]));
+			var b = {x:skelly.get(component.Transformation).pos.x,y:skelly.get(component.Transformation).pos.y,width:16,height:16};
+			skelly.get(component.Collisions).registerCollisionRegion(b);
+		}
+
+		//player = new Player(input,this);
+
+		p = entities.create();
+		
+		p.set(new component.Transformation(new kha.math.Vector2(31*16,31*16)));
+		p.set(new component.Sprite(0));
+		p.set(new component.KeyMovement());
+		p.set(new component.Physics());
+		p.set(new component.Gun());
+		p.set(new component.Collisions([component.Collisions.CollisionGroup.Friendly],[component.Collisions.CollisionGroup.Friendly,component.Collisions.CollisionGroup.Bullet]));
+		p.get(component.Collisions).registerCollisionRegion({x:p.get(component.Transformation).pos.x,y:p.get(component.Transformation).pos.y,width:14,height:14});
+		p.set(new component.Light());
+		
+		p.get(component.Light).colour = kha.Color.fromBytes(255,200,200);//kha.Color.Green;
+		p.get(component.Light).strength = 1.5;
+
+		input.onRUp = function (){
+			p.get(component.Transformation).pos = new kha.math.Vector2(31*16,31*16);
+			
+		}
+
 		//entities.push(player);
 
-		for (i in 0...150){
-			var x = Math.floor(Math.random()*level.width);
-			var y = Math.floor(Math.random()*level.height);
-			if (level.getTile(x,y) == 0) continue;
-			var skelly = new entity.Skeleton(this,new kha.math.Vector2(x*8,y*8),function (e){
-				entities.remove(e);
-			});
-			entities.push(skelly);
-		}
+		
 
 		lastTime = Scheduler.time();
 
@@ -65,42 +143,49 @@ class Project {
 	}
 
 	function update() {
-		
 		var delta = Scheduler.time() - lastTime;
 		
-		for (entity in entities)
-			entity.update(delta);
+		systems.update(delta);
 
-		for (system in systems)
-			system.update(delta,entities);
-
+		camera.pos = new kha.math.Vector2(p.get(component.Transformation).pos.x-kha.System.windowWidth()/2/camera.scale.x,p.get(component.Transformation).pos.y-kha.System.windowHeight()/2/camera.scale.y);
+		
 
 		lastTime = Scheduler.time();
 	}
-
-	function render(framebuffer: Framebuffer): Void {
+	function render(framebuffer: Framebuffer): Void { 
 		frame++;
+
 
 		var g = framebuffer.g2;
 		g.begin();
 		g.color = kha.Color.White;
 		
-		//camera.pos = new kha.math.Vector2(player.pos.x-kha.System.windowWidth()/2/camera.scale.x,player.pos.y-kha.System.windowHeight()/2/camera.scale.y);
-		camera.pos = new kha.math.Vector2((cast p.components.get("transformation")).pos.x-kha.System.windowWidth()/2/camera.scale.x,(cast p.components.get("transformation")).pos.y-kha.System.windowHeight()/2/camera.scale.y);
-		//camera.pos = new kha.math.Vector2(60,60);
+		//camera.pos = new kha.math.Vector2(0,0);
 		camera.transform(g);
-		
-		for (entity in entities)
-			entity.draw(g);
-		
-		for (system in systems)
-			system.render(g,entities);
 
+		//level.draw(g);
+		
+		for (system in renderSystems)
+			system.render(g);
+
+	
 		camera.restore(g);
+		
 
 		//Draw mouse cursor.
-		g.drawSubImage(kha.Assets.images.Entities,input.mousePos.x/8 -4,input.mousePos.y/8 -4,2*8,0,8,8);
+		g.drawSubImage(kha.Assets.images.Entities,input.mousePos.x/4 -4,input.mousePos.y/4 -4,2*16,0,16,16);
 
 		g.end();
+
+		//Clear any transformation for the UI.
+		g.transformation = kha.math.FastMatrix3.identity();
+
+		/*ui.begin(g);
+        if (ui.window(Id.window(), 0, 0, 100, 100, Zui.LAYOUT_VERTICAL)) {
+            if (ui.button("Hello")) {
+                trace("World");
+            }
+        }
+        ui.end();*/
 	}
 }

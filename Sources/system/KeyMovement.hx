@@ -2,27 +2,27 @@ package system;
 
 class KeyMovement extends System {
 	var input:Input;
-	public function new (input:Input){
+	var view:eskimo.views.View;
+	public function new (input:Input,entities:eskimo.EntityManager){
 		this.input = input;
+		view = new eskimo.views.View(new eskimo.filters.Filter([component.KeyMovement,component.Physics]),entities);
 		super();
 	}
 
-	override public function update (delta:Float,entities:Array<Entity>){
-		super.update(delta,entities);
+	override public function onUpdate (delta:Float){
+		super.onUpdate(delta);
 
-		for (entity in entities){
-			if (entity.components.has("keymovement") && entity.components.has("physics")){
-				var keymovement:component.KeyMovement = cast entity.components.get("keymovement");
-				var physics:component.Physics = cast entity.components.get("physics");
+		for (entity in view.entities){
+			var keymovement:component.KeyMovement = entity.get(component.KeyMovement);
+			var physics:component.Physics = entity.get(component.Physics);
 
-				var speed = keymovement.speed;
+			var speed = keymovement.speed;
 
-				if (input.left && physics.velocity.x > -speed) physics.velocity.x -= speed;
-				if (input.right && physics.velocity.x < speed) physics.velocity.x += speed;
-				if (input.up && physics.velocity.y > -speed) physics.velocity.y -= speed;
-				if (input.down && physics.velocity.y < speed) physics.velocity.y += speed;
+			if (input.left) physics.velocity.x = -speed;
+			if (input.right) physics.velocity.x = speed;
+			if (input.up) physics.velocity.y = -speed;
+			if (input.down) physics.velocity.y = speed;
 
-			}
 		}
 	}
 }

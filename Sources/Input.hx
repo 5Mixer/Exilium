@@ -8,6 +8,7 @@ class Input {
 	public var up: Bool;
 	public var down: Bool;
 	public var mousePos:kha.math.Vector2 = new kha.math.Vector2(0,0);
+	public var onRUp:Void->Void;
 	public var mouseButtons:{left:Bool, right:Bool} = {
 		left: false,
 		right: false
@@ -53,6 +54,10 @@ class Input {
 	}
 
 	public function keyUp(char: Key,letter) {
+		if (letter =='r')
+			if (onRUp != null)
+				onRUp();
+		
 		if(char == LEFT || letter == 'a')
 			left = false;
 		if(char == RIGHT || letter == 'd')

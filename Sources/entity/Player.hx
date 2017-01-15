@@ -18,7 +18,7 @@ class Player extends Entity {
 		super();
 
 		pos = new Vector2(16,16);
-		size = new Vector2(8,8);
+		size = new Vector2(16,16);
 		velocity = new Vector2(0,0);
 		sprite = new Sprite(kha.Assets.images.Entities,0);
 		this.input = input;
@@ -29,7 +29,7 @@ class Player extends Entity {
 
 		this.game = game;
 
-		light = { pos: pos.div(8), radius: .7, colour: kha.Color.Green};
+		light = { pos: pos.div(16), radius: .7, colour: kha.Color.Green};
 		game.level.lights.push(light);
 	}
 	override public function draw (g){
@@ -43,7 +43,7 @@ class Player extends Entity {
 		
 		sprite.draw(g,pos.x,pos.y);
 
-		light.pos = pos.div(8);		
+		light.pos = pos.div(16);		
 		
 	}
 	var frame = 0;

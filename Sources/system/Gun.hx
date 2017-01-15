@@ -1,97 +1,94 @@
 package system;
 
-import entity.Bullet;
-import entity.Particle;
-
 class Gun extends System {
-	var bullets = new Array<Bullet>();
-	var particles = new Array<Particle>();
 	var frame = 0;
 	var input:Input;
 	var camera:Camera;
-	var lights:Array<Level.Light>;
+	var view:eskimo.views.View;
+	var entities:eskimo.EntityManager;
 
-	override public function new (input:Input,camera:Camera,lights:Array<Level.Light>){
+	override public function new (input:Input,camera:Camera,entities:eskimo.EntityManager){
 		this.input = input;
 		this.camera = camera;
-		this.lights = lights;
+		this.entities = entities;
+		view = new eskimo.views.View(new eskimo.filters.Filter([component.Gun,component.Transformation]),entities);
 		super();
 	}
 
-	override public function render (g:kha.graphics2.Graphics,entities:Array<Entity>){
-		super.render(g,entities);
-
-		for (bullet in bullets) bullet.draw(g);
-		for (particle in particles) particle.draw(g);
-	}
-
-	override public function update (delta:Float,entities:Array<Entity>){
-		super.update(delta,entities);
+	override public function onUpdate (delta:Float){
+		super.onUpdate(delta);
 		frame++;
-
-		for (bullet in bullets) bullet.update(delta);
-		for (particle in particles) particle.update(delta);
-
 		
-		if (frame%6 == 0 && input.mouseButtons.left){
-			for (entity in entities){
-				if (entity.components.has("gun") && entity.components.has("transformation")){
-					var transformation:component.Transformation = cast entity.components.get("transformation");
-					var gun:component.Gun = cast entity.components.get("gun");
+		if (frame%2 == 0 && input.mouseButtons.left){
+			for (entity in view.entities){
+				
+				var transformation:component.Transformation = entity.get(component.Transformation);
+				var gun:component.Gun = entity.get(component.Gun);
 
-					var dir = transformation.pos.sub(camera.screenToWorld(input.mousePos.sub(new kha.math.Vector2(32,32))));
-					var a = Math.round(Math.atan2(-dir.y,-dir.x)*(180/Math.PI));
+				var dir = transformation.pos.sub(camera.screenToWorld(input.mousePos.sub(new kha.math.Vector2(32,32))));
+				var a = Math.round(Math.atan2(-dir.y,-dir.x)*(180/Math.PI));
 
+				var camOffset = dir.mult(1);
+				camOffset.normalize();
+				camOffset = camOffset.mult(6);
+				camera.offset.x += camOffset.x;
+				camera.offset.y += camOffset.y;
+
+				if (entity.has(component.Physics)){
+					var physics:component.Physics = entity.get(component.Physics);
 					
-					var camOffset = dir.mult(1);
-					camOffset.normalize();
-					camOffset = camOffset.mult(6);
-					camera.offset.x += camOffset.x;
-					camera.offset.y += camOffset.y;
-
-					if (entity.components.has("physics")){
-						var physics:component.Physics = cast entity.components.get("physics");
-						
-						var knockback = .7+Math.random()/2;
-						physics.velocity.x -= Math.cos(a*(Math.PI/180))*knockback;
-						physics.velocity.y -= Math.sin(a*(Math.PI/180))*knockback;
-					}
-
-					shoot(entity,entities,a);
+					var knockback = .7+Math.random()/2;
+					physics.velocity.x -= Math.cos(a*(Math.PI/180))*knockback;
+					physics.velocity.y -= Math.sin(a*(Math.PI/180))*knockback;
 				}
+
+				shoot(entity,a);
+				
 			}
 		}
 	}
-	public function shoot (parent:Entity,entities,angle){
+	public function shoot (parent:eskimo.Entity,angle){
 
 		
-		kha.audio1.Audio.play(kha.Assets.sounds.RapidFire);
+		//kha.audio1.Audio.play(kha.Assets.sounds.RapidFire);
 		
-		var l = { pos: parent.pos, radius: .6, colour: kha.Color.Red};
+		var l = { pos: parent.get(component.Transformation).pos.mult(1), radius: .6, colour: kha.Color.Red};
 	
-		bullets.push(
-			new Bullet(parent,cast(parent.components.get("transformation"),component.Transformation).pos.mult(1),entities,angle,
-			function (entity:Bullet){
-				lights.remove(entity.light);
-				bullets.remove(entity);
-				
-				particles.push(
-					new Particle(entity,entity.pos,6+Math.round(Math.random()*4),Math.floor(entity.angle+180),
-								function (entity) { particles.remove(entity); }
-					)
-				);
-			},l)
-		);
+		var bullet = entities.create();
 
-		particles.push(
-			new Particle(parent,(cast parent.components.get("transformation")).pos, 10+Math.round(Math.random()*5),angle,
-						function (entity) { particles.remove(entity); }
-			)
-		);
+		var t = new component.Transformation(parent.get(component.Transformation).pos.mult(1));
+		t.angle = angle;
+		bullet.set(t);
+		
+		var p = new component.Physics();
+		var speed = 1;
+		p.friction = 0.999;
+		p.velocity = new kha.math.Vector2(Math.cos(angle * (Math.PI / 180)) * speed,Math.sin(angle * (Math.PI / 180)) * speed);
+		bullet.set(p);
+		bullet.set(new component.Sprite(1));
 
+		bullet.set(new component.TimedLife(3));
+		bullet.set(new component.DieOnCollision([component.Collisions.CollisionGroup.Enemy,component.Collisions.CollisionGroup.Level]));
+		
+		bullet.set(new component.Light());
+		bullet.get(component.Light).colour = kha.Color.Red;
+		bullet.get(component.Light).strength = .9;
+		bullet.set(new component.Collisions([component.Collisions.CollisionGroup.Bullet,component.Collisions.CollisionGroup.Friendly],[component.Collisions.CollisionGroup.Bullet,component.Collisions.CollisionGroup.Friendly]));
+		bullet.get(component.Collisions).registerCollisionRegion({x:bullet.get(component.Transformation).pos.x,y:bullet.get(component.Transformation).pos.y,width:16,height:16});
+
+		var particle = entities.create();
+		particle.set(new component.VisualParticle(component.VisualParticle.Effect.Smoke));
 		
 
-		lights.push(l);
-	
+		var t = new component.Transformation(parent.get(component.Transformation).pos.add(new kha.math.Vector2(8,8)));
+		t.angle = angle;
+		particle.set(t);
+		var phys = new component.Physics();
+		var speed = 8;
+		phys.friction = 0.8;
+		var particleAngle = angle - 6 + Math.random()*12;
+		phys.velocity = new kha.math.Vector2(Math.cos(particleAngle * (Math.PI / 180)) * speed,Math.sin(particleAngle * (Math.PI / 180)) * speed);		
+		particle.set(phys);
+		particle.set(new component.TimedLife(.2));	
 	}
 }

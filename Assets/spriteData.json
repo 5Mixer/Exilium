@@ -1,0 +1,28 @@
+{
+	"tilesets" : {
+		"ghost" : {
+			"tilesize" : {
+				"x" : 16,
+				"y" : 16
+			}
+
+		}
+	},
+	"entity" : {
+		"ghost" : {
+			"tileset":"ghost",
+			"animations" : {
+				"idle" : 3,
+				"walk up" : 4,
+				"walk up right" : 4,
+				"walk right" : 4,
+				"walk down right" :4,
+				"walk down" : 4,
+				"walk down left" : 4,
+				"walk left" : 4,
+				"walk up left" : 4,
+				"shoot" : 2
+			}
+		}
+	}
+}

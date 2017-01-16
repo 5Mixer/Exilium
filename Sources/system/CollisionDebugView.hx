@@ -27,8 +27,8 @@ class CollisionDebugView extends System {
 					
 					g.color = kha.Color.White;
 					//g.drawRect(Math.floor(cell%grid.w)*16,Math.floor(cell/grid.h)*16,16,16,.25);
-					g.color = kha.Color.fromFloats(.2,.2,.6,.3);
-					//g.fillRect(Math.floor(cell%grid.w)*16,Math.floor(cell/grid.h)*16,16,16);
+					g.color = kha.Color.fromFloats(.2,.2,.6,.05);
+					g.fillRect(Math.floor(cell%grid.w)*16,Math.floor(cell/grid.h)*16,16,16);
 					
 				}
 				g.color = kha.Color.Cyan;

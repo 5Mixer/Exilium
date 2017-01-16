@@ -104,15 +104,17 @@ class Project {
 		}
 		for (e in generator.enemies){
 			//if (map.get(component.Tilemap).getTile(x,y) == 0) continue;
-			var skelly = entities.create();
-			skelly.set(new component.Transformation(new kha.math.Vector2(e.x*16,e.y*16)));
-			skelly.set(new component.Sprite(5));
-			//skelly.set(new component.Physics());
-			skelly.set(new component.AI());
-			skelly.set(new component.DieOnCollision([component.Collisions.CollisionGroup.Bullet]));
-			skelly.set(new component.Collisions([component.Collisions.CollisionGroup.Enemy]));
-			var b = {x:skelly.get(component.Transformation).pos.x,y:skelly.get(component.Transformation).pos.y,width:16,height:16};
-			skelly.get(component.Collisions).registerCollisionRegion(b);
+			var slime = entities.create();
+			slime.set(new component.Transformation(new kha.math.Vector2(e.x*16,e.y*16)));
+			slime.set(new component.Sprite(3));
+			slime.get(component.Sprite).spriteMap = kha.Assets.images.Slime;
+			slime.get(component.Sprite).tilesize = 8;
+			slime.set(new component.Physics());
+			slime.set(new component.AI());
+			slime.set(new component.DieOnCollision([component.Collisions.CollisionGroup.Bullet]));
+			slime.set(new component.Collisions([component.Collisions.CollisionGroup.Enemy]));
+			var b = {x:slime.get(component.Transformation).pos.x,y:slime.get(component.Transformation).pos.y,width:8,height:8};
+			slime.get(component.Collisions).registerCollisionRegion(b);
 		}
 
 		//player = new Player(input,this);
@@ -121,6 +123,7 @@ class Project {
 		
 		p.set(new component.Transformation(new kha.math.Vector2(31*16,31*16)));
 		p.set(new component.Sprite(0));
+		p.get(component.Sprite).spriteMap = kha.Assets.images.ghost;
 		p.set(new component.KeyMovement());
 		p.set(new component.Physics());
 		p.set(new component.Gun());
@@ -129,7 +132,7 @@ class Project {
 		p.set(new component.Light());
 		
 		p.get(component.Light).colour = kha.Color.fromBytes(255,200,200);//kha.Color.Green;
-		p.get(component.Light).strength = 1.5;
+		p.get(component.Light).strength = .8;
 
 		input.onRUp = function (){
 			p.get(component.Transformation).pos = new kha.math.Vector2(31*16,31*16);

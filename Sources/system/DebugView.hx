@@ -35,7 +35,11 @@ class DebugView extends System {
 		for (message in log){
 			i--;
 			g.color = kha.Color.fromFloats(1,1,1,Math.min(i/messageFadeOutTime,(messagesShown-(kha.System.time-message.time))/messagesShown));
-			g.drawString(message.string,10,y);
+			if (message != null && message.string != ""){
+				g.drawString(message.string,10,y);
+			}else{
+				g.drawString("Null",10,y);
+			}
 			y += 25;
 
 			if (kha.System.time-message.time > messageFadeOutTime){

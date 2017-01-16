@@ -5,7 +5,7 @@ import kha.math.Vector2;
 class Physics extends System {
 	var view:eskimo.views.View;
 	var colliders:eskimo.views.View;
-	var grid:util.SpatialHash;
+	public var grid:util.SpatialHash;
 	public function new (entities:eskimo.EntityManager,broadPhaseGrid:util.SpatialHash){
 		super();
 		grid = broadPhaseGrid;
@@ -15,7 +15,6 @@ class Physics extends System {
 
 	override public function onUpdate (delta:Float){
 		super.onUpdate(delta);
-
 
 		for (entity in view.entities){
 			var transformation = entity.get(component.Transformation);
@@ -30,84 +29,76 @@ class Physics extends System {
 
 			}else{
 				transformation.pos.x += physics.velocity.x;
-				if (collider.lockShapesToEntityTransform){
-					for (shape in collider.collisionRegions){
-						shape.x = transformation.pos.x;
-						shape.y = transformation.pos.y;
-
-					}
-				}
-
+				//transformation.pos.y += physics.velocity.y;
 				var collision = false;
-				var thingThatCollided:eskimo.Entity = null;
+				var collidingShape:component.Collisions.Rect = null;
 
-				collider.collisionRegions[0].gridIndex
-				
-				//Colliders.entities is instead just the entities in this entities' grid cells.
-				for (otherCollider in colliders.entities){
-					if (otherCollider == entity) continue;			
-					
-					var collideData = otherCollider.get(component.Collisions).getCollisionWithCollider(collider);
-					if (collideData != null){
-						
-						if (otherCollider.has(component.DieOnCollision))
-							for (groupThatKills in otherCollider.get(component.DieOnCollision).collisionGroups)
-								if (collider.collisionGroups.indexOf(groupThatKills) != -1)
-									otherCollider.destroy();
-								
-						thingThatCollided = otherCollider;
-
-						transformation.pos.x -= collideData.separationX;//physics.velocity.x;
-						if (collider.lockShapesToEntityTransform){
-							for (shape in collider.collisionRegions){
-								shape.x = transformation.pos.x;
-							}
-						}
-						
-
-						collision = true;
-					}
-				}
-
-				
-				transformation.pos.y += physics.velocity.y;
-
+				//transformation.pos.x += physics.velocity.x;
 				if (collider.lockShapesToEntityTransform){
 					for (shape in collider.collisionRegions){
 						shape.x = transformation.pos.x;
 						shape.y = transformation.pos.y;
+
 					}
 				}
-			
-				for (otherCollider in colliders.entities){
-					if (otherCollider == entity) continue;
-					
-					var colData = otherCollider.get(component.Collisions).getCollisionWithCollider(collider);
-					if (colData != null){
-					
-						if (otherCollider.has(component.DieOnCollision))
-							for (groupThatKills in otherCollider.get(component.DieOnCollision).collisionGroups)
-								if (collider.collisionGroups.indexOf(groupThatKills) != -1)
-									otherCollider.destroy();
+				for (shape in collider.collisionRegions){
 
-						thingThatCollided = otherCollider;
+					for (otherShape in grid.findContacts(shape)){
+						if (!validCollision(shape,otherShape)) continue;
 
-						transformation.pos.y -= colData.separationY; //physics.velocity.y;
-						if (collider.lockShapesToEntityTransform){
-							for (shape in collider.collisionRegions){
-								shape.y = transformation.pos.y;
-							}
+						var c = differ.Collision.shapeWithShape(differ.shapes.Polygon.rectangle(shape.x,shape.y,shape.width,shape.height,false),differ.shapes.Polygon.rectangle(otherShape.x,otherShape.y,otherShape.width,otherShape.height,false));
+						if (c != null && c.separationX != 0){
+							collision = true;
+							collidingShape = otherShape;
+							transformation.pos.x += c.separationX;
+							break;
 						}
-						
-						collision = true;
+					}
+					
+					if (collider.lockShapesToEntityTransform){
+						shape.x = transformation.pos.x;
 					}
 				}
 
-				//if (collider.lockShapesToEntityTransform){
-				//	for (shape in collider.collisionRegions){
-				//		shape.position = new differ.math.Vector(transformation.pos.x,transformation.pos.y);
-				//	}
-				//}
+				transformation.pos.y += physics.velocity.y;
+				if (collider.lockShapesToEntityTransform){
+					for (collisionRegion in collider.collisionRegions){
+					
+						for (shape in collider.collisionRegions){
+							shape.x = transformation.pos.x;
+							shape.y = transformation.pos.y;
+						}
+					}
+				}
+				for (shape in collider.collisionRegions){
+					for (otherShape in grid.findContacts(shape)){
+						
+						if (!validCollision(shape,otherShape)) continue;
+					
+						var c = differ.Collision.shapeWithShape(differ.shapes.Polygon.rectangle(shape.x,shape.y,shape.width,shape.height,false),differ.shapes.Polygon.rectangle(otherShape.x,otherShape.y,otherShape.width,otherShape.height,false));
+						
+						if (c != null && c.separationY != 0){
+							collision = true;
+							collidingShape = otherShape;
+							transformation.pos.y += c.separationY;
+							break;
+						}
+					}
+					
+					if (collider.lockShapesToEntityTransform){
+						shape.y = transformation.pos.y;
+					}
+				}
+				if (collider.lockShapesToEntityTransform){
+					for (collisionRegion in collider.collisionRegions){
+					
+						for (shape in collider.collisionRegions){
+							shape.x = transformation.pos.x;
+							shape.y = transformation.pos.y;
+						}
+					}
+				}
+
 
 				if (collision){
 					if (entity.has(component.DieOnCollision)){
@@ -118,5 +109,26 @@ class Physics extends System {
 					
 			}
 		}
+	}
+	function validCollision(shape:component.Collisions.Rect,otherShape:component.Collisions.Rect){
+		var valid = false;
+		for (othersIgnore in otherShape.ignoreGroups){
+			if (shape.group.indexOf(othersIgnore) == -1){
+				//The other entity is not ignoring one of our groups, this is a valid collision.
+				valid = true;
+				break;
+			}
+		}
+		if (valid){
+			for (ignore in shape.ignoreGroups){
+				if (otherShape.group.indexOf(ignore) != -1){
+					//The other entity is not ignoring one of our groups, this is a valid collision.
+					valid = false;
+					break;
+				}
+			}
+		}
+		return valid;
+
 	}
 }

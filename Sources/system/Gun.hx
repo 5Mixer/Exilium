@@ -61,7 +61,7 @@ class Gun extends System {
 		bullet.set(t);
 		
 		var p = new component.Physics();
-		var speed = 1;
+		var speed = 3;
 		p.friction = 0.999;
 		p.velocity = new kha.math.Vector2(Math.cos(angle * (Math.PI / 180)) * speed,Math.sin(angle * (Math.PI / 180)) * speed);
 		bullet.set(p);

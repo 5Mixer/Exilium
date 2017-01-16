@@ -82,8 +82,8 @@ class Tilemap extends Component{
 		if( swapXY )
 			// Y / X
 			for ( x in x0 ... x1+1 ) {
-				//pts.push({x:y, y:x});
-				if (tileInfo.get(get(y,x)).collide) {
+				var tInfo = tileInfo.get(get(y,x));
+				if (tInfo != null && tInfo.collide) {
 					//g.drawLine((x0+.5)*8,(y0+.5)*8,(x1+.5)*8,(y1+.5)*8,.5);
 					//g.drawRect((x)*8+4,(y)*8+4,2,2);
 					return true;
@@ -97,8 +97,8 @@ class Tilemap extends Component{
 		else
 			// X / Y
 			for ( x in x0 ... x1+1 ) {
-				//pts.push({x:x, y:y});
-				if (tileInfo.get(get(x,y)).collide) {
+				var tInfo = tileInfo.get(get(x,y));
+				if (tInfo != null && tInfo.collide) {
 					
 					//g.drawLine((x0+.5)*8,(y0+.5)*8,(x1+.5)*8,(y1+.5)*8,.5);
 					//g.drawRect((x)*8+4,(y)*8+4,2,2);

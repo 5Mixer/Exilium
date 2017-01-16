@@ -13,6 +13,8 @@ typedef Rect = {
 	var y:Float;
 	var width:Int;
 	var height:Int;
+	@:optional var group:Array<CollisionGroup>;
+	@:optional var ignoreGroups:Array<CollisionGroup>;
 	@:optional var gridIndex:Array<Int>;
 }
 
@@ -40,6 +42,8 @@ class Collisions extends Component{
 	}
 	public function registerCollisionRegion(collisionShape:Rect){
 		collisionRegions.push(collisionShape);
+		collisionShape.group = this.collisionGroups;
+		collisionShape.ignoreGroups = this.ignoreGroups;
 		return this;
 	}
 	public function getCollisionWithCollider(other:Collisions){
@@ -79,11 +83,11 @@ class Collisions extends Component{
 					}*/
 					differ.Collision.shapeWithShape(differ.shapes.Polygon.rectangle(shape.x,shape.y,shape.width,shape.height),differ.shapes.Polygon.rectangle(otherShape.x,otherShape.y,otherShape.width,otherShape.height),result);
 					if (result != null){
-						if (x.separationX != result.separationX)
-							x.separationX += result.separationX;
+						//if (x.separationX != result.separationX)
+							//x.separationX += result.separationX;
 						
-						if (x.separationY != result.separationY)
-							x.separationY += result.separationY;
+						//if (x.separationY != result.separationY)
+							//x.separationY += result.separationY;
 					}
 					
 				}

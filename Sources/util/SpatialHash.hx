@@ -67,7 +67,7 @@ class SpatialHash {
 
 	public function updateCollider(c:Rect){
 		updateIndexes(c, aabbToGrid(new Vector2(c.x,c.y), new Vector2(c.x+c.width,c.y+c.height) ));
-		findContacts(c);
+		//findContacts(c);
 	}
 
 	public function empty(){
@@ -90,22 +90,31 @@ class SpatialHash {
 		_tmp_getGridIndexesArray = null;
 	}
 
-	inline public function findContacts(collider:Rect) {
+	public function findContacts(collider:Rect) {
+		var c = [];
+		if (collider.gridIndex == null) {
+			addCollider(collider);
+		}
 		for (i in collider.gridIndex) {
 			for (otherCollider in grid[i]) {
 				if(collider == otherCollider) continue;
-					// add contacts here
-					// addContact(collider, otherCollider);
+
+				c.push(otherCollider);
 			}
 		}
-
+		
+		return c;
 	}
 
 	inline function aabbToGrid(_min:Vector2, _max:Vector2):Array<Int> {
 		var ret:Array<Int> = _tmp_getGridIndexesArray;
 		ret.splice(0, ret.length);
 
-		if(!overlaps(_min, _max)) return ret;
+		if(!overlaps(_min, _max)) {
+			//trace("Off grid rect: "+_min+", "+_max);
+		
+			return ret;
+		}
 		
 		var aabbMinX:Int = clampi(getIndex_X(_min.x), 0, w-1);
 		var aabbMinY:Int = clampi(getIndex_Y(_min.y), 0, h-1);
@@ -124,6 +133,7 @@ class SpatialHash {
 			for (x in 0...lenX) {
 				for (y in 0...lenY) {
 					if((x == 0 && y == 0) || (x == lenX-1 && y == lenY-1) ) continue;
+					//trace("pushing ret");
 					ret.push(getIndex1d(x, y) + aabbMin);
 				}
 			}
@@ -133,6 +143,10 @@ class SpatialHash {
 	}
 
 	function updateIndexes(c:Rect, _ar:Array<Int>) {
+		if (c.gridIndex == null)
+			c.gridIndex = new Array<Int>();
+
+		
 		for (i in c.gridIndex) {
 			removeIndex(c, i);
 		}

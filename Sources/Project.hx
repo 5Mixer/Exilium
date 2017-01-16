@@ -29,7 +29,7 @@ class Project {
 		kha.System.notifyOnRender(render);
 		Scheduler.addTimeTask(update, 0, 1 / 60);
 
-		kha.SystemImpl.requestFullscreen();
+		//kha.SystemImpl.requestFullscreen();
 
 		ui = new Zui(kha.Assets.fonts.OpenSans, 17, 16, 0, 1.5);
 
@@ -47,34 +47,38 @@ class Project {
 		var prsys = new system.ParticleRenderer(entities);
 		renderSystems.push(prsys);
 		systems.add(prsys);
-		//var dbsys = new system.CollisionDebugView(entities);
-		//renderSystems.push(dbsys);
-		//systems.add(dbsys);
+		
 		var renderer = new system.Renderer(entities);
 		renderSystems.push(renderer);
 		systems.add(renderer);
 		var debug = new system.DebugView(entities);
 		renderSystems.push(debug);
 		systems.add(debug);
-		haxe.Log.trace = debug.traceLog;
+		//haxe.Log.trace = debug.traceLog;
+
+		var collisionSys = new system.Collisions(entities);
+
+		var dbsys = new system.CollisionDebugView(entities,collisionSys.grid);
+		renderSystems.push(dbsys);
+		systems.add(dbsys);
 
 		systems.add(new system.KeyMovement(input,entities));
 		systems.add(new system.AI(entities));
-		systems.add(new system.Collisions(entities));
-		systems.add(new system.Physics(entities,systems.get(system.Collisions).grid);
+		systems.add(collisionSys);
+		systems.add(new system.Physics(entities,collisionSys.grid));
 		systems.add(new system.TimedLife(entities));
 		systems.add(new system.Gun(input,camera,entities));
 		
 		var map = entities.create();
 		map.set(new component.Transformation(new kha.math.Vector2()));
 		map.set(new component.Tilemap());
-		map.set(new component.Collisions());
+		map.set(new component.Collisions([component.Collisions.CollisionGroup.Level],[component.Collisions.CollisionGroup.Level]));
 		map.get(component.Collisions).lockShapesToEntityTransform = false;
 
-		var generator = new util.DungeonWorldGenerator(180,180);
+		var generator = new util.DungeonWorldGenerator(120,120);
 		map.get(component.Tilemap).tiles = generator.tiles;
-		map.get(component.Tilemap).width = 180;
-		map.get(component.Tilemap).height = 180;
+		map.get(component.Tilemap).width = 120;
+		map.get(component.Tilemap).height = 120;
 
 		var t = 0;
 		for (tile in generator.tiles){
@@ -121,7 +125,7 @@ class Project {
 		p.set(new component.Physics());
 		p.set(new component.Gun());
 		p.set(new component.Collisions([component.Collisions.CollisionGroup.Friendly],[component.Collisions.CollisionGroup.Friendly,component.Collisions.CollisionGroup.Bullet]));
-		p.get(component.Collisions).registerCollisionRegion({x:p.get(component.Transformation).pos.x,y:p.get(component.Transformation).pos.y,width:14,height:14});
+		p.get(component.Collisions).registerCollisionRegion({x:p.get(component.Transformation).pos.x,y:p.get(component.Transformation).pos.y,width:16,height:16});
 		p.set(new component.Light());
 		
 		p.get(component.Light).colour = kha.Color.fromBytes(255,200,200);//kha.Color.Green;
@@ -143,9 +147,13 @@ class Project {
 	}
 
 	function update() {
+		//if (frame%30 == 0)
+		//	trace(Math.random());
+		
 		var delta = Scheduler.time() - lastTime;
 		
 		systems.update(delta);
+		cast(systems.get(system.Physics),system.Physics).grid = cast(systems.get(system.Collisions),system.Collisions).grid;
 
 		camera.pos = new kha.math.Vector2(p.get(component.Transformation).pos.x-kha.System.windowWidth()/2/camera.scale.x,p.get(component.Transformation).pos.y-kha.System.windowHeight()/2/camera.scale.y);
 		

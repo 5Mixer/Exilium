@@ -29,6 +29,8 @@ class Project {
 		kha.System.notifyOnRender(render);
 		Scheduler.addTimeTask(update, 0, 1 / 60);
 
+		var spriteData = CompileTime.parseJsonFile('../assets/spriteData.json');
+		
 		//kha.SystemImpl.requestFullscreen();
 
 		ui = new Zui(kha.Assets.fonts.OpenSans, 17, 16, 0, 1.5);
@@ -63,7 +65,6 @@ class Project {
 		systems.add(dbsys);
 
 		systems.add(new system.KeyMovement(input,entities));
-		systems.add(new system.AI(entities));
 		systems.add(collisionSys);
 		systems.add(new system.Physics(entities,collisionSys.grid));
 		systems.add(new system.TimedLife(entities));
@@ -74,6 +75,9 @@ class Project {
 		map.set(new component.Tilemap());
 		map.set(new component.Collisions([component.Collisions.CollisionGroup.Level],[component.Collisions.CollisionGroup.Level]));
 		map.get(component.Collisions).lockShapesToEntityTransform = false;
+
+		
+		systems.add(new system.AI(entities,map.get(component.Tilemap)));
 
 		var generator = new util.DungeonWorldGenerator(120,120);
 		map.get(component.Tilemap).tiles = generator.tiles;
@@ -106,9 +110,9 @@ class Project {
 			//if (map.get(component.Tilemap).getTile(x,y) == 0) continue;
 			var slime = entities.create();
 			slime.set(new component.Transformation(new kha.math.Vector2(e.x*16,e.y*16)));
-			slime.set(new component.Sprite(3));
-			slime.get(component.Sprite).spriteMap = kha.Assets.images.Slime;
-			slime.get(component.Sprite).tilesize = 8;
+			slime.set(new component.AnimatedSprite(spriteData.entity.slime.animations));
+			slime.get(component.AnimatedSprite).spriteMap = kha.Assets.images.Slime;
+			slime.get(component.AnimatedSprite).tilesize = 8;
 			slime.set(new component.Physics());
 			slime.set(new component.AI());
 			slime.set(new component.DieOnCollision([component.Collisions.CollisionGroup.Bullet]));
@@ -122,13 +126,16 @@ class Project {
 		p = entities.create();
 		
 		p.set(new component.Transformation(new kha.math.Vector2(31*16,31*16)));
-		p.set(new component.Sprite(0));
-		p.get(component.Sprite).spriteMap = kha.Assets.images.ghost;
+		//p.set(new component.Sprite(0));
+		p.set(new component.AnimatedSprite(spriteData.entity.ghost.animations));
+		p.set(new component.AITarget());
+		p.get(component.AnimatedSprite).spriteMap = kha.Assets.images.Ghost;
+		p.get(component.AnimatedSprite).tilesize = 10;
 		p.set(new component.KeyMovement());
 		p.set(new component.Physics());
 		p.set(new component.Gun());
 		p.set(new component.Collisions([component.Collisions.CollisionGroup.Friendly],[component.Collisions.CollisionGroup.Friendly,component.Collisions.CollisionGroup.Bullet]));
-		p.get(component.Collisions).registerCollisionRegion({x:p.get(component.Transformation).pos.x,y:p.get(component.Transformation).pos.y,width:16,height:16});
+		p.get(component.Collisions).registerCollisionRegion({x:p.get(component.Transformation).pos.x,y:p.get(component.Transformation).pos.y,width:10,height:10});
 		p.set(new component.Light());
 		
 		p.get(component.Light).colour = kha.Color.fromBytes(255,200,200);//kha.Color.Green;

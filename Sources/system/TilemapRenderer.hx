@@ -22,8 +22,8 @@ class TilemapRenderer extends System {
 
 			var camtiley:Int = cast Math.max(Math.floor((camera.pos.y)/tilesize),0);
 			var camtilex:Int = cast Math.max(Math.floor((camera.pos.x)/tilesize),0);
-			var windoww = Math.ceil(kha.System.windowWidth()/(16*4));
-			var windowh = Math.ceil(kha.System.windowHeight()/(16*4));
+			var windoww = Math.ceil(kha.System.windowWidth()/(16*4))+1;
+			var windowh = Math.ceil(kha.System.windowHeight()/(16*4))+1;
 
 			for (y in camtiley ... cast Math.min(camtiley+windowh,map.height)){
 				for (x in camtilex ... cast Math.min(camtilex+windoww,map.width)){
@@ -73,7 +73,7 @@ class TilemapRenderer extends System {
 					
 					var sourcePos = { x: (tileData.id%map.width)*tilesize, y:Math.floor(tileData.id/map.height)*tilesize };
 					
-					g.drawScaledSubImage(kha.Assets.images.Tileset,sourcePos.x,sourcePos.y,tilesize,tilesize,x*tilesize,y*tilesize,tilesize,tilesize);
+					g.drawScaledSubImage(kha.Assets.images.Dungeonsets,sourcePos.x,sourcePos.y,tilesize,tilesize,x*tilesize,y*tilesize,tilesize,tilesize);
 
 				}
 			}

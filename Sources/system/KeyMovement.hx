@@ -17,11 +17,24 @@ class KeyMovement extends System {
 			var physics:component.Physics = entity.get(component.Physics);
 
 			var speed = keymovement.speed;
-
-			if (input.left) physics.velocity.x = -speed;
-			if (input.right) physics.velocity.x = speed;
-			if (input.up) physics.velocity.y = -speed;
-			if (input.down) physics.velocity.y = speed;
+			var animation = "walk";
+			if (input.up) {
+				physics.velocity.y = -speed;
+				animation += "_up";
+			}else if (input.down) {
+				physics.velocity.y = speed;
+				animation += "_down";
+			}
+			if (input.left) {
+				physics.velocity.x = -speed;
+				animation += "_left";
+			}else if (input.right) {
+				physics.velocity.x = speed;
+				animation += "_right";
+			}
+			if (entity.has(component.AnimatedSprite))
+			entity.get(component.AnimatedSprite).playAnimation(animation);
+			
 
 		}
 	}

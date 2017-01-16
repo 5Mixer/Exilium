@@ -12,6 +12,7 @@ enum AIMode {
 }
 class AI extends Component{
 	public var activeState:AIMode;
+	public var visionLength = 50;
 	public function new (){
 		activeState = AIMode.Idle;
 		super();

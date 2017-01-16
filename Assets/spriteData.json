@@ -12,16 +12,31 @@
 		"ghost" : {
 			"tileset":"ghost",
 			"animations" : {
-				"idle" : 3,
-				"walk up" : 4,
-				"walk up right" : 4,
-				"walk right" : 4,
-				"walk down right" :4,
-				"walk down" : 4,
-				"walk down left" : 4,
-				"walk left" : 4,
-				"walk up left" : 4,
-				"shoot" : 2
+				"idle" : [0,1,2,3],
+				"walk_down" : [0,1,2,3],
+				"walk_down_left" : [4,5,6,7],
+				"walk_left" : [8,9,10,11],
+				"walk_up_left" : [12,13,14,15],
+				"walk_up" : [16,17,18,19],
+				"walk_up_right" : [20,21,22,23],
+				"walk_right" : [24,25,26,27],
+				"walk_down_right" :[28,29,30,31],
+				"die" : [32,33,34,45]
+			}
+		},
+		"slime" : {
+			"tileset":"slime",
+			"animations" : {
+				"idle" : [0],
+				"ul" : [0],
+				"l" : [1],
+				"dl" : [2],
+				"d" : [3],
+				"dr" : [4],
+				"r" : [5],
+				"ur" : [6],
+				"u" :[7],
+				"die" : [8]
 			}
 		}
 	}

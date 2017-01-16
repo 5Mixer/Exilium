@@ -4,7 +4,6 @@ import kha.math.FastMatrix3;
 
 class Renderer extends System {
 	var view:eskimo.views.View;
-	var tilesize = 16;
 	public function new (entities:eskimo.EntityManager){
 		view = new eskimo.views.View(new eskimo.filters.Filter([component.Sprite,component.Transformation]), entities);
 		super();
@@ -18,8 +17,10 @@ class Renderer extends System {
 			var sprite:component.Sprite = entity.get(component.Sprite);
 			var transformation:component.Transformation = entity.get(component.Transformation);
 
-			var originX = 8;
-			var originY = 8;
+			
+			var tilesize = sprite.tilesize;
+			var originX = Math.floor(tilesize/2);
+			var originY = Math.floor(tilesize/2);
 			var x = transformation.pos.x;
 			var y = transformation.pos.y;
 			var angle = transformation.angle;

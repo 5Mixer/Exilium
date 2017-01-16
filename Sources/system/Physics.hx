@@ -102,7 +102,12 @@ class Physics extends System {
 
 				if (collision){
 					if (entity.has(component.DieOnCollision)){
-						entity.destroy();
+						for (killingGroup in entity.get(component.DieOnCollision).collisionGroups){
+							if (collidingShape.group.indexOf(killingGroup) != -1){
+								entity.destroy();
+								break;
+							}
+						}
 					}
 				}
 			

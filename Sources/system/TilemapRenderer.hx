@@ -31,6 +31,10 @@ class TilemapRenderer extends System {
 					g.color = kha.Color.White;
 					
 					var tileData = map.tileInfo.get(map.tiles[(y*map.width)+x]);
+
+					if (tileData.id == -1)
+						continue;
+
 					var spec = tileData.specularity==null ? 1.0 : tileData.specularity;
 					
 					//In the rendering loop of tilemaps, where x,y is tile location.
@@ -70,8 +74,8 @@ class TilemapRenderer extends System {
 					//Now actually apply the tint, again, within a range.
 					g.color = kha.Color.fromFloats(Math.min(c.r,1),Math.min(c.g,1),Math.min(c.b,1),1);
 					
-					
-					var sourcePos = { x: (tileData.id%map.width)*tilesize, y:Math.floor(tileData.id/map.height)*tilesize };
+					var id = tileData.id;
+					var sourcePos = { x: (id%Math.floor(kha.Assets.images.Dungeonsets.width/tilesize))*tilesize, y:Math.floor(id/Math.floor(kha.Assets.images.Dungeonsets.height/tilesize))*tilesize };
 					
 					g.drawScaledSubImage(kha.Assets.images.Dungeonsets,sourcePos.x,sourcePos.y,tilesize,tilesize,x*tilesize,y*tilesize,tilesize,tilesize);
 

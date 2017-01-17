@@ -13,12 +13,13 @@ typedef Tile = {
 class Tilemap extends Component{
 	public var tiles = new Array<Int>();
 	public var tileInfo:Map<Int,Tile> = [
-		0 => { name: "empty", collide: false, id: 0},
+		0 => { name: "empty", collide: false, id: -1},
 		1 => { name: "floor", collide: false, id: 4, specularity: 2},
 		2 => { name: "dungeonwall", collide: true, id: 1, ambient: kha.Color.fromFloats(.1,.1,.1), specularity: 1.3},
 		3 => { name: "dungeonwall.h", collide: true, id: 2, ambient: kha.Color.fromFloats(.1,.1,.1), specularity: 1.3},
 		4 => { name: "dungeonwall.v", collide: true, id: 3, ambient: kha.Color.fromFloats(.1,.1,.1), specularity: 1.3},
-		5 => { name: "gate", collide: false, id: 4}
+		5 => { name: "dungeonwall.side", collide: true, id: 0, ambient: kha.Color.fromFloats(.1,.1,.1), specularity: 1.3},
+		6 => { name: "gate", collide: false, id: 4}
 	];
 	public var width:Int;
 	public var height:Int;

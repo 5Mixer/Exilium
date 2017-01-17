@@ -64,6 +64,8 @@ class Project {
 		renderSystems.push(dbsys);
 		systems.add(dbsys);
 
+		renderSystems.push(new system.Healthbars(entities));
+
 		systems.add(new system.KeyMovement(input,entities));
 		systems.add(collisionSys);
 		systems.add(new system.Physics(entities,collisionSys.grid));
@@ -96,7 +98,6 @@ class Project {
 		for (t in generator.treasure){
 			var treasure = entities.create();
 			treasure.set(new component.Transformation(new kha.math.Vector2(t.x*16,t.y*16)));
-			//treasure.set(new component.Physics());
 			treasure.set(new component.Sprite(4));
 			treasure.set(new component.Collisions([component.Collisions.CollisionGroup.Level],[component.Collisions.CollisionGroup.Level]));
 			treasure.get(component.Collisions).registerCollisionRegion({x:treasure.get(component.Transformation).pos.x,y:treasure.get(component.Transformation).pos.y,width:16,height:16});
@@ -111,8 +112,10 @@ class Project {
 			var slime = entities.create();
 			slime.set(new component.Transformation(new kha.math.Vector2(e.x*16,e.y*16)));
 			slime.set(new component.AnimatedSprite(spriteData.entity.slime.animations));
+			slime.set(new component.Health(5));
 			slime.get(component.AnimatedSprite).spriteMap = kha.Assets.images.Slime;
 			slime.get(component.AnimatedSprite).tilesize = 8;
+			slime.get(component.AnimatedSprite).speed = 4;
 			slime.set(new component.Physics());
 			slime.set(new component.AI());
 			slime.set(new component.DieOnCollision([component.Collisions.CollisionGroup.Bullet]));
@@ -121,14 +124,13 @@ class Project {
 			slime.get(component.Collisions).registerCollisionRegion(b);
 		}
 
-		//player = new Player(input,this);
-
 		p = entities.create();
 		
 		p.set(new component.Transformation(new kha.math.Vector2(31*16,31*16)));
 		//p.set(new component.Sprite(0));
 		p.set(new component.AnimatedSprite(spriteData.entity.ghost.animations));
 		p.set(new component.AITarget());
+		p.set(new component.Health(50));
 		p.get(component.AnimatedSprite).spriteMap = kha.Assets.images.Ghost;
 		p.get(component.AnimatedSprite).tilesize = 10;
 		p.set(new component.KeyMovement());
@@ -145,10 +147,6 @@ class Project {
 			p.get(component.Transformation).pos = new kha.math.Vector2(31*16,31*16);
 			
 		}
-
-		//entities.push(player);
-
-		
 
 		lastTime = Scheduler.time();
 
@@ -191,6 +189,7 @@ class Project {
 		
 
 		//Draw mouse cursor.
+		g.color = kha.Color.White;
 		g.drawSubImage(kha.Assets.images.Entities,input.mousePos.x/4 -4,input.mousePos.y/4 -4,2*16,0,16,16);
 
 		g.end();

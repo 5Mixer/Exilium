@@ -15,6 +15,7 @@ class Collisions extends System {
 		for (entity in view.entities){
 			var collisions = entity.get(component.Collisions);
 			for (collider in collisions.collisionRegions){
+				collider.ofEntity = entity;
 				grid.addCollider(collider);
 			}
 		}

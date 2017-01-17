@@ -16,6 +16,7 @@ typedef Rect = {
 	@:optional var group:Array<CollisionGroup>;
 	@:optional var ignoreGroups:Array<CollisionGroup>;
 	@:optional var gridIndex:Array<Int>;
+	@:optional var ofEntity:eskimo.Entity;
 }
 
 class Collisions extends Component{

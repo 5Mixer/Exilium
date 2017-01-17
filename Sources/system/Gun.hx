@@ -19,38 +19,39 @@ class Gun extends System {
 		super.onUpdate(delta);
 		frame++;
 		
-		if (frame%2 == 0 && input.mouseButtons.left){
+		if (input.mouseButtons.left){
 			for (entity in view.entities){
 				
 				var transformation:component.Transformation = entity.get(component.Transformation);
 				var gun:component.Gun = entity.get(component.Gun);
 
-				var dir = transformation.pos.sub(camera.screenToWorld(input.mousePos.sub(new kha.math.Vector2(32,32))));
-				var a = Math.round(Math.atan2(-dir.y,-dir.x)*(180/Math.PI));
+				if (frame%gun.fireRate == 0){
+					var dir = transformation.pos.sub(camera.screenToWorld(input.mousePos.sub(new kha.math.Vector2(32,32))));
+					var a = Math.round(Math.atan2(-dir.y,-dir.x)*(180/Math.PI));
 
-				var camOffset = dir.mult(1);
-				camOffset.normalize();
-				camOffset = camOffset.mult(6);
-				camera.offset.x += camOffset.x;
-				camera.offset.y += camOffset.y;
+					var camOffset = dir.mult(1);
+					camOffset.normalize();
+					camOffset = camOffset.mult(6+Math.random()*2);
+					camera.offset.x += camOffset.x;
+					camera.offset.y += camOffset.y;
 
-				if (entity.has(component.Physics)){
-					var physics:component.Physics = entity.get(component.Physics);
-					
-					var knockback = .7+Math.random()/2;
-					physics.velocity.x -= Math.cos(a*(Math.PI/180))*knockback;
-					physics.velocity.y -= Math.sin(a*(Math.PI/180))*knockback;
+					if (entity.has(component.Physics)){
+						var physics:component.Physics = entity.get(component.Physics);
+						
+						var knockback = .5+(Math.random()*.3);
+						physics.velocity.x -= Math.cos(a*(Math.PI/180))*knockback;
+						physics.velocity.y -= Math.sin(a*(Math.PI/180))*knockback;
+					}
+
+					shoot(entity,a);
 				}
-
-				shoot(entity,a);
-				
 			}
 		}
 	}
 	public function shoot (parent:eskimo.Entity,angle){
 
 		
-		//kha.audio1.Audio.play(kha.Assets.sounds.RapidFire);
+		kha.audio1.Audio.play(kha.Assets.sounds.RapidFire);
 		
 		var l = { pos: parent.get(component.Transformation).pos.mult(1), radius: .6, colour: kha.Color.Red};
 	
@@ -61,7 +62,7 @@ class Gun extends System {
 		bullet.set(t);
 		
 		var p = new component.Physics();
-		var speed = 3;
+		var speed = 6;
 		p.friction = 0.999;
 		p.velocity = new kha.math.Vector2(Math.cos(angle * (Math.PI / 180)) * speed,Math.sin(angle * (Math.PI / 180)) * speed);
 		bullet.set(p);

@@ -45,6 +45,7 @@ class DungeonWorldGenerator {
 		growFromRoom(rooms[0]);
 		fillRooms();
 		bakerooms();
+		createWallDepth();
 	}
 	var fails = 0;
 	function fail(){
@@ -120,6 +121,14 @@ class DungeonWorldGenerator {
 			placeThingInRoom(room);
 		}
 	}
+	function createWallDepth (){
+		for (x in 0...width){
+			for (y in 0...height){
+				if ((get(x,y-1) == 3 || get(x,y-1) == 2) && get(x,y) != 4)
+					set(x,y,5);
+			}
+		}
+	}
 	function createMap () {
 		var i = 0;
 		for (y in 0...height){
@@ -150,7 +159,7 @@ class DungeonWorldGenerator {
 		}
 		for (room in rooms){
 			for (door in room.doorways){
-				set(door.x,door.y,5);
+				set(door.x,door.y,6);
 			}
 		}
 	}

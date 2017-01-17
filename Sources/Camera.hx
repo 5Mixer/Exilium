@@ -4,7 +4,7 @@ class Camera {
 	public var rotation = 0;
 	public var pos:kha.math.Vector2;
 	public var offset:kha.math.Vector2; //For screenshake etc.
-	public var offsetRestore:Float = .4; //Smaller is faster.
+	public var offsetRestore:Float = .3; //Smaller is faster.
 	public var scale = {x : 4.0, y : 4.0};
 	public function new (){
 		pos = new kha.math.Vector2(-kha.System.windowWidth()/2,-kha.System.windowHeight()/2);

@@ -51,6 +51,14 @@ class Physics extends System {
 							collision = true;
 							collidingShape = otherShape;
 							transformation.pos.x += c.separationX;
+
+							if (collidingShape.ofEntity.has(component.DieOnCollision))
+								for (group in shape.group)
+									if (collidingShape.ofEntity.get(component.DieOnCollision).collisionGroups.indexOf(group) != -1){
+										collidingShape.ofEntity.destroy();
+										break;
+									}
+								
 							break;
 						}
 					}
@@ -81,6 +89,14 @@ class Physics extends System {
 							collision = true;
 							collidingShape = otherShape;
 							transformation.pos.y += c.separationY;
+
+							if (collidingShape.ofEntity.has(component.DieOnCollision))
+								for (group in shape.group)
+									if (collidingShape.ofEntity.get(component.DieOnCollision).collisionGroups.indexOf(group) != -1){
+										collidingShape.ofEntity.destroy();
+										break;
+									}
+
 							break;
 						}
 					}

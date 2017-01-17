@@ -77,8 +77,6 @@ class Project {
 		map.set(new component.Transformation(new kha.math.Vector2()));
 		map.set(new component.Tilemap());
 		map.set(new component.Collisions([component.Collisions.CollisionGroup.Level],[component.Collisions.CollisionGroup.Level]));
-		map.get(component.Collisions).lockShapesToEntityTransform = false;
-
 		
 		systems.add(new system.AI(entities,map.get(component.Tilemap)));
 
@@ -99,9 +97,9 @@ class Project {
 		for (t in generator.treasure){
 			var treasure = entities.create();
 			treasure.set(new component.Transformation(new kha.math.Vector2(t.x*16,t.y*16)));
-			treasure.set(new component.Sprite(4));
+			treasure.set(new component.Sprite(cast spriteData.entity.chest));
 			treasure.set(new component.Collisions([component.Collisions.CollisionGroup.Level],[component.Collisions.CollisionGroup.Level]));
-			treasure.get(component.Collisions).registerCollisionRegion({x:treasure.get(component.Transformation).pos.x,y:treasure.get(component.Transformation).pos.y,width:16,height:16});
+			treasure.get(component.Collisions).registerCollisionRegion({x:0,y:0,width:16,height:16});
 			treasure.set(new component.DieOnCollision([component.Collisions.CollisionGroup.Bullet]));
 			
 			//treasure.set(new component.Light());
@@ -121,7 +119,7 @@ class Project {
 			slime.set(new component.AI());
 			slime.set(new component.DieOnCollision([component.Collisions.CollisionGroup.Bullet]));
 			slime.set(new component.Collisions([component.Collisions.CollisionGroup.Enemy]));
-			var b = {x:slime.get(component.Transformation).pos.x,y:slime.get(component.Transformation).pos.y,width:8,height:8};
+			var b:component.Collisions.Rect = {x:0,y:0,width:8,height:8};
 			slime.get(component.Collisions).registerCollisionRegion(b);
 		}
 	}
@@ -140,7 +138,7 @@ class Project {
 		p.set(new component.Physics());
 		p.set(new component.Gun());
 		p.set(new component.Collisions([component.Collisions.CollisionGroup.Friendly],[component.Collisions.CollisionGroup.Friendly,component.Collisions.CollisionGroup.Bullet]));
-		p.get(component.Collisions).registerCollisionRegion({x:p.get(component.Transformation).pos.x,y:p.get(component.Transformation).pos.y,width:10,height:10});
+		p.get(component.Collisions).registerCollisionRegion({x:0,y:0,width:10,height:10});
 		p.set(new component.Light());
 		
 		p.get(component.Light).colour = kha.Color.fromBytes(255,200,200);//kha.Color.Green;

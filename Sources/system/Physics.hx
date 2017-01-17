@@ -28,25 +28,22 @@ class Physics extends System {
 				transformation.pos.y += physics.velocity.y;
 
 			}else{
-				transformation.pos.x += physics.velocity.x;
-				//transformation.pos.y += physics.velocity.y;
 				var collision = false;
 				var collidingShape:component.Collisions.Rect = null;
 
-				//transformation.pos.x += physics.velocity.x;
-				if (collider.lockShapesToEntityTransform){
-					for (shape in collider.collisionRegions){
-						shape.x = transformation.pos.x;
-						shape.y = transformation.pos.y;
-
-					}
-				}
+				transformation.pos.x += physics.velocity.x;
 				for (shape in collider.collisionRegions){
 
 					for (otherShape in grid.findContacts(shape)){
 						if (!validCollision(shape,otherShape)) continue;
+						if (!otherShape.ofEntity.has(component.Transformation)) continue;
 
-						var c = differ.Collision.shapeWithShape(differ.shapes.Polygon.rectangle(shape.x,shape.y,shape.width,shape.height,false),differ.shapes.Polygon.rectangle(otherShape.x,otherShape.y,otherShape.width,otherShape.height,false));
+						var otherTransform = otherShape.ofEntity.get(component.Transformation).pos;
+
+						var c = differ.Collision.shapeWithShape(
+							differ.shapes.Polygon.rectangle(shape.x+transformation.pos.x,shape.y+transformation.pos.y,shape.width,shape.height,false),
+							differ.shapes.Polygon.rectangle(otherShape.x+otherTransform.x,otherShape.y+otherTransform.y,otherShape.width,otherShape.height,false));
+						
 						if (c != null && c.separationX != 0){
 							collision = true;
 							collidingShape = otherShape;
@@ -62,28 +59,19 @@ class Physics extends System {
 							break;
 						}
 					}
-					
-					if (collider.lockShapesToEntityTransform){
-						shape.x = transformation.pos.x;
-					}
 				}
 
 				transformation.pos.y += physics.velocity.y;
-				if (collider.lockShapesToEntityTransform){
-					for (collisionRegion in collider.collisionRegions){
-					
-						for (shape in collider.collisionRegions){
-							shape.x = transformation.pos.x;
-							shape.y = transformation.pos.y;
-						}
-					}
-				}
+				
 				for (shape in collider.collisionRegions){
 					for (otherShape in grid.findContacts(shape)){
 						
 						if (!validCollision(shape,otherShape)) continue;
-					
-						var c = differ.Collision.shapeWithShape(differ.shapes.Polygon.rectangle(shape.x,shape.y,shape.width,shape.height,false),differ.shapes.Polygon.rectangle(otherShape.x,otherShape.y,otherShape.width,otherShape.height,false));
+						if (!otherShape.ofEntity.has(component.Transformation)) continue;
+						var otherTransform = otherShape.ofEntity.get(component.Transformation).pos;
+						var c = differ.Collision.shapeWithShape(
+							differ.shapes.Polygon.rectangle(shape.x+transformation.pos.x,shape.y+transformation.pos.y,shape.width,shape.height,false),
+							differ.shapes.Polygon.rectangle(otherShape.x+otherTransform.x,otherShape.y+otherTransform.y,otherShape.width,otherShape.height,false));
 						
 						if (c != null && c.separationY != 0){
 							collision = true;
@@ -100,22 +88,8 @@ class Physics extends System {
 							break;
 						}
 					}
-					
-					if (collider.lockShapesToEntityTransform){
-						shape.y = transformation.pos.y;
-					}
 				}
-				if (collider.lockShapesToEntityTransform){
-					for (collisionRegion in collider.collisionRegions){
-					
-						for (shape in collider.collisionRegions){
-							shape.x = transformation.pos.x;
-							shape.y = transformation.pos.y;
-						}
-					}
-				}
-
-
+				
 				if (collision){
 					if (entity.has(component.DieOnCollision)){
 						for (killingGroup in entity.get(component.DieOnCollision).collisionGroups){

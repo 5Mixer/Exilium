@@ -57,8 +57,12 @@ class SpatialHash {
 	}
 
 
-	public function addCollider(c:Rect){
-		updateIndexes(c, aabbToGrid(new Vector2(c.x,c.y), new Vector2(c.x+c.width,c.y+c.height) ));
+	public function addCollider(c:Rect,offset:Vector2){
+		if (offset == null){
+			updateIndexes(c, aabbToGrid(new Vector2(c.x,c.y), new Vector2(c.x+c.width,c.y+c.height) ));
+		}else{
+			updateIndexes(c, aabbToGrid(new Vector2(c.x+offset.x,c.y+offset.y), new Vector2(c.x+c.width+offset.x,c.y+c.height+offset.y) ));
+		}
 	}
 
 	public function removeCollider(c:Rect):Void{
@@ -92,16 +96,16 @@ class SpatialHash {
 
 	public function findContacts(collider:Rect) {
 		var c = [];
-		if (collider.gridIndex == null) {
-			addCollider(collider);
-		}
-		for (i in collider.gridIndex) {
-			for (otherCollider in grid[i]) {
-				if(collider == otherCollider) continue;
+		if (collider.gridIndex != null){
+			for (i in collider.gridIndex) {
+				for (otherCollider in grid[i]) {
+					if(collider == otherCollider) continue;
 
-				c.push(otherCollider);
+					c.push(otherCollider);
+				}
 			}
 		}
+		
 		
 		return c;
 	}

@@ -12,6 +12,9 @@ Promise.all([Project.createProject('build/windows-build', __dirname), Project.cr
 	if (fs.existsSync(path.join('C:/HaxeToolkit/haxe/lib/differ', 'korefile.js'))) {
 		libs.push(Project.createProject('C:/HaxeToolkit/haxe/lib/differ', __dirname));
 	}
+	if (fs.existsSync(path.join('C:/HaxeToolkit/haxe/lib/compiletime', 'korefile.js'))) {
+		libs.push(Project.createProject('C:/HaxeToolkit/haxe/lib/compiletime', __dirname));
+	}
 	if (fs.existsSync(path.join('C:/HaxeToolkit/haxe/lib/zui', 'korefile.js'))) {
 		libs.push(Project.createProject('C:/HaxeToolkit/haxe/lib/zui', __dirname));
 	}

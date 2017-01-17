@@ -6,6 +6,7 @@ class Gun extends System {
 	var camera:Camera;
 	var view:eskimo.views.View;
 	var entities:eskimo.EntityManager;
+	var spriteData = CompileTime.parseJsonFile('../assets/spriteData.json').entity.bullet_basic;
 
 	override public function new (input:Input,camera:Camera,entities:eskimo.EntityManager){
 		this.input = input;
@@ -51,7 +52,7 @@ class Gun extends System {
 	public function shoot (parent:eskimo.Entity,angle){
 
 		
-		kha.audio1.Audio.play(kha.Assets.sounds.RapidFire);
+		//kha.audio1.Audio.play(kha.Assets.sounds.RapidFire);
 		
 		var l = { pos: parent.get(component.Transformation).pos.mult(1), radius: .6, colour: kha.Color.Red};
 	
@@ -66,8 +67,8 @@ class Gun extends System {
 		p.friction = 0.999;
 		p.velocity = new kha.math.Vector2(Math.cos(angle * (Math.PI / 180)) * speed,Math.sin(angle * (Math.PI / 180)) * speed);
 		bullet.set(p);
-		bullet.set(new component.Sprite(0));
-		bullet.get(component.Sprite).spriteMap = kha.Assets.images.Projectiles;
+		bullet.set(new component.Sprite(cast spriteData));
+		//bullet.get(component.Sprite).spriteMap = kha.Assets.images.Projectiles;
 
 		bullet.set(new component.TimedLife(3));
 		bullet.set(new component.DieOnCollision([component.Collisions.CollisionGroup.Enemy,component.Collisions.CollisionGroup.Level]));
@@ -76,7 +77,7 @@ class Gun extends System {
 		bullet.get(component.Light).colour = kha.Color.Red;
 		bullet.get(component.Light).strength = .5;
 		bullet.set(new component.Collisions([component.Collisions.CollisionGroup.Bullet,component.Collisions.CollisionGroup.Friendly],[component.Collisions.CollisionGroup.Bullet,component.Collisions.CollisionGroup.Friendly]));
-		bullet.get(component.Collisions).registerCollisionRegion({offx:4,offy:4,width:7,height:7});
+		bullet.get(component.Collisions).registerCollisionRegion({x:4,y:4,width:7,height:7});
 
 		var particle = entities.create();
 		particle.set(new component.VisualParticle(component.VisualParticle.Effect.Smoke));

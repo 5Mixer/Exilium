@@ -10,13 +10,13 @@ class Collisions extends System {
 	}
 	override public function onUpdate (delta:Float){
 		super.onUpdate(delta);
-		grid.empty();
+		grid = new util.SpatialHash(new kha.math.Vector2(), new kha.math.Vector2(130*16,130*16),16);
 		
 		for (entity in view.entities){
 			var collisions = entity.get(component.Collisions);
 			for (collider in collisions.collisionRegions){
 				collider.ofEntity = entity;
-				grid.addCollider(collider);
+				grid.addCollider(collider,entity.get(component.Transformation).pos);
 			}
 		}
 	}

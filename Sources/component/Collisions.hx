@@ -9,10 +9,8 @@ enum CollisionGroup {
 }
 
 typedef Rect = {
-	@:optional var x:Float;
-	@:optional var y:Float;
-	@:optional var offx:Float;
-	@:optional var offy:Float;
+	var x:Float;
+	var y:Float;
 	var width:Int;
 	var height:Int;
 	@:optional var group:Array<CollisionGroup>;
@@ -26,7 +24,6 @@ class Collisions extends Component{
 	
 	public var ignoreGroups = new Array<CollisionGroup>();//Will ignore collisions with entities having, at minimum, ALL these fields.
 	public var collisionGroups = new Array<CollisionGroup>(); //Groups that this entity resides in. Could be multiple.
-	public var lockShapesToEntityTransform = true;
 	var x = new differ.data.ShapeCollision();
 	var validCollision = false;
 	var result:differ.data.ShapeCollision = null;

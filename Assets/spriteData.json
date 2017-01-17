@@ -48,6 +48,18 @@
 				"attack ur" : [72,73,74,75],
 				"attack u" : [76,77,78,79]
 			}
+		},
+		"chest" : {
+			"tileset":"objects",
+			"id":1,
+			"width": 8,
+			"height": 8
+		},
+		"bullet_basic" : {
+			"tileset":"projectiles",
+			"id":0,
+			"width":8,
+			"height":8
 		}
 	}
 }

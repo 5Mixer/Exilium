@@ -17,7 +17,7 @@ class ParticleRenderer extends System {
 			if (entity.has(component.TimedLife)){
 				var life = entity.get(component.TimedLife);
 
-				g.fillCircle(transform.pos.x,transform.pos.y,((life.length-life.fuse)/life.length)*4,4);
+				g.fillCircle(transform.pos.x,transform.pos.y,((life.length-life.fuse)/life.length)*2,4);
 			}else{
 				g.fillCircle(transform.pos.x,transform.pos.y,3,4);
 			}

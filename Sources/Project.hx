@@ -24,53 +24,54 @@ class Project {
 	var renderview:eskimo.views.View;
 	
 	var ui:Zui;
+	var spriteData = CompileTime.parseJsonFile('../assets/spriteData.json');
 
 	public function new() {
 		kha.System.notifyOnRender(render);
 		Scheduler.addTimeTask(update, 0, 1 / 60);
-
-		var spriteData = CompileTime.parseJsonFile('../assets/spriteData.json');
 		
-		//kha.SystemImpl.requestFullscreen();
-
-		ui = new Zui(kha.Assets.fonts.OpenSans, 17, 16, 0, 1.5);
+		input = new Input();
+		camera = new Camera();
+		kha.input.Mouse.get().hideSystemCursor();
 
 		var components = new eskimo.ComponentManager();
 		entities = new eskimo.EntityManager(components);
 		systems = new eskimo.systems.SystemManager(entities);		
 
-		input = new Input();
 
-		camera = new Camera();
-
-		var lrsys = new system.TilemapRenderer(camera,entities);
-		renderSystems.push(lrsys);
-		systems.add(lrsys);
-		var prsys = new system.ParticleRenderer(entities);
-		renderSystems.push(prsys);
-		systems.add(prsys);
+		registerRenderSystem(new system.TilemapRenderer(camera,entities));
+		registerRenderSystem(new system.ParticleRenderer(entities));
+		registerRenderSystem(new system.Renderer(entities));
+		registerRenderSystem(new system.DebugView(entities));
+		registerRenderSystem(new system.Healthbars(entities));
 		
-		var renderer = new system.Renderer(entities);
-		renderSystems.push(renderer);
-		systems.add(renderer);
-		var debug = new system.DebugView(entities);
-		renderSystems.push(debug);
-		systems.add(debug);
-		//haxe.Log.trace = debug.traceLog;
-
 		var collisionSys = new system.Collisions(entities);
-
-		var dbsys = new system.CollisionDebugView(entities,collisionSys.grid);
-		renderSystems.push(dbsys);
-		systems.add(dbsys);
-
-		renderSystems.push(new system.Healthbars(entities));
-
-		systems.add(new system.KeyMovement(input,entities));
+		registerRenderSystem(new system.CollisionDebugView(entities,collisionSys.grid));
+		
 		systems.add(collisionSys);
+		systems.add(new system.KeyMovement(input,entities));
 		systems.add(new system.Physics(entities,collisionSys.grid));
 		systems.add(new system.TimedLife(entities));
 		systems.add(new system.Gun(input,camera,entities));
+		
+		resetWorld();
+		input.onRUp = function (){
+			resetWorld();
+		}
+
+		lastTime = Scheduler.time();
+		
+	}
+	function resetWorld(){
+		createMap();
+		createPlayer();
+	}
+	function registerRenderSystem(system:System){
+		renderSystems.push(system);
+		systems.add(system);
+	}
+	function createMap () {
+		entities.clear();
 		
 		var map = entities.create();
 		map.set(new component.Transformation(new kha.math.Vector2()));
@@ -123,11 +124,13 @@ class Project {
 			var b = {x:slime.get(component.Transformation).pos.x,y:slime.get(component.Transformation).pos.y,width:8,height:8};
 			slime.get(component.Collisions).registerCollisionRegion(b);
 		}
+	}
+	function createPlayer() {
+		if (p != null && p.get(component.Transformation) != null)
+			p.destroy();
 
 		p = entities.create();
-		
-		p.set(new component.Transformation(new kha.math.Vector2(31*16,31*16)));
-		//p.set(new component.Sprite(0));
+		p.set(new component.Transformation(new kha.math.Vector2(31*16,32*16)));
 		p.set(new component.AnimatedSprite(spriteData.entity.ghost.animations));
 		p.set(new component.AITarget());
 		p.set(new component.Health(50));
@@ -142,28 +145,17 @@ class Project {
 		
 		p.get(component.Light).colour = kha.Color.fromBytes(255,200,200);//kha.Color.Green;
 		p.get(component.Light).strength = .8;
-
-		input.onRUp = function (){
-			p.get(component.Transformation).pos = new kha.math.Vector2(31*16,31*16);
-			
-		}
-
-		lastTime = Scheduler.time();
-
-		kha.input.Mouse.get().hideSystemCursor();
-		
 	}
 
 	function update() {
-		//if (frame%30 == 0)
-		//	trace(Math.random());
 		
 		var delta = Scheduler.time() - lastTime;
 		
 		systems.update(delta);
 		cast(systems.get(system.Physics),system.Physics).grid = cast(systems.get(system.Collisions),system.Collisions).grid;
 
-		camera.pos = new kha.math.Vector2(p.get(component.Transformation).pos.x-kha.System.windowWidth()/2/camera.scale.x,p.get(component.Transformation).pos.y-kha.System.windowHeight()/2/camera.scale.y);
+		if (p != null && p.has(component.Transformation))
+			camera.pos = new kha.math.Vector2(p.get(component.Transformation).pos.x-kha.System.windowWidth()/2/camera.scale.x,p.get(component.Transformation).pos.y-kha.System.windowHeight()/2/camera.scale.y);
 		
 
 		lastTime = Scheduler.time();
@@ -176,18 +168,13 @@ class Project {
 		g.begin();
 		g.color = kha.Color.White;
 		
-		//camera.pos = new kha.math.Vector2(0,0);
 		camera.transform(g);
 
-		//level.draw(g);
-		
 		for (system in renderSystems)
 			system.render(g);
 
-	
 		camera.restore(g);
 		
-
 		//Draw mouse cursor.
 		g.color = kha.Color.White;
 		g.drawSubImage(kha.Assets.images.Entities,input.mousePos.x/4 -4,input.mousePos.y/4 -4,2*16,0,16,16);

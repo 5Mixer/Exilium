@@ -22,8 +22,16 @@ class Healthbars extends System {
 			g.color = kha.Color.Green;
 			g.fillRect(transformation.pos.x+1,transformation.pos.y-4,(Math.max(health.current/health.max,0))*9,1);
 			
-			if (health.max - health.current < 0){
+			
+		}
+	}
+	override public function onUpdate (delta:Float){
+		super.onUpdate(delta);
+		for (entity in view.entities){
+			var health:component.Health = entity.get(component.Health);
+			if (health.current < 0){
 				entity.destroy();
+				trace("Destroy");
 			}
 		}
 	}

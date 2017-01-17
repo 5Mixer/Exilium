@@ -9,8 +9,10 @@ enum CollisionGroup {
 }
 
 typedef Rect = {
-	var x:Float;
-	var y:Float;
+	@:optional var x:Float;
+	@:optional var y:Float;
+	@:optional var offx:Float;
+	@:optional var offy:Float;
 	var width:Int;
 	var height:Int;
 	@:optional var group:Array<CollisionGroup>;

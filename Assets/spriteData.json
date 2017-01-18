@@ -51,7 +51,7 @@
 		},
 		"chest" : {
 			"tileset":"objects",
-			"id":1,
+			"id":0,
 			"width": 8,
 			"height": 8
 		},

@@ -46,7 +46,7 @@ class Project {
 		registerRenderSystem(new system.Healthbars(entities));
 		
 		var collisionSys = new system.Collisions(entities);
-		registerRenderSystem(new system.CollisionDebugView(entities,collisionSys.grid));
+		//registerRenderSystem(new system.CollisionDebugView(entities,collisionSys.grid));
 		
 		systems.add(collisionSys);
 		systems.add(new system.KeyMovement(input,entities));
@@ -80,10 +80,10 @@ class Project {
 		
 		systems.add(new system.AI(entities,map.get(component.Tilemap)));
 
-		var generator = new util.DungeonWorldGenerator(120,120);
+		var generator = new util.DungeonWorldGenerator(60,60);
 		map.get(component.Tilemap).tiles = generator.tiles;
-		map.get(component.Tilemap).width = 120;
-		map.get(component.Tilemap).height = 120;
+		map.get(component.Tilemap).width = 60;
+		map.get(component.Tilemap).height = 60;
 
 		var t = 0;
 		for (tile in generator.tiles){
@@ -99,7 +99,7 @@ class Project {
 			treasure.set(new component.Transformation(new kha.math.Vector2(t.x*16,t.y*16)));
 			treasure.set(new component.Sprite(cast spriteData.entity.chest));
 			treasure.set(new component.Collisions([component.Collisions.CollisionGroup.Level],[component.Collisions.CollisionGroup.Level]));
-			treasure.get(component.Collisions).registerCollisionRegion({x:0,y:0,width:16,height:16});
+			treasure.get(component.Collisions).registerCollisionRegion({x:0,y:0,width:8,height:8});
 			treasure.set(new component.DieOnCollision([component.Collisions.CollisionGroup.Bullet]));
 			
 			//treasure.set(new component.Light());
@@ -175,7 +175,7 @@ class Project {
 		
 		//Draw mouse cursor.
 		g.color = kha.Color.White;
-		g.drawSubImage(kha.Assets.images.Entities,input.mousePos.x/4 -4,input.mousePos.y/4 -4,2*16,0,16,16);
+		g.drawSubImage(kha.Assets.images.Entities,input.mousePos.x/4 -8,input.mousePos.y/4 -8,2*16,0,16,16);
 
 		g.end();
 

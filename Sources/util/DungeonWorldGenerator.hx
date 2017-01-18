@@ -41,7 +41,7 @@ class DungeonWorldGenerator {
 		createMap();
 
 		//Place root rooms
-		rooms.push({id:rooms.length, x:30, y: 30, width: 5, height: 5, attachedFromSide: null, doorways: []});
+		rooms.push({id:rooms.length, x:Std.int(width/2), y: Std.int(height/2), width: 5, height: 5, attachedFromSide: null, doorways: []});
 		growFromRoom(rooms[0]);
 		fillRooms();
 		bakerooms();

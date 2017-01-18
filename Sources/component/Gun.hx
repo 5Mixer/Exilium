@@ -1,5 +1,5 @@
 package component;
 
 class Gun extends Component {
-	public var fireRate = 4;
+	public var fireRate = 7;
 }

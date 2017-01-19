@@ -27,6 +27,7 @@ class Collisions extends Component{
 	var x = new differ.data.ShapeCollision();
 	var validCollision = false;
 	var result:differ.data.ShapeCollision = null;
+	public var fixed = false;
 	
 	override public function new (?collisionGroups:Array<CollisionGroup>,?ignoreCollisionGroups:Array<CollisionGroup>) {
 		collisionRegions = new Array<Rect>();

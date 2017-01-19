@@ -77,7 +77,7 @@ class Project {
 		map.set(new component.Transformation(new kha.math.Vector2()));
 		map.set(new component.Tilemap());
 		map.set(new component.Collisions([component.Collisions.CollisionGroup.Level],[component.Collisions.CollisionGroup.Level]));
-		
+		map.get(component.Collisions).fixed = true;
 		systems.add(new system.AI(entities,map.get(component.Tilemap)));
 
 		var generator = new util.DungeonWorldGenerator(60,60);

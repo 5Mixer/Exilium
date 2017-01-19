@@ -5,7 +5,6 @@ import component.Collisions.Rect;
 
 class SpatialHash {
 
-	public var min(default, null):Vector2;
 	public var max(default, null):Vector2;
 
 	public var pos:Vector2;
@@ -28,15 +27,11 @@ class SpatialHash {
 	// temp
 	var _tmp_getGridIndexesArray:Array<Int>;
 
-	public function new( _min:Vector2, _max:Vector2, _cs:UInt) {
-
-		min = _min.mult(1);
-		max = _max.mult(1);
-
+	public function new( _maxx:Int,_maxy:Int, _cs:UInt) {
 		pos = new Vector2();
 
-		width = max.x - min.x;
-		height = max.y - min.y;
+		width = _maxx;
+		height = _maxy;
 
 		cellSize = _cs;
 
@@ -59,9 +54,9 @@ class SpatialHash {
 
 	public function addCollider(c:Rect,offset:Vector2){
 		if (offset == null){
-			updateIndexes(c, aabbToGrid(new Vector2(c.x,c.y), new Vector2(c.x+c.width,c.y+c.height) ));
+			updateIndexes(c, aabbToGrid(c.x,c.y, c.x+c.width,c.y+c.height ));
 		}else{
-			updateIndexes(c, aabbToGrid(new Vector2(c.x+offset.x,c.y+offset.y), new Vector2(c.x+c.width+offset.x,c.y+c.height+offset.y) ));
+			updateIndexes(c, aabbToGrid(c.x+offset.x,c.y+offset.y, c.x+c.width+offset.x,c.y+c.height+offset.y ));
 		}
 	}
 
@@ -69,8 +64,8 @@ class SpatialHash {
 		removeIndexes(c);
 	}
 
-	public function updateCollider(c:Rect){
-		updateIndexes(c, aabbToGrid(new Vector2(c.x,c.y), new Vector2(c.x+c.width,c.y+c.height) ));
+	inline public function updateCollider(c:Rect){
+		updateIndexes(c, aabbToGrid(c.x,c.y, c.x+c.width,c.y+c.height));
 		//findContacts(c);
 	}
 
@@ -78,16 +73,16 @@ class SpatialHash {
 		for (cell in grid) {
 			if(cell.length > 0){
 				for (c in cell) {
+					if (c.ofEntity.get(component.Collisions) != null && c.ofEntity.get(component.Collisions).fixed) continue;
 					c.gridIndex.splice(0, c.gridIndex.length);
+					cell.remove(c);
 				}
-				cell.splice(0, cell.length);
 			}
 		}
 	}
 
 	public function destroy(){
 		empty();
-		min = null;
 		max = null;
 		pos = null;
 		grid = null;
@@ -110,20 +105,17 @@ class SpatialHash {
 		return c;
 	}
 
-	inline function aabbToGrid(_min:Vector2, _max:Vector2):Array<Int> {
-		var ret:Array<Int> = _tmp_getGridIndexesArray;
-		ret.splice(0, ret.length);
+	inline function aabbToGrid(_minx:Float,_miny:Float, _maxx:Float,_maxy):Array<Int> {
+		var ret:Array<Int> = [];
 
-		if(!overlaps(_min, _max)) {
-			//trace("Off grid rect: "+_min+", "+_max);
-		
+		if(!overlaps(_minx,_miny, _maxx, _maxy)) {
 			return ret;
 		}
 		
-		var aabbMinX:Int = clampi(getIndex_X(_min.x), 0, w-1);
-		var aabbMinY:Int = clampi(getIndex_Y(_min.y), 0, h-1);
-		var aabbMaxX:Int = clampi(getIndex_X(_max.x), 0, w-1);
-		var aabbMaxY:Int = clampi(getIndex_Y(_max.y), 0, h-1);
+		var aabbMinX:Int = clampi(getIndex_X(_minx), 0, w-1);
+		var aabbMinY:Int = clampi(getIndex_Y(_miny), 0, h-1);
+		var aabbMaxX:Int = clampi(getIndex_X(_maxx), 0, w-1);
+		var aabbMaxY:Int = clampi(getIndex_Y(_maxy), 0, h-1);
 
 		var aabbMin:Int = getIndex1d(aabbMinX, aabbMinY);
 		var aabbMax:Int = getIndex1d(aabbMaxX, aabbMaxY);
@@ -178,20 +170,20 @@ class SpatialHash {
 	}
 
 	inline function getIndex_X(_pos:Float):Int {
-		return Std.int((_pos - (pos.x + min.x))) >> powerOfTwo;
+		return Std.int((_pos - pos.x)) >> powerOfTwo;
 	}
 
 	inline function getIndex_Y(_pos:Float):Int {
-		return Std.int((_pos - (pos.y + min.y))) >> powerOfTwo;
+		return Std.int((_pos - pos.y)) >> powerOfTwo;
 	}
 
 	inline function getIndex1d(_x:Int, _y:Int):Int { // i = x + w * y;  x = i % w; y = i / w;
 		return Std.int(_x + w * _y);
 	}
 
-	inline function overlaps(_min:Vector2, _max:Vector2):Bool {
-		if ( _max.x < (pos.x + min.x) || _min.x > (pos.x + max.x) ) return false;
-		if ( _max.y < (pos.y + min.y) || _min.y > (pos.y + max.y) ) return false;
+	inline function overlaps(_minx:Float,_miny:Float, _maxx:Float,_maxy:Float):Bool {
+		if ( _maxx < pos.x || 0 > pos.x + _maxx ) return false;
+		if ( _maxy < pos.y || 0 > pos.y + _maxy ) return false;
 		return true;
 	}
 

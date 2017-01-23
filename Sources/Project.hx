@@ -22,6 +22,9 @@ class Project {
 	var p:eskimo.Entity;
 
 	var renderview:eskimo.views.View;
+
+	var minimap:kha.Image;
+	var minimapOpacity = 1.0;
 	
 	var ui:Zui;
 	var spriteData = CompileTime.parseJsonFile('../assets/spriteData.json');
@@ -73,33 +76,46 @@ class Project {
 	function createMap () {
 		entities.clear();
 		
+		(cast systems.get(system.Collisions)).processFixedEntities = true;
 		var map = entities.create();
-		map.set(new component.Transformation(new kha.math.Vector2()));
+		map.set(new component.Transformation(new kha.math.Vector2())); 
 		map.set(new component.Tilemap());
 		map.set(new component.Collisions([component.Collisions.CollisionGroup.Level],[component.Collisions.CollisionGroup.Level]));
 		map.get(component.Collisions).fixed = true;
 		systems.add(new system.AI(entities,map.get(component.Tilemap)));
 
+
 		var generator = new util.DungeonWorldGenerator(60,60);
 		map.get(component.Tilemap).tiles = generator.tiles;
 		map.get(component.Tilemap).width = 60;
 		map.get(component.Tilemap).height = 60;
-
+		
+		minimap = kha.Image.createRenderTarget(60,60);
+		
+		minimapOpacity = 1.0;
+		minimap.g2.begin();
+		minimap.g2.clear(kha.Color.fromBytes(0,0,0,128));
 		var t = 0;
 		for (tile in generator.tiles){
 			if (map.get(component.Tilemap).tileInfo.get(tile).collide){
-				map.get(component.Collisions).registerCollisionRegion({
-					x:t%map.get(component.Tilemap).width*16,y:Math.floor(t/map.get(component.Tilemap).width)*16,
-					width:16,height:16});
+				map.get(component.Collisions).registerCollisionRegion(new component.Collisions.Rect(
+					t%map.get(component.Tilemap).width*16,Math.floor(t/map.get(component.Tilemap).width)*16,
+					16,16));
+
+				minimap.g2.color = map.get(component.Tilemap).tileInfo.get(tile).colour;
+				minimap.g2.fillRect(t%map.get(component.Tilemap).width,Math.floor(t/map.get(component.Tilemap).width),1,1);
+				
 			}
 			t++;
 		}
+		minimap.g2.end();
+
 		for (t in generator.treasure){
 			var treasure = entities.create();
 			treasure.set(new component.Transformation(new kha.math.Vector2(t.x*16,t.y*16)));
 			treasure.set(new component.Sprite(cast spriteData.entity.chest));
 			treasure.set(new component.Collisions([component.Collisions.CollisionGroup.Level],[component.Collisions.CollisionGroup.Level]));
-			treasure.get(component.Collisions).registerCollisionRegion({x:0,y:0,width:8,height:8});
+			treasure.get(component.Collisions).registerCollisionRegion(new component.Collisions.Rect(0,0,8,8));
 			treasure.set(new component.DieOnCollision([component.Collisions.CollisionGroup.Bullet]));
 			
 			//treasure.set(new component.Light());
@@ -119,7 +135,7 @@ class Project {
 			slime.set(new component.AI());
 			slime.set(new component.DieOnCollision([component.Collisions.CollisionGroup.Bullet]));
 			slime.set(new component.Collisions([component.Collisions.CollisionGroup.Enemy]));
-			var b:component.Collisions.Rect = {x:0,y:0,width:8,height:8};
+			var b:component.Collisions.Rect = new component.Collisions.Rect(0,0,8,8);
 			slime.get(component.Collisions).registerCollisionRegion(b);
 		}
 	}
@@ -138,7 +154,7 @@ class Project {
 		p.set(new component.Physics());
 		p.set(new component.Gun());
 		p.set(new component.Collisions([component.Collisions.CollisionGroup.Friendly],[component.Collisions.CollisionGroup.Friendly,component.Collisions.CollisionGroup.Bullet]));
-		p.get(component.Collisions).registerCollisionRegion({x:0,y:0,width:10,height:10});
+		p.get(component.Collisions).registerCollisionRegion(new component.Collisions.Rect(0,0,10,10));
 		p.set(new component.Light());
 		
 		p.get(component.Light).colour = kha.Color.fromBytes(255,200,200);//kha.Color.Green;
@@ -149,6 +165,12 @@ class Project {
 		
 		var delta = Scheduler.time() - lastTime;
 		
+		if (minimapOpacity > 0)
+			if (minimapOpacity - delta < 0)
+				minimapOpacity = 0;
+			else
+				minimapOpacity -= delta;
+
 		systems.update(delta);
 		cast(systems.get(system.Physics),system.Physics).grid = cast(systems.get(system.Collisions),system.Collisions).grid;
 
@@ -177,10 +199,19 @@ class Project {
 		g.color = kha.Color.White;
 		g.drawSubImage(kha.Assets.images.Entities,input.mousePos.x/4 -8,input.mousePos.y/4 -8,2*16,0,16,16);
 
-		g.end();
 
 		//Clear any transformation for the UI.
-		g.transformation = kha.math.FastMatrix3.identity();
+		g.pushTransformation(kha.math.FastMatrix3.identity());
+		g.transformation._00 = 5;
+		g.transformation._11 = 5;
+		g.transformation._20 = kha.System.windowWidth()/2 - minimap.width*5/2;
+		g.transformation._21 = kha.System.windowHeight()/2 - minimap.height*5/2;
+		g.color = kha.Color.fromFloats(1,1,1,minimapOpacity);
+		g.drawImage(minimap,0,0);
+
+		g.popTransformation();
+		
+		g.end();
 
 		/*ui.begin(g);
         if (ui.window(Id.window(), 0, 0, 100, 100, Zui.LAYOUT_VERTICAL)) {

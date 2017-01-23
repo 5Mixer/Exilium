@@ -27,7 +27,7 @@ class Gun extends System {
 				var gun:component.Gun = entity.get(component.Gun);
 
 				if (frame%gun.fireRate == 0){
-					var dir = transformation.pos.sub(camera.screenToWorld(input.mousePos.sub(new kha.math.Vector2(32,32))));
+					var dir = transformation.pos.sub(camera.screenToWorld(input.mousePos.sub(new kha.math.Vector2(24,24))));
 					var a = Math.round(Math.atan2(-dir.y,-dir.x)*(180/Math.PI));
 
 					var camOffset = dir.mult(1);
@@ -58,7 +58,7 @@ class Gun extends System {
 	
 		var bullet = entities.create();
 
-		var t = new component.Transformation(parent.get(component.Transformation).pos.mult(1));
+		var t = new component.Transformation(parent.get(component.Transformation).pos.sub(new kha.math.Vector2(3,3)));
 		t.angle = angle;
 		bullet.set(t);
 		
@@ -77,7 +77,7 @@ class Gun extends System {
 		//bullet.get(component.Light).colour = kha.Color.Red;
 		//bullet.get(component.Light).strength = .5;
 		bullet.set(new component.Collisions([component.Collisions.CollisionGroup.Bullet,component.Collisions.CollisionGroup.Friendly],[component.Collisions.CollisionGroup.Bullet,component.Collisions.CollisionGroup.Friendly]));
-		bullet.get(component.Collisions).registerCollisionRegion({x:4,y:4,width:7,height:7});
+		bullet.get(component.Collisions).registerCollisionRegion(new component.Collisions.Rect(4,4,7,7));
 
 		var particle = entities.create();
 		particle.set(new component.VisualParticle(component.VisualParticle.Effect.Smoke));
@@ -92,6 +92,7 @@ class Gun extends System {
 		var particleAngle = angle - 6 + Math.random()*12;
 		phys.velocity = new kha.math.Vector2(Math.cos(particleAngle * (Math.PI / 180)) * speed,Math.sin(particleAngle * (Math.PI / 180)) * speed);		
 		particle.set(phys);
-		particle.set(new component.TimedLife(.15));	
+		particle.set(new component.TimedLife(.15));
+		
 	}
 }

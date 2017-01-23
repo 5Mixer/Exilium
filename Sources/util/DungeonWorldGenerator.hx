@@ -57,11 +57,10 @@ class DungeonWorldGenerator {
 		var thing = {x:room.x+Math.floor(room.width/2),y:room.y+Math.floor(room.height/2)};
 		treasure.push(thing);
 
-		for (i in 0...4){
-			var enemy = {x: room.x+2+Math.floor(Math.random()*(room.width-4)),y: room.y+2+Math.floor(Math.random()*(room.height-4))};
-			if (thing.x != enemy.x && thing.y != enemy.y)
+		var enemy = {x: room.x+2+Math.floor(Math.random()*(room.width-4)),y: room.y+2+Math.floor(Math.random()*(room.height-4))};
+		if (thing.x != enemy.x && thing.y != enemy.y)
 				enemies.push(enemy);
-		}
+		
 	}
 	var roomCount = 0;
 	function growFromRoom (room:Room){

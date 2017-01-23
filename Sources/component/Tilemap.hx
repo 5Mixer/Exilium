@@ -1,5 +1,7 @@
 package component;
 
+import kha.Color;
+
 typedef Tile = {
 	var name:String;
 	var collide:Bool;
@@ -7,19 +9,20 @@ typedef Tile = {
 	@:optional var specularity:Float;
 	@:optional var ambient:kha.Color;
 	var id:Int;
+	var colour:kha.Color;
 }
 
 
 class Tilemap extends Component{
 	public var tiles = new Array<Int>();
 	public var tileInfo:Map<Int,Tile> = [
-		0 => { name: "empty", collide: false, id: -1},
-		1 => { name: "floor", collide: false, id: 4, specularity: 2},
-		2 => { name: "dungeonwall", collide: true, id: 1, ambient: kha.Color.fromFloats(.1,.1,.1), specularity: 1.3},
-		3 => { name: "dungeonwall.h", collide: true, id: 2, ambient: kha.Color.fromFloats(.1,.1,.1), specularity: 1.3},
-		4 => { name: "dungeonwall.v", collide: true, id: 3, ambient: kha.Color.fromFloats(.1,.1,.1), specularity: 1.3},
-		5 => { name: "dungeonwall.side", collide: true, id: 0, ambient: kha.Color.fromFloats(.1,.1,.1), specularity: 1.3},
-		6 => { name: "gate", collide: false, id: 4}
+		0 => { name: "empty", collide: false, id: -1, colour: Color.fromFloats(0,0,0,0) },
+		1 => { name: "floor", collide: false, id: 4, specularity: 2, colour:Color.fromBytes(158,93,94)},
+		2 => { name: "dungeonwall", collide: true, id: 1, ambient: Color.fromFloats(.1,.1,.1), specularity: 1.3, colour:Color.fromBytes(214,166,122)},
+		3 => { name: "dungeonwall.h", collide: true, id: 2, ambient: Color.fromFloats(.1,.1,.1), specularity: 1.3, colour:Color.fromBytes(214,166,122)},
+		4 => { name: "dungeonwall.v", collide: true, id: 3, ambient: Color.fromFloats(.1,.1,.1), specularity: 1.3, colour:Color.fromBytes(214,166,122)},
+		5 => { name: "dungeonwall.side", collide: true, id: 0, ambient: Color.fromFloats(.1,.1,.1), specularity: 1.3, colour:Color.fromBytes(186,143,104)},
+		6 => { name: "gate", collide: false, id: 4, colour:Color.fromBytes(104,111,186)}
 	];
 	public var width:Int;
 	public var height:Int;

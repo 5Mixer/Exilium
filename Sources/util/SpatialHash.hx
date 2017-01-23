@@ -70,15 +70,16 @@ class SpatialHash {
 	}
 
 	public function empty(){
+		
 		for (cell in grid) {
-			if(cell.length > 0){
+			//if(cell.length > 0){
 				for (c in cell) {
-					if (c.ofEntity.get(component.Collisions) != null && c.ofEntity.get(component.Collisions).fixed) continue;
-					c.gridIndex.splice(0, c.gridIndex.length);
+					//if (c.ofEntity.get(component.Collisions) != null && c.ofEntity.get(component.Collisions).fixed) continue;
+					//c.gridIndex.splice(0, c.gridIndex.length);
 					cell.remove(c);
 				}
-			}
-		}
+			//}
+		}//*/
 	}
 
 	public function destroy(){
@@ -90,7 +91,8 @@ class SpatialHash {
 	}
 
 	public function findContacts(collider:Rect) {
-		var c = [];
+		var c = [];//_tmp_getGridIndexesArray.splice(0,_tmp_getGridIndexesArray.length);
+
 		if (collider.gridIndex != null){
 			for (i in collider.gridIndex) {
 				for (otherCollider in grid[i]) {
@@ -106,7 +108,7 @@ class SpatialHash {
 	}
 
 	inline function aabbToGrid(_minx:Float,_miny:Float, _maxx:Float,_maxy):Array<Int> {
-		var ret:Array<Int> = [];
+		var ret:Array<Int> = [];//_tmp_getGridIndexesArray.splice(0,_tmp_getGridIndexesArray.length);
 
 		if(!overlaps(_minx,_miny, _maxx, _maxy)) {
 			return ret;
@@ -139,15 +141,15 @@ class SpatialHash {
 	}
 
 	function updateIndexes(c:Rect, _ar:Array<Int>) {
-		if (c.gridIndex == null)
-			c.gridIndex = new Array<Int>();
-
+		//if (c.gridIndex == null)
 		
 		for (i in c.gridIndex) {
 			removeIndex(c, i);
 		}
 
-		c.gridIndex.splice(0, c.gridIndex.length);
+		c.gridIndex = [];//new Array<Int>();
+
+		//c.gridIndex.splice(0, c.gridIndex.length);
 		for (i in _ar) {
 			addIndexes(c, i);
 		}

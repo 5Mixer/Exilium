@@ -8,15 +8,22 @@ enum CollisionGroup {
 	Particle;
 }
 
-typedef Rect = {
-	var x:Float;
-	var y:Float;
-	var width:Int;
-	var height:Int;
-	@:optional var group:Array<CollisionGroup>;
-	@:optional var ignoreGroups:Array<CollisionGroup>;
-	@:optional var gridIndex:Array<Int>;
-	@:optional var ofEntity:eskimo.Entity;
+class Rect {
+	public var x:Float;
+	public var y:Float;
+	public var width:Int;
+	public var height:Int;
+	public var group:Array<CollisionGroup>;
+	public var ignoreGroups:Array<CollisionGroup>;
+	public var gridIndex:Array<Int> = [];
+	public var ofEntity:eskimo.Entity;
+
+	public function new (x:Float,y:Float,width:Int,height:Int){
+		this.x = x;
+		this.y = y;
+		this.width = width;
+		this.height = height;
+	}
 }
 
 class Collisions extends Component{

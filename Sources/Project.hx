@@ -13,6 +13,8 @@ class Project {
 	var input:Input;
 
 	var lastTime:Float;
+	var realLastTime:Float;
+	var lastRenderTime:Float;
 	public var entities:eskimo.EntityManager;
 
 	var systems:eskimo.systems.SystemManager;
@@ -28,6 +30,8 @@ class Project {
 	
 	var ui:Zui;
 	var spriteData = CompileTime.parseJsonFile('../assets/spriteData.json');
+	var fpsGraph:ui.Graph;
+	var updateGraph:ui.Graph;
 
 	public function new() {
 		kha.System.notifyOnRender(render);
@@ -58,12 +62,19 @@ class Project {
 		systems.add(new system.Gun(input,camera,entities));
 		
 		resetWorld();
-		input.onRUp = function (){
-			resetWorld();
-		}
 
 		lastTime = Scheduler.time();
+		realLastTime = Scheduler.realTime();
+		lastRenderTime = Scheduler.time();
+
+		fpsGraph = new ui.Graph(new kha.math.Vector2(5,30),new kha.math.Vector2(200,60));
+		updateGraph = new ui.Graph(new kha.math.Vector2(5,100),new kha.math.Vector2(200,60));
 		
+		input.listenToKeyRelease('r', resetWorld);
+		input.listenToKeyRelease('q',function (){
+			fpsGraph.visible = !fpsGraph.visible;
+			updateGraph.visible = ! updateGraph.visible;
+		});
 	}
 	function resetWorld(){
 		createMap();
@@ -164,6 +175,7 @@ class Project {
 	function update() {
 		
 		var delta = Scheduler.time() - lastTime;
+		var realDelta = Scheduler.realTime() - realLastTime;
 		
 		if (minimapOpacity > 0)
 			if (minimapOpacity - delta < 0)
@@ -177,12 +189,16 @@ class Project {
 		if (p != null && p.has(component.Transformation))
 			camera.pos = new kha.math.Vector2(p.get(component.Transformation).pos.x-kha.System.windowWidth()/2/camera.scale.x,p.get(component.Transformation).pos.y-kha.System.windowHeight()/2/camera.scale.y);
 		
+		fpsGraph.pushValue(1/delta/fpsGraph.size.y);
+		
 
 		lastTime = Scheduler.time();
+		realLastTime = Scheduler.realTime();
 	}
-	function render(framebuffer: Framebuffer): Void { 
+	function render(framebuffer: Framebuffer): Void {
 		frame++;
 
+		var renderDelta = Scheduler.time() - lastRenderTime;
 
 		var g = framebuffer.g2;
 		g.begin();
@@ -209,9 +225,18 @@ class Project {
 		g.color = kha.Color.fromFloats(1,1,1,minimapOpacity);
 		g.drawImage(minimap,0,0);
 
+		g.transformation = kha.math.FastMatrix3.identity();
+		fpsGraph.render(g);
+		updateGraph.render(g);
+
 		g.popTransformation();
 		
 		g.end();
+
+		updateGraph.pushValue(1/renderDelta/updateGraph.size.y);
+		
+
+		lastRenderTime = Scheduler.time();
 
 		/*ui.begin(g);
         if (ui.window(Id.window(), 0, 0, 100, 100, Zui.LAYOUT_VERTICAL)) {

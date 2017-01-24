@@ -24,10 +24,12 @@ class DungeonWorldGenerator {
 	var rooms = new Array<Room>();
 	public var treasure = new Array<{x:Int, y:Int}>();
 	public var enemies = new Array<{x:Int, y:Int}>();
+	var random:util.Random;
 
 	public function new (width,height){
 		this.width = width;
 		this.height = height;
+		random = new util.Random(11);
 		generate();
 	}
 	function roomPlacementValid (room:Room){
@@ -57,7 +59,7 @@ class DungeonWorldGenerator {
 		var thing = {x:room.x+Math.floor(room.width/2),y:room.y+Math.floor(room.height/2)};
 		treasure.push(thing);
 
-		var enemy = {x: room.x+2+Math.floor(Math.random()*(room.width-4)),y: room.y+2+Math.floor(Math.random()*(room.height-4))};
+		var enemy = {x: room.x+2+Math.floor(random.generate()*(room.width-4)),y: room.y+2+Math.floor(random.generate()*(room.height-4))};
 		if (thing.x != enemy.x && thing.y != enemy.y)
 				enemies.push(enemy);
 		
@@ -65,18 +67,18 @@ class DungeonWorldGenerator {
 	var roomCount = 0;
 	function growFromRoom (room:Room){
 		if (roomCount++ > 100) return;
-		var side = Side.createByIndex(Math.floor(Math.random()*4));
+		var side = Side.createByIndex(Math.floor(random.generate()*4));
 		while (side == room.attachedFromSide){
-			side = Side.createByIndex(Math.floor(Math.random()*4));
+			side = Side.createByIndex(Math.floor(random.generate()*4));
 		}
 		
-		var width = 9+Math.floor(Math.random()*6);
-		var height = 9+Math.floor(Math.random()*6);
+		var width = 9+Math.floor(random.generate()*6);
+		var height = 9+Math.floor(random.generate()*6);
 		
 		var doorx = room.x+Math.floor(Math.min(room.width/2,width/2)) ;
 		var doory = room.y+Math.floor(Math.min(room.height/2,height/2)) ;
 
-		if (Math.random() > .25) {
+		if (random.generate() > .25) {
 			var newRoom = {id:rooms.length, attachedFromSide: Side.Left, doorways:[{x:room.x+room.width-1,y:doory}], x: room.x+room.width-1, y: room.y, width:width, height:height};
 			if (roomPlacementValid(newRoom)){
 				rooms.push(newRoom);
@@ -85,7 +87,7 @@ class DungeonWorldGenerator {
 				growFromRoom(room);
 			}
 		}
-		if (Math.random() > .25) {
+		if (random.generate() > .25) {
 			var newRoom = {id:rooms.length, attachedFromSide: Side.Top, doorways:[{x:doorx,y:room.y+room.height-1}], x: room.x, y: room.y+room.height-1, width:width, height:height};
 			if (roomPlacementValid(newRoom)){
 				rooms.push(newRoom);
@@ -94,7 +96,7 @@ class DungeonWorldGenerator {
 				growFromRoom(room);
 			}
 		}
-		if (Math.random() > .25) {
+		if (random.generate() > .25) {
 			var newRoom = {id:rooms.length, attachedFromSide: Side.Right, doorways:[{x:room.x,y:doory}], x: room.x-width+1, y: room.y, width:width, height:height};
 			if (roomPlacementValid(newRoom)){
 				rooms.push(newRoom);
@@ -103,7 +105,7 @@ class DungeonWorldGenerator {
 				growFromRoom(room);
 			}
 		}
-		if (Math.random() > .25) {
+		if (random.generate() > .25) {
 			var newRoom = {id:rooms.length, attachedFromSide: Side.Bottom, doorways:[{x:doorx,y:room.y}], x: room.x, y: room.y-height+1, width:width, height:height};
 			if (roomPlacementValid(newRoom)){
 				rooms.push(newRoom);

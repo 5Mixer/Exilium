@@ -73,11 +73,12 @@ class SpatialHash {
 		
 		for (cell in grid) {
 			//if(cell.length > 0){
-				for (c in cell) {
+				/*for (c in cell) {
 					//if (c.ofEntity.get(component.Collisions) != null && c.ofEntity.get(component.Collisions).fixed) continue;
 					//c.gridIndex.splice(0, c.gridIndex.length);
 					cell.remove(c);
-				}
+				}*/
+				cell.splice(0,cell.length);
 			//}
 		}//*/
 	}
@@ -143,9 +144,9 @@ class SpatialHash {
 	function updateIndexes(c:Rect, _ar:Array<Int>) {
 		//if (c.gridIndex == null)
 		
-		for (i in c.gridIndex) {
-			removeIndex(c, i);
-		}
+		//for (i in c.gridIndex) {
+		//	removeIndex(c, i);
+		//}
 
 		c.gridIndex = [];//new Array<Int>();
 

@@ -2,17 +2,26 @@ package;
 
 import kha.Key;
 
+typedef Listener = {
+	var key : String;
+	var callback:Void->Void;
+}
+
 class Input {
 	public var left: Bool;
 	public var right: Bool;
 	public var up: Bool;
 	public var down: Bool;
 	public var mousePos:kha.math.Vector2 = new kha.math.Vector2(0,0);
-	public var onRUp:Void->Void;
 	public var mouseButtons:{left:Bool, right:Bool} = {
 		left: false,
 		right: false
 	};
+
+	public var listeners:Array<Listener> = [];
+	public function listenToKeyRelease(char:String,listener:Void->Void){
+		listeners.push({key:char,callback:listener});
+	}
 
 	public function new() {
 		kha.input.Keyboard.get().notify(keyDown,keyUp);
@@ -54,9 +63,12 @@ class Input {
 	}
 
 	public function keyUp(char: Key,letter) {
-		if (letter =='r')
-			if (onRUp != null)
-				onRUp();
+
+		for (listener in listeners){
+			if (letter == listener.key){
+				listener.callback();
+			}
+		}
 		
 		if(char == LEFT || letter == 'a')
 			left = false;

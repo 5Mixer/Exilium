@@ -25,11 +25,12 @@ class DungeonWorldGenerator {
 	public var treasure = new Array<{x:Int, y:Int}>();
 	public var enemies = new Array<{x:Int, y:Int}>();
 	var random:util.Random;
+	public var spawnPoint:{x:Int, y:Int};
 
 	public function new (width,height){
 		this.width = width;
 		this.height = height;
-		random = new util.Random(11);
+		random = new util.Random(Math.floor(Math.random()*10000));
 		generate();
 	}
 	function roomPlacementValid (room:Room){
@@ -44,6 +45,7 @@ class DungeonWorldGenerator {
 
 		//Place root rooms
 		rooms.push({id:rooms.length, x:Std.int(width/2), y: Std.int(height/2), width: 5, height: 5, attachedFromSide: null, doorways: []});
+		spawnPoint = {x:Std.int(width/2)+2, y: Std.int(height/2)+2};
 		growFromRoom(rooms[0]);
 		fillRooms();
 		bakerooms();

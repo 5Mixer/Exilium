@@ -46,9 +46,12 @@ class Renderer extends System {
 			}
 
 			var baseFrame = 0;
-			if (animation.spriteData != null && Reflect.field(animation.spriteData,animation.currentAnimation) != null){
-				baseFrame = Reflect.field(animation.spriteData,animation.currentAnimation)[0];
-				animation.frame %= Std.int(Reflect.field(animation.spriteData,animation.currentAnimation).length);
+			if (animation.spriteData.animations != null && Reflect.field(animation.spriteData.animations,animation.currentAnimation) != null){
+				if (animation.frame >= Std.int(Reflect.field(animation.spriteData.animations,animation.currentAnimation).length)){
+					animation.frame = 0;
+					animation.currentAnimation = animation.whenFinishedStart;	
+				}
+				baseFrame = Reflect.field(animation.spriteData.animations,animation.currentAnimation)[0];
 			}else{
 				animation.frame = 0;
 			}

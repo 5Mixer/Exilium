@@ -29,7 +29,7 @@ class Project {
 	var minimapOpacity = 1.0;
 	
 	var ui:Zui;
-	var spriteData = CompileTime.parseJsonFile('../assets/spriteData.json');
+	public static var spriteData = CompileTime.parseJsonFile('../assets/spriteData.json');
 	var fpsGraph:ui.Graph;
 	var updateGraph:ui.Graph;
 
@@ -75,10 +75,12 @@ class Project {
 			fpsGraph.visible = !fpsGraph.visible;
 			updateGraph.visible = ! updateGraph.visible;
 		});
+		input.listenToKeyRelease('m', function (){
+			minimapOpacity = 1.0;
+		});
 	}
 	function resetWorld(){
 		createMap();
-		createPlayer();
 	}
 	function registerRenderSystem(system:System){
 		renderSystems.push(system);
@@ -121,13 +123,18 @@ class Project {
 		}
 		minimap.g2.end();
 
+		
+
 		for (t in generator.treasure){
 			var treasure = entities.create();
+			treasure.set(new component.Name("Treasure"));
 			treasure.set(new component.Transformation(new kha.math.Vector2(t.x*16,t.y*16)));
-			treasure.set(new component.Sprite(cast spriteData.entity.chest));
+			treasure.set(new component.AnimatedSprite(cast spriteData.entity.chest));
+			treasure.get(component.AnimatedSprite).speed = 2;
 			treasure.set(new component.Collisions([component.Collisions.CollisionGroup.Level],[component.Collisions.CollisionGroup.Level]));
 			treasure.get(component.Collisions).registerCollisionRegion(new component.Collisions.Rect(0,0,8,8));
-			treasure.set(new component.DieOnCollision([component.Collisions.CollisionGroup.Bullet]));
+			//treasure.set(new component.DieOnCollision([component.Collisions.CollisionGroup.Bullet]));
+			treasure.set(new component.ReleaseOnCollision([component.Collisions.CollisionGroup.Friendly]));
 			
 			//treasure.set(new component.Light());
 			//treasure.get(component.Light).colour = kha.Color.fromBytes(0,0,140);//kha.Color.Green;
@@ -136,8 +143,9 @@ class Project {
 		for (e in generator.enemies){
 			//if (map.get(component.Tilemap).getTile(x,y) == 0) continue;
 			var slime = entities.create();
+			slime.set(new component.Name("Slime"));
 			slime.set(new component.Transformation(new kha.math.Vector2(e.x*16,e.y*16)));
-			slime.set(new component.AnimatedSprite(spriteData.entity.slime.animations));
+			slime.set(new component.AnimatedSprite(spriteData.entity.slime));
 			slime.set(new component.Health(5));
 			slime.get(component.AnimatedSprite).spriteMap = kha.Assets.images.Slime;
 			slime.get(component.AnimatedSprite).tilesize = 8;
@@ -149,14 +157,20 @@ class Project {
 			var b:component.Collisions.Rect = new component.Collisions.Rect(0,0,8,8);
 			slime.get(component.Collisions).registerCollisionRegion(b);
 		}
+
+		
+		createPlayer(generator.spawnPoint);
+
+		return map;
 	}
-	function createPlayer() {
+	function createPlayer(spawnPoint:{x:Int,y:Int}) {
 		if (p != null && p.get(component.Transformation) != null)
 			p.destroy();
 
 		p = entities.create();
-		p.set(new component.Transformation(new kha.math.Vector2(31*16,32*16)));
-		p.set(new component.AnimatedSprite(spriteData.entity.ghost.animations));
+		p.set(new component.Name("Ghost"));
+		p.set(new component.Transformation(new kha.math.Vector2(spawnPoint.x*16,spawnPoint.y*16)));
+		p.set(new component.AnimatedSprite(spriteData.entity.ghost));
 		p.set(new component.AITarget());
 		p.set(new component.Health(50));
 		p.get(component.AnimatedSprite).spriteMap = kha.Assets.images.Ghost;
@@ -164,6 +178,7 @@ class Project {
 		p.set(new component.KeyMovement());
 		p.set(new component.Physics());
 		p.set(new component.Gun());
+		p.set(new component.Inventory());
 		p.set(new component.Collisions([component.Collisions.CollisionGroup.Friendly],[component.Collisions.CollisionGroup.Friendly,component.Collisions.CollisionGroup.Bullet]));
 		p.get(component.Collisions).registerCollisionRegion(new component.Collisions.Rect(0,0,10,10));
 		p.set(new component.Light());
@@ -226,6 +241,20 @@ class Project {
 		g.drawImage(minimap,0,0);
 
 		g.transformation = kha.math.FastMatrix3.identity();
+
+		g.transformation._00 = camera.scale.x;
+		g.transformation._11 = camera.scale.y;
+		var x = 0;
+		g.color = kha.Color.White;
+		if (p.has(component.Inventory)){
+			for (item in p.get(component.Inventory).items){
+				x++;
+				g.drawSubImage(kha.Assets.images.Objects,x*5,10,10,2,4,4);
+			}
+		}
+
+		g.transformation = kha.math.FastMatrix3.identity();
+
 		fpsGraph.render(g);
 		updateGraph.render(g);
 

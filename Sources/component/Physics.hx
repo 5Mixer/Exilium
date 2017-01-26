@@ -7,4 +7,9 @@ class Physics extends Component{
 		velocity = new kha.math.Vector2();
 		super();
 	}
+	//For oneline chaining
+	public inline function setVelocity(v:kha.math.Vector2){
+		velocity = v;
+		return this;
+	}
 }

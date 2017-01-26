@@ -50,16 +50,26 @@
 			}
 		},
 		"chest" : {
-			"tileset":"objects",
-			"id":0,
-			"width": 8,
-			"height": 8
+			"tileset":"chest",
+			"width": 11,
+			"height": 11,
+			"animations" : {
+				"idle" : [0],
+				"open" : [0,1,2,3,4,5,6],
+				"emptied" : [6]
+			}
 		},
 		"bullet_basic" : {
 			"tileset":"projectiles",
 			"id":0,
 			"width":8,
 			"height":8
+		},
+		"gold" : {
+			"tileset":"objects",
+			"id":1,
+			"width": 8,
+			"height": 8
 		}
 	}
 }

@@ -6,8 +6,10 @@ class Physics extends System {
 	var view:eskimo.views.View;
 	var colliders:eskimo.views.View;
 	public var grid:util.SpatialHash;
+	var entities:eskimo.EntityManager;
 	public function new (entities:eskimo.EntityManager,broadPhaseGrid:util.SpatialHash){
 		super();
+		this.entities = entities;
 		grid = broadPhaseGrid;
 		view = new eskimo.views.View(new eskimo.filters.Filter([component.Transformation, component.Physics]),entities);
 		colliders = new eskimo.views.View(new eskimo.filters.Filter([component.Transformation, component.Collisions]),entities);
@@ -49,12 +51,8 @@ class Physics extends System {
 							collidingShape = otherShape;
 							transformation.pos.x += c.separationX;
 
-							if (collidingShape.ofEntity.has(component.DieOnCollision))
-								for (group in shape.group)
-									if (collidingShape.ofEntity.get(component.DieOnCollision).collisionGroups.indexOf(group) != -1){
-										collidingShape.ofEntity.destroy();
-										break;
-									}
+							onCollision(shape,otherShape);
+							onCollision(otherShape,shape);
 								
 							break;
 						}
@@ -78,30 +76,66 @@ class Physics extends System {
 							collidingShape = otherShape;
 							transformation.pos.y += c.separationY;
 
-							if (collidingShape.ofEntity.has(component.DieOnCollision))
-								for (group in shape.group)
-									if (collidingShape.ofEntity.get(component.DieOnCollision).collisionGroups.indexOf(group) != -1){
-										collidingShape.ofEntity.destroy();
-										break;
-									}
+							onCollision(shape,otherShape);
+							onCollision(otherShape,shape);
 
 							break;
 						}
 					}
 				}
 				
-				if (collision){
-					if (entity.has(component.DieOnCollision)){
-						for (killingGroup in entity.get(component.DieOnCollision).collisionGroups){
-							if (collidingShape.group.indexOf(killingGroup) != -1){
-								entity.destroy();
-								break;
-							}
-						}
-					}
-				}
 			
 					
+			}
+		}
+	}
+	function onCollision(shape:component.Collisions.Rect,otherShape:component.Collisions.Rect){
+		var shapeEntity = shape.ofEntity;
+		var otherShapeEntity = otherShape.ofEntity;
+		if (shapeEntity.has(component.ReleaseOnCollision)){
+			var roc = shapeEntity.get(component.ReleaseOnCollision);
+			for (releaseGroup in roc.collisionGroups){
+				if (otherShape.group.indexOf(releaseGroup) != -1){
+					var i = 10+Math.floor(Math.random()*5);
+					for (i in 0...i){
+						var gold = entities.create();
+						gold.set(new component.Name("Gold"));
+						gold.set(new component.Transformation(shapeEntity.get(component.Transformation).pos.mult(1)));
+						gold.set(new component.Sprite(Project.spriteData.entity.gold));
+						gold.set(new component.TimedLife(5+Math.random()*3));
+						gold.set(new component.Physics().setVelocity(new kha.math.Vector2(-6+Math.random()*12,-6+Math.random()*12)));
+						gold.set(new component.Collisions([]).registerCollisionRegion(new component.Collisions.Rect(0,0,8,8)));
+						gold.set(new component.Collectable([component.Collisions.CollisionGroup.Friendly],[1]));
+					}
+
+					if (shapeEntity.has(component.AnimatedSprite))
+						shapeEntity.get(component.AnimatedSprite).playAnimation("open","emptied");
+
+					if (roc.once)
+						shapeEntity.remove(component.ReleaseOnCollision);
+
+					break;
+				}
+			}
+		}
+		if (shapeEntity.has(component.DieOnCollision)){
+			for (killingGroup in shapeEntity.get(component.DieOnCollision).collisionGroups){
+				if (otherShape.group.indexOf(killingGroup) != -1){
+					shapeEntity.destroy();
+					break;
+				}
+			}
+		}
+		if (shapeEntity.has(component.Collectable)){
+			if (otherShapeEntity.has(component.Inventory)){
+				for (group in shapeEntity.get(component.Collectable).collisionGroups){
+					if (otherShape.group.indexOf(group) != -1){
+						otherShapeEntity.get(component.Inventory).items = otherShapeEntity.get(component.Inventory).items.concat(shapeEntity.get(component.Collectable).items);
+					
+						shapeEntity.destroy();
+						break;
+					}
+				}
 			}
 		}
 	}

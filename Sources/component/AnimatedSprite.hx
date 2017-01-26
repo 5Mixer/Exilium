@@ -9,15 +9,33 @@ class AnimatedSprite extends Component {
 	public var tilesize = 16;
 	public var speed:Int = 10;
 	public var spriteData:Dynamic;
+	public var whenFinishedStart:String;
 	public function new (?spriteData:Dynamic){
 		this.spriteData = spriteData;
 		spriteMap = kha.Assets.images.Entities;
+
+		if (spriteData.tileset != null){
+			switch spriteData.tileset {
+				case "ghost": spriteMap = kha.Assets.images.Ghost;
+				case "slime": spriteMap = kha.Assets.images.Slime;
+				case "projectiles": spriteMap = kha.Assets.images.Projectiles;
+				case "objects": spriteMap = kha.Assets.images.Objects; tilesize = 8;
+				case "chest": spriteMap = kha.Assets.images.Chest; tilesize = 11;
+			}
+		}
+
 		super();
 	}
-	public function playAnimation(name:String){
+	public function playAnimation(name:String,?whenFinishedStart:String){
 		if(currentAnimation != name)
 			frame = 0;
+		if (whenFinishedStart != null){
+			this.whenFinishedStart = whenFinishedStart;
+		}else{
+			this.whenFinishedStart = name;
+		}
 		
 		currentAnimation = name;
+		return this;
 	}
 }

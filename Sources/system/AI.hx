@@ -4,7 +4,7 @@ class AI extends System {
 	var view:eskimo.views.View;
 	var frame = 0.0;
 	var entities:eskimo.EntityManager;
-	var map:component.Tilemap;
+	public var map:component.Tilemap;
 	var targets:eskimo.views.View;
 	public function new (entities:eskimo.EntityManager,tilemap:component.Tilemap){
 		this.entities = entities;

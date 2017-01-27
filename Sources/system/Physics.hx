@@ -96,16 +96,15 @@ class Physics extends System {
 			var roc = shapeEntity.get(component.ReleaseOnCollision);
 			for (releaseGroup in roc.collisionGroups){
 				if (otherShape.group.indexOf(releaseGroup) != -1){
-					var i = 10+Math.floor(Math.random()*5);
-					for (i in 0...i){
-						var gold = entities.create();
-						gold.set(new component.Name("Gold"));
-						gold.set(new component.Transformation(shapeEntity.get(component.Transformation).pos.mult(1)));
-						gold.set(new component.Sprite(Project.spriteData.entity.gold));
-						gold.set(new component.TimedLife(5+Math.random()*3));
-						gold.set(new component.Physics().setVelocity(new kha.math.Vector2(-6+Math.random()*12,-6+Math.random()*12)));
-						gold.set(new component.Collisions([]).registerCollisionRegion(new component.Collisions.Rect(0,0,8,8)));
-						gold.set(new component.Collectable([component.Collisions.CollisionGroup.Friendly],[1]));
+					for (item in roc.release){
+						var droppedItem = entities.create();
+						droppedItem.set(new component.Name("Dropped Item"));
+						droppedItem.set(new component.Transformation(shapeEntity.get(component.Transformation).pos.mult(1)));
+						droppedItem.set(new component.Sprite(Project.spriteData.entity.gold));
+						droppedItem.set(new component.TimedLife(5+Math.random()*3));
+						droppedItem.set(new component.Physics().setVelocity(new kha.math.Vector2(-6+Math.random()*12,-6+Math.random()*12)));
+						droppedItem.set(new component.Collisions([]).registerCollisionRegion(new component.Collisions.Rect(0,0,8,8)));
+						droppedItem.set(new component.Collectable([component.Collisions.CollisionGroup.Friendly],[item]));
 					}
 
 					if (shapeEntity.has(component.AnimatedSprite))
@@ -130,7 +129,8 @@ class Physics extends System {
 			if (otherShapeEntity.has(component.Inventory)){
 				for (group in shapeEntity.get(component.Collectable).collisionGroups){
 					if (otherShape.group.indexOf(group) != -1){
-						otherShapeEntity.get(component.Inventory).items = otherShapeEntity.get(component.Inventory).items.concat(shapeEntity.get(component.Collectable).items);
+						for (thing in shapeEntity.get(component.Collectable).items)
+							otherShapeEntity.get(component.Inventory).putIntoInventory(thing);
 					
 						shapeEntity.destroy();
 						break;
@@ -138,16 +138,29 @@ class Physics extends System {
 				}
 			}
 		}
+		if (shapeEntity.has(component.CustomCollisionHandler)){
+			for (group in shapeEntity.get(component.CustomCollisionHandler).collisionGroups){
+				if (otherShape.group.indexOf(group) != -1){
+					shapeEntity.get(component.CustomCollisionHandler).handler();
+					break;
+				}
+			}
+		}
 	}
 	function validCollision(shape:component.Collisions.Rect,otherShape:component.Collisions.Rect){
 		var valid = false;
-		for (othersIgnore in otherShape.ignoreGroups){
-			if (shape.group.indexOf(othersIgnore) == -1){
-				//The other entity is not ignoring one of our groups, this is a valid collision.
-				valid = true;
-				break;
+		if (otherShape.ignoreGroups.length > 0){
+			for (othersIgnore in otherShape.ignoreGroups){
+				if (shape.group.indexOf(othersIgnore) == -1){
+					//The other entity is not ignoring one of our groups, this is a valid collision.
+					valid = true;
+					break;
+				}
 			}
+		}else{
+			valid = true;
 		}
+		
 		if (valid){
 			for (ignore in shape.ignoreGroups){
 				if (otherShape.group.indexOf(ignore) != -1){

@@ -1,15 +1,18 @@
 package system;
-using kha.graphics2.GraphicsExtension;
 
 class CollisionDebugView extends System {
 	var view:eskimo.views.View;
 	var draw:util.KhaShapeDrawer;
 	var grid:util.SpatialHash;
-	public function new (entities:eskimo.EntityManager,grid:util.SpatialHash){
+	public function new (entities:eskimo.EntityManager,grid:util.SpatialHash,showStaticEntities = false){
 		super();
 		this.grid = grid;
 		draw = new util.KhaShapeDrawer();
-		view = new eskimo.views.View(new eskimo.filters.Filter([component.Physics,component.Transformation,component.Collisions]),entities);
+		if (showStaticEntities){
+			view = new eskimo.views.View(new eskimo.filters.Filter([component.Transformation,component.Collisions]),entities);
+		}else{
+			view = new eskimo.views.View(new eskimo.filters.Filter([component.Physics,component.Transformation,component.Collisions]),entities);
+		}
 	}
 
 	override public function render (g:kha.graphics2.Graphics){

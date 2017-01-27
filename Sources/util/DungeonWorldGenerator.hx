@@ -8,6 +8,7 @@ typedef Room = {
 	var height:Int;
 	var attachedFromSide:Side;
 	var doorways:Array<{x:Int, y:Int}>;
+	@:optional var distanceToEntrance:Int;
 }
 
 enum Side {
@@ -24,13 +25,16 @@ class DungeonWorldGenerator {
 	var rooms = new Array<Room>();
 	public var treasure = new Array<{x:Int, y:Int}>();
 	public var enemies = new Array<{x:Int, y:Int}>();
+	public var exitPoint:{x:Int, y:Int};
 	var random:util.Random;
 	public var spawnPoint:{x:Int, y:Int};
+	public var seed:Int;
 
 	public function new (width,height){
 		this.width = width;
 		this.height = height;
-		random = new util.Random(Math.floor(Math.random()*10000));
+		seed = Math.floor(Math.random()*999999);
+		random = new util.Random(seed);
 		generate();
 	}
 	function roomPlacementValid (room:Room){
@@ -44,10 +48,11 @@ class DungeonWorldGenerator {
 		createMap();
 
 		//Place root rooms
-		rooms.push({id:rooms.length, x:Std.int(width/2), y: Std.int(height/2), width: 5, height: 5, attachedFromSide: null, doorways: []});
+		rooms.push({id:rooms.length, x:Std.int(width/2), y: Std.int(height/2), width: 5, height: 5, attachedFromSide: null, doorways: [], distanceToEntrance:0});
 		spawnPoint = {x:Std.int(width/2)+2, y: Std.int(height/2)+2};
 		growFromRoom(rooms[0]);
 		fillRooms();
+		placeExit();
 		bakerooms();
 		createWallDepth();
 	}
@@ -55,6 +60,16 @@ class DungeonWorldGenerator {
 	function fail(){
 		fails++;
 		return fails < 20;
+	}
+	function placeExit(){
+		//Sort rooms so furtherest rooms are at end of Array
+		rooms.sort(function(a,b){
+			if (a.distanceToEntrance > b.distanceToEntrance) return 1;
+			if (a.distanceToEntrance < b.distanceToEntrance) return -1;
+			return 0;
+		});
+		var farRoom = rooms[rooms.length-1];
+		exitPoint = {x:farRoom.x+Math.floor(farRoom.width/2)+1,y:farRoom.y+Math.floor(farRoom.height/2)};
 	}
 	function placeThingInRoom (room:Room){
 		if (room.id < 2) return; //Don't place in start room
@@ -79,9 +94,11 @@ class DungeonWorldGenerator {
 		
 		var doorx = room.x+Math.floor(Math.min(room.width/2,width/2)) ;
 		var doory = room.y+Math.floor(Math.min(room.height/2,height/2)) ;
+		
+		var dte = room.distanceToEntrance+1;
 
 		if (random.generate() > .25) {
-			var newRoom = {id:rooms.length, attachedFromSide: Side.Left, doorways:[{x:room.x+room.width-1,y:doory}], x: room.x+room.width-1, y: room.y, width:width, height:height};
+			var newRoom = {id:rooms.length, attachedFromSide: Side.Left, distanceToEntrance:dte, doorways:[{x:room.x+room.width-1,y:doory}], x: room.x+room.width-1, y: room.y, width:width, height:height};
 			if (roomPlacementValid(newRoom)){
 				rooms.push(newRoom);
 				growFromRoom(newRoom);
@@ -90,7 +107,7 @@ class DungeonWorldGenerator {
 			}
 		}
 		if (random.generate() > .25) {
-			var newRoom = {id:rooms.length, attachedFromSide: Side.Top, doorways:[{x:doorx,y:room.y+room.height-1}], x: room.x, y: room.y+room.height-1, width:width, height:height};
+			var newRoom = {id:rooms.length, attachedFromSide: Side.Top, distanceToEntrance:dte, doorways:[{x:doorx,y:room.y+room.height-1}], x: room.x, y: room.y+room.height-1, width:width, height:height};
 			if (roomPlacementValid(newRoom)){
 				rooms.push(newRoom);
 				growFromRoom(newRoom);
@@ -99,7 +116,7 @@ class DungeonWorldGenerator {
 			}
 		}
 		if (random.generate() > .25) {
-			var newRoom = {id:rooms.length, attachedFromSide: Side.Right, doorways:[{x:room.x,y:doory}], x: room.x-width+1, y: room.y, width:width, height:height};
+			var newRoom = {id:rooms.length, attachedFromSide: Side.Right, distanceToEntrance:dte, doorways:[{x:room.x,y:doory}], x: room.x-width+1, y: room.y, width:width, height:height};
 			if (roomPlacementValid(newRoom)){
 				rooms.push(newRoom);
 				growFromRoom(newRoom);
@@ -108,7 +125,7 @@ class DungeonWorldGenerator {
 			}
 		}
 		if (random.generate() > .25) {
-			var newRoom = {id:rooms.length, attachedFromSide: Side.Bottom, doorways:[{x:doorx,y:room.y}], x: room.x, y: room.y-height+1, width:width, height:height};
+			var newRoom = {id:rooms.length, attachedFromSide: Side.Bottom, distanceToEntrance:dte, doorways:[{x:doorx,y:room.y}], x: room.x, y: room.y-height+1, width:width, height:height};
 			if (roomPlacementValid(newRoom)){
 				rooms.push(newRoom);
 				growFromRoom(newRoom);

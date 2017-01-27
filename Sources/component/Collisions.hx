@@ -2,6 +2,7 @@ package component;
 
 enum CollisionGroup {
 	Friendly;
+	Player;
 	Enemy;
 	Level;
 	Bullet;

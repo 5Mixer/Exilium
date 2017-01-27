@@ -6,6 +6,19 @@ import zui.Zui;
 import zui.Id;
 //import entity.Player;
 
+typedef Dungeon = {
+	var seed:Int;
+}
+typedef PlayerSave = {
+	var pos : {x: Int, y:Int};
+	var health: Int;
+}
+typedef Save  = {
+	var player : PlayerSave;
+	var dungeonLevel: Int;
+	var dungeons:Array<Dungeon>;
+}
+
 class Project {
 	public var camera:Camera;
 	var frame = 0;
@@ -32,6 +45,11 @@ class Project {
 	public static var spriteData = CompileTime.parseJsonFile('../assets/spriteData.json');
 	var fpsGraph:ui.Graph;
 	var updateGraph:ui.Graph;
+	var dungeonLevel = 1;
+
+	//var dungeonLevels = Array<DungeonLevel>;
+	var lastSave:Save;
+	var dungeons:Array<Dungeon> = [];
 
 	public function new() {
 		kha.System.notifyOnRender(render);
@@ -44,7 +62,6 @@ class Project {
 		var components = new eskimo.ComponentManager();
 		entities = new eskimo.EntityManager(components);
 		systems = new eskimo.systems.SystemManager(entities);		
-
 
 		registerRenderSystem(new system.TilemapRenderer(camera,entities));
 		registerRenderSystem(new system.ParticleRenderer(entities));
@@ -60,8 +77,9 @@ class Project {
 		systems.add(new system.Physics(entities,collisionSys.grid));
 		systems.add(new system.TimedLife(entities));
 		systems.add(new system.Gun(input,camera,entities));
+		systems.add(new system.AI(entities,null));
 		
-		resetWorld();
+		createMap();
 
 		lastTime = Scheduler.time();
 		realLastTime = Scheduler.realTime();
@@ -70,7 +88,7 @@ class Project {
 		fpsGraph = new ui.Graph(new kha.math.Vector2(5,30),new kha.math.Vector2(200,60));
 		updateGraph = new ui.Graph(new kha.math.Vector2(5,100),new kha.math.Vector2(200,60));
 		
-		input.listenToKeyRelease('r', resetWorld);
+		input.listenToKeyRelease('r', descend);
 		input.listenToKeyRelease('q',function (){
 			fpsGraph.visible = !fpsGraph.visible;
 			updateGraph.visible = ! updateGraph.visible;
@@ -78,9 +96,6 @@ class Project {
 		input.listenToKeyRelease('m', function (){
 			minimapOpacity = 1.0;
 		});
-	}
-	function resetWorld(){
-		createMap();
 	}
 	function registerRenderSystem(system:System){
 		renderSystems.push(system);
@@ -95,7 +110,7 @@ class Project {
 		map.set(new component.Tilemap());
 		map.set(new component.Collisions([component.Collisions.CollisionGroup.Level],[component.Collisions.CollisionGroup.Level]));
 		map.get(component.Collisions).fixed = true;
-		systems.add(new system.AI(entities,map.get(component.Tilemap)));
+		(cast systems.get(system.AI)).map = map.get(component.Tilemap);
 
 
 		var generator = new util.DungeonWorldGenerator(60,60);
@@ -107,7 +122,7 @@ class Project {
 		
 		minimapOpacity = 1.0;
 		minimap.g2.begin();
-		minimap.g2.clear(kha.Color.fromBytes(0,0,0,128));
+		minimap.g2.clear(kha.Color.fromBytes(0,0,0,200));
 		var t = 0;
 		for (tile in generator.tiles){
 			if (map.get(component.Tilemap).tileInfo.get(tile).collide){
@@ -121,47 +136,37 @@ class Project {
 			}
 			t++;
 		}
+		minimap.g2.color = kha.Color.Red;
+		minimap.g2.fillRect(generator.spawnPoint.x,generator.spawnPoint.y,1,1);
+
+		minimap.g2.color = kha.Color.Green;
+		minimap.g2.fillRect(generator.exitPoint.x,generator.exitPoint.y,1,1);
 		minimap.g2.end();
-
 		
-
 		for (t in generator.treasure){
-			var treasure = entities.create();
-			treasure.set(new component.Name("Treasure"));
-			treasure.set(new component.Transformation(new kha.math.Vector2(t.x*16,t.y*16)));
-			treasure.set(new component.AnimatedSprite(cast spriteData.entity.chest));
-			treasure.get(component.AnimatedSprite).speed = 2;
-			treasure.set(new component.Collisions([component.Collisions.CollisionGroup.Level],[component.Collisions.CollisionGroup.Level]));
-			treasure.get(component.Collisions).registerCollisionRegion(new component.Collisions.Rect(0,0,8,8));
-			//treasure.set(new component.DieOnCollision([component.Collisions.CollisionGroup.Bullet]));
-			treasure.set(new component.ReleaseOnCollision([component.Collisions.CollisionGroup.Friendly]));
-			
-			//treasure.set(new component.Light());
-			//treasure.get(component.Light).colour = kha.Color.fromBytes(0,0,140);//kha.Color.Green;
-			//treasure.get(component.Light).strength = 1;
+			createTreasure(t.x*16,t.y*16);
 		}
 		for (e in generator.enemies){
-			//if (map.get(component.Tilemap).getTile(x,y) == 0) continue;
-			var slime = entities.create();
-			slime.set(new component.Name("Slime"));
-			slime.set(new component.Transformation(new kha.math.Vector2(e.x*16,e.y*16)));
-			slime.set(new component.AnimatedSprite(spriteData.entity.slime));
-			slime.set(new component.Health(5));
-			slime.get(component.AnimatedSprite).spriteMap = kha.Assets.images.Slime;
-			slime.get(component.AnimatedSprite).tilesize = 8;
-			slime.get(component.AnimatedSprite).speed = 4;
-			slime.set(new component.Physics());
-			slime.set(new component.AI());
-			slime.set(new component.DieOnCollision([component.Collisions.CollisionGroup.Bullet]));
-			slime.set(new component.Collisions([component.Collisions.CollisionGroup.Enemy]));
-			var b:component.Collisions.Rect = new component.Collisions.Rect(0,0,8,8);
-			slime.get(component.Collisions).registerCollisionRegion(b);
+			createSlime(e.x*16,e.y*16);
 		}
 
-		
-		createPlayer(generator.spawnPoint);
+		createLadder(generator.exitPoint.x*16,generator.exitPoint.y*16);
+
+		p = createPlayer({x:generator.spawnPoint.x, y:generator.spawnPoint.y});
+
+		dungeons.push ({
+			seed: generator.seed
+		});
 
 		return map;
+	}
+	function descend (){
+		trace("You enter deeper into the dungeon...");
+
+		dungeonLevel++;
+		save();
+		createMap();
+		save();
 	}
 	function createPlayer(spawnPoint:{x:Int,y:Int}) {
 		if (p != null && p.get(component.Transformation) != null)
@@ -179,12 +184,76 @@ class Project {
 		p.set(new component.Physics());
 		p.set(new component.Gun());
 		p.set(new component.Inventory());
-		p.set(new component.Collisions([component.Collisions.CollisionGroup.Friendly],[component.Collisions.CollisionGroup.Friendly,component.Collisions.CollisionGroup.Bullet]));
+		p.set(new component.Collisions([component.Collisions.CollisionGroup.Friendly,component.Collisions.CollisionGroup.Player],[component.Collisions.CollisionGroup.Friendly,component.Collisions.CollisionGroup.Player,component.Collisions.CollisionGroup.Bullet]));
 		p.get(component.Collisions).registerCollisionRegion(new component.Collisions.Rect(0,0,10,10));
 		p.set(new component.Light());
 		
-		p.get(component.Light).colour = kha.Color.fromBytes(255,200,200);//kha.Color.Green;
+		p.get(component.Light).colour = kha.Color.fromBytes(255,200,200);
 		p.get(component.Light).strength = .8;
+
+		if (lastSave != null && lastSave.player != null){
+			p.get(component.Health).current = lastSave.player.health;
+		}
+		return p;
+	}
+	function createSlime(x:Int,y:Int){
+		var slime = entities.create();
+		slime.set(new component.Name("Slime"));
+		slime.set(new component.Transformation(new kha.math.Vector2(x,y)));
+		slime.set(new component.AnimatedSprite(spriteData.entity.slime));
+		slime.set(new component.Health(5));
+		slime.get(component.AnimatedSprite).spriteMap = kha.Assets.images.Slime;
+		slime.get(component.AnimatedSprite).tilesize = 8;
+		slime.get(component.AnimatedSprite).speed = 4;
+		slime.set(new component.Physics());
+		slime.set(new component.AI());
+		slime.set(new component.DieOnCollision([component.Collisions.CollisionGroup.Bullet]));
+		slime.set(new component.Collisions([component.Collisions.CollisionGroup.Enemy]));
+		var b:component.Collisions.Rect = new component.Collisions.Rect(0,0,8,8);
+		slime.get(component.Collisions).registerCollisionRegion(b);
+		return slime;
+	}
+	function createTreasure(x:Int,y:Int){
+		var treasure = entities.create();
+		treasure.set(new component.Name("Treasure"));
+		treasure.set(new component.Transformation(new kha.math.Vector2(x,y)));
+		treasure.set(new component.AnimatedSprite(cast spriteData.entity.chest));
+		treasure.get(component.AnimatedSprite).speed = 2;
+		treasure.set(new component.Collisions([component.Collisions.CollisionGroup.Level],[component.Collisions.CollisionGroup.Level]));
+		treasure.get(component.Collisions).registerCollisionRegion(new component.Collisions.Rect(2,3,8,8));
+		treasure.set(new component.ReleaseOnCollision([component.Inventory.Item.Gold],[component.Collisions.CollisionGroup.Friendly]));
+		
+		treasure.set(new component.Light());
+		treasure.get(component.Light).colour = kha.Color.fromBytes(0,0,140);//kha.Color.Green;
+		//treasure.get(component.Light).strength = 1;
+
+		return treasure;
+	}
+	function createLadder(x:Int,y:Int){
+		var ladder = entities.create();
+		ladder.set(new component.Name("Ladder"));
+		ladder.set(new component.Transformation(new kha.math.Vector2(x,y)));
+		ladder.set(new component.Sprite(spriteData.entity.ladder));
+		ladder.set(new component.Collisions([component.Collisions.CollisionGroup.Level]));
+		ladder.get(component.Collisions).registerCollisionRegion(new component.Collisions.Rect(0,0,8,8));
+		ladder.set(new component.CustomCollisionHandler([component.Collisions.CollisionGroup.Player],descend));
+		return ladder;
+	}
+	function save (){
+		lastSave = {
+			dungeonLevel: dungeonLevel,
+			dungeons: dungeons,
+			player: null
+		};
+		if (p.get(component.Transformation) != null)
+			lastSave.player = {
+				pos: {
+					x: Math.round(p.get(component.Transformation).pos.x),
+					y: Math.round(p.get(component.Transformation).pos.y)
+				},
+				health: Math.round(p.get(component.Health).current)
+			}
+		
 	}
 
 	function update() {
@@ -230,7 +299,6 @@ class Project {
 		g.color = kha.Color.White;
 		g.drawSubImage(kha.Assets.images.Entities,input.mousePos.x/4 -8,input.mousePos.y/4 -8,2*16,0,16,16);
 
-
 		//Clear any transformation for the UI.
 		g.pushTransformation(kha.math.FastMatrix3.identity());
 		g.transformation._00 = 5;
@@ -254,6 +322,11 @@ class Project {
 		}
 
 		g.transformation = kha.math.FastMatrix3.identity();
+		g.color = kha.Color.White;
+		g.fontSize = 20;
+		g.drawString("Floor "+dungeonLevel,10,kha.System.windowHeight()-30);
+
+		g.transformation = kha.math.FastMatrix3.identity();
 
 		fpsGraph.render(g);
 		updateGraph.render(g);
@@ -266,13 +339,5 @@ class Project {
 		
 
 		lastRenderTime = Scheduler.time();
-
-		/*ui.begin(g);
-        if (ui.window(Id.window(), 0, 0, 100, 100, Zui.LAYOUT_VERTICAL)) {
-            if (ui.button("Hello")) {
-                trace("World");
-            }
-        }
-        ui.end();*/
 	}
 }

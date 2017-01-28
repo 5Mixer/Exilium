@@ -97,14 +97,8 @@ class Physics extends System {
 			for (releaseGroup in roc.collisionGroups){
 				if (otherShape.group.indexOf(releaseGroup) != -1){
 					for (item in roc.release){
-						var droppedItem = entities.create();
-						droppedItem.set(new component.Name("Dropped Item"));
-						droppedItem.set(new component.Transformation(shapeEntity.get(component.Transformation).pos.mult(1)));
-						droppedItem.set(new component.Sprite(Project.spriteData.entity.gold));
-						droppedItem.set(new component.TimedLife(5+Math.random()*3));
+						var droppedItem = EntityFactory.makeItem(entities,item,{pos:{x:shapeEntity.get(component.Transformation).pos.x,y:shapeEntity.get(component.Transformation).pos.y}});
 						droppedItem.set(new component.Physics().setVelocity(new kha.math.Vector2(-6+Math.random()*12,-6+Math.random()*12)));
-						droppedItem.set(new component.Collisions([]).registerCollisionRegion(new component.Collisions.Rect(0,0,8,8)));
-						droppedItem.set(new component.Collectable([component.Collisions.CollisionGroup.Friendly],[item]));
 					}
 
 					if (shapeEntity.has(component.AnimatedSprite))

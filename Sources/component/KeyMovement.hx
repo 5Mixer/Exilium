@@ -1,5 +1,5 @@
 package component;
 
 class KeyMovement extends Component {
-	public var speed = 4;
+	public var speed = 3;
 }

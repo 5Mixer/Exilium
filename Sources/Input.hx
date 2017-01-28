@@ -17,6 +17,7 @@ class Input {
 		left: false,
 		right: false
 	};
+	public var wheelListeners:Array<Int->Void> = [];
 
 	public var listeners:Array<Listener> = [];
 	public function listenToKeyRelease(char:String,listener:Void->Void){
@@ -42,7 +43,8 @@ class Input {
 		mousePos.y = y;
 	}
 	public function mouseWheel(direction){
-
+		for (listener in wheelListeners)
+			listener(direction);
 	}
 
 

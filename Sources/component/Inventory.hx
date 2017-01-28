@@ -2,7 +2,9 @@ package component;
 
 enum Item {
 	Gold;
+	SlimeGun;
 	Gem;
+	HealthPotion;
 	
 }
 enum ItemType {
@@ -29,25 +31,50 @@ typedef Stack = {
 }
 
 class Inventory extends Component {
-	public var items:Map<Item,Int>;
-	public var itemData =  [
-		Item.Gold => { name: "gold", stackable: true, type: ItemType.Currency, sprite:Project.spriteData.entity.gold }
+	public var stacks:Array<Stack>;
+	public var length(get,null) = 0;
+	public var itemData:Map<Item,{name:String, stackable:Bool, type: ItemType, sprite: Dynamic}> = [
+		Item.Gold => { name: "gold", stackable: true, type: ItemType.Currency, sprite:Project.spriteData.entity.gold },
+		Item.HealthPotion => { name: "gold", stackable: true, type: ItemType.Potion, sprite:Project.spriteData.entity.healthPotion },
+		Item.SlimeGun => { name: "slime gun", stackable: false, type: ItemType.Gun, sprite:Project.spriteData.entity.slimeGun }
 	];
 	override public function new (){
 		super();
-		items = new Map<Item,Int>();
+		stacks = new Array<Stack>();
 	}
 	public function putIntoInventory(item:Item,quantity:Int = 1){
-		
-		if (items.exists(item)){
-			items.set(item, items.get(item)+quantity);
+		if (exists(item)){
+			getStack(item).quantity += quantity;
 		}else{
-			items.set(item,1);
+			stacks.push({item:item, quantity:quantity});
 		}
 	}
 	public function takeFromInventory(item:Item,quantity:Int = 1){
-		if (items.exists(item)){
-			items.set(item, items.get(item)-quantity);
+		if (exists(item)){
+			if (getStack(item).quantity >= quantity){
+				getStack(item).quantity -= quantity;
+				return true;
+			}
 		}
+		return false;
+	}
+	public function getStack(item:Item){
+		for (stack in stacks)
+			if (stack.item == item)
+				return stack;
+		return null;
+	}
+	public function exists(item:Item){
+		for (stack in stacks)
+			if (stack.item == item)
+				return true;
+		
+		return false;
+	}
+	public function getByIndex(index:Int):Stack{
+		return stacks[index];
+	}
+	function get_length(){
+		return stacks.length;
 	}
 }

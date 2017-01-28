@@ -2,8 +2,6 @@ package;
 
 import kha.Framebuffer;
 import kha.Scheduler;
-import zui.Zui;
-import zui.Id;
 //import entity.Player;
 
 typedef Dungeon = {
@@ -12,6 +10,7 @@ typedef Dungeon = {
 typedef PlayerSave = {
 	var pos : {x: Int, y:Int};
 	var health: Int;
+	var inventory: Array<component.Inventory.Stack>;
 }
 typedef Save  = {
 	var player : PlayerSave;
@@ -41,15 +40,18 @@ class Project {
 	var minimap:kha.Image;
 	var minimapOpacity = 1.0;
 	
-	var ui:Zui;
+	//var ui:Zui;
 	public static var spriteData = CompileTime.parseJsonFile('../assets/spriteData.json');
 	var fpsGraph:ui.Graph;
 	var updateGraph:ui.Graph;
 	var dungeonLevel = 1;
 
+	var overlay:Float = 0.0;
+
 	//var dungeonLevels = Array<DungeonLevel>;
 	var lastSave:Save;
 	var dungeons:Array<Dungeon> = [];
+	var inventorySelectIndex = 0;
 
 	public function new() {
 		kha.System.notifyOnRender(render);
@@ -95,6 +97,11 @@ class Project {
 		});
 		input.listenToKeyRelease('m', function (){
 			minimapOpacity = 1.0;
+		});
+		input.wheelListeners.push(function(dir){
+			inventorySelectIndex += dir;
+			if (inventorySelectIndex < 0) inventorySelectIndex = p.get(component.Inventory).length-1;
+			if (inventorySelectIndex > p.get(component.Inventory).length-1) inventorySelectIndex = 0;
 		});
 	}
 	function registerRenderSystem(system:System){
@@ -144,15 +151,21 @@ class Project {
 		minimap.g2.end();
 		
 		for (t in generator.treasure){
-			createTreasure(t.x*16,t.y*16);
+			EntityFactory.createTreasure(entities,t.x*16,t.y*16);
 		}
 		for (e in generator.enemies){
-			createSlime(e.x*16,e.y*16);
+			EntityFactory.createSlime(entities,e.x*16,e.y*16);
+			EntityFactory.createGoblin(entities,e.x*16,e.y*16);
 		}
 
-		createLadder(generator.exitPoint.x*16,generator.exitPoint.y*16);
+		EntityFactory.createLadder(entities,generator.exitPoint.x*16,generator.exitPoint.y*16,descend);
 
-		p = createPlayer({x:generator.spawnPoint.x, y:generator.spawnPoint.y});
+		p = EntityFactory.createPlayer(entities,{x:generator.spawnPoint.x, y:generator.spawnPoint.y});
+		p.get(component.Inventory).putIntoInventory(component.Inventory.Item.SlimeGun);
+		if (lastSave != null && lastSave.player != null){
+			p.get(component.Health).current = lastSave.player.health;
+			p.get(component.Inventory).stacks = lastSave.player.inventory;
+		}
 
 		dungeons.push ({
 			seed: generator.seed
@@ -162,83 +175,13 @@ class Project {
 	}
 	function descend (){
 		trace("You enter deeper into the dungeon...");
-
+		overlay = .7;
 		dungeonLevel++;
 		save();
 		createMap();
 		save();
 	}
-	function createPlayer(spawnPoint:{x:Int,y:Int}) {
-		if (p != null && p.get(component.Transformation) != null)
-			p.destroy();
-
-		p = entities.create();
-		p.set(new component.Name("Ghost"));
-		p.set(new component.Transformation(new kha.math.Vector2(spawnPoint.x*16,spawnPoint.y*16)));
-		p.set(new component.AnimatedSprite(spriteData.entity.ghost));
-		p.set(new component.AITarget());
-		p.set(new component.Health(50));
-		p.get(component.AnimatedSprite).spriteMap = kha.Assets.images.Ghost;
-		p.get(component.AnimatedSprite).tilesize = 10;
-		p.set(new component.KeyMovement());
-		p.set(new component.Physics());
-		p.set(new component.Gun());
-		p.set(new component.Inventory());
-		p.set(new component.Collisions([component.Collisions.CollisionGroup.Friendly,component.Collisions.CollisionGroup.Player],[component.Collisions.CollisionGroup.Friendly,component.Collisions.CollisionGroup.Player,component.Collisions.CollisionGroup.Bullet]));
-		p.get(component.Collisions).registerCollisionRegion(new component.Collisions.Rect(0,0,10,10));
-		p.set(new component.Light());
-		
-		p.get(component.Light).colour = kha.Color.fromBytes(255,200,200);
-		p.get(component.Light).strength = .8;
-
-		if (lastSave != null && lastSave.player != null){
-			p.get(component.Health).current = lastSave.player.health;
-		}
-		return p;
-	}
-	function createSlime(x:Int,y:Int){
-		var slime = entities.create();
-		slime.set(new component.Name("Slime"));
-		slime.set(new component.Transformation(new kha.math.Vector2(x,y)));
-		slime.set(new component.AnimatedSprite(spriteData.entity.slime));
-		slime.set(new component.Health(5));
-		slime.get(component.AnimatedSprite).spriteMap = kha.Assets.images.Slime;
-		slime.get(component.AnimatedSprite).tilesize = 8;
-		slime.get(component.AnimatedSprite).speed = 4;
-		slime.set(new component.Physics());
-		slime.set(new component.AI());
-		slime.set(new component.DieOnCollision([component.Collisions.CollisionGroup.Bullet]));
-		slime.set(new component.Collisions([component.Collisions.CollisionGroup.Enemy]));
-		var b:component.Collisions.Rect = new component.Collisions.Rect(0,0,8,8);
-		slime.get(component.Collisions).registerCollisionRegion(b);
-		return slime;
-	}
-	function createTreasure(x:Int,y:Int){
-		var treasure = entities.create();
-		treasure.set(new component.Name("Treasure"));
-		treasure.set(new component.Transformation(new kha.math.Vector2(x,y)));
-		treasure.set(new component.AnimatedSprite(cast spriteData.entity.chest));
-		treasure.get(component.AnimatedSprite).speed = 2;
-		treasure.set(new component.Collisions([component.Collisions.CollisionGroup.Level],[component.Collisions.CollisionGroup.Level]));
-		treasure.get(component.Collisions).registerCollisionRegion(new component.Collisions.Rect(2,3,8,8));
-		treasure.set(new component.ReleaseOnCollision([component.Inventory.Item.Gold],[component.Collisions.CollisionGroup.Friendly]));
-		
-		treasure.set(new component.Light());
-		treasure.get(component.Light).colour = kha.Color.fromBytes(0,0,140);//kha.Color.Green;
-		//treasure.get(component.Light).strength = 1;
-
-		return treasure;
-	}
-	function createLadder(x:Int,y:Int){
-		var ladder = entities.create();
-		ladder.set(new component.Name("Ladder"));
-		ladder.set(new component.Transformation(new kha.math.Vector2(x,y)));
-		ladder.set(new component.Sprite(spriteData.entity.ladder));
-		ladder.set(new component.Collisions([component.Collisions.CollisionGroup.Level]));
-		ladder.get(component.Collisions).registerCollisionRegion(new component.Collisions.Rect(0,0,8,8));
-		ladder.set(new component.CustomCollisionHandler([component.Collisions.CollisionGroup.Player],descend));
-		return ladder;
-	}
+	
 	function save (){
 		lastSave = {
 			dungeonLevel: dungeonLevel,
@@ -251,7 +194,8 @@ class Project {
 					x: Math.round(p.get(component.Transformation).pos.x),
 					y: Math.round(p.get(component.Transformation).pos.y)
 				},
-				health: Math.round(p.get(component.Health).current)
+				health: Math.round(p.get(component.Health).current),
+				inventory: p.get(component.Inventory).stacks
 			}
 		
 	}
@@ -260,6 +204,17 @@ class Project {
 		
 		var delta = Scheduler.time() - lastTime;
 		var realDelta = Scheduler.realTime() - realLastTime;
+
+		if (p.get(component.Inventory) != null){
+			var pinv = p.get(component.Inventory);
+			var itemData = pinv.itemData.get(pinv.getByIndex(inventorySelectIndex).item);
+			if (itemData.type == component.Inventory.ItemType.Gun){
+				p.get(component.Gun).gun = component.Gun.GunType.SlimeGun;
+			}else{
+				p.get(component.Gun).gun = null;
+
+			}
+		}
 		
 		if (minimapOpacity > 0)
 			if (minimapOpacity - delta < 0)
@@ -275,6 +230,8 @@ class Project {
 		
 		fpsGraph.pushValue(1/delta/fpsGraph.size.y);
 		
+		if (overlay > 0.0) overlay -= delta;
+		if (overlay < 0.0) overlay = 0.0;
 
 		lastTime = Scheduler.time();
 		realLastTime = Scheduler.realTime();
@@ -310,24 +267,45 @@ class Project {
 
 		g.transformation = kha.math.FastMatrix3.identity();
 
-		g.transformation._00 = camera.scale.x;
-		g.transformation._11 = camera.scale.y;
+		g.color = kha.Color.White;
+		g.font = kha.Assets.fonts.trenco;
+		
 		var x = 0;
 		g.color = kha.Color.White;
+		g.font = kha.Assets.fonts.trenco;
+		g.fontSize = 38;//Math.floor(frame/30);
 		if (p.has(component.Inventory)){
-			for (item in p.get(component.Inventory).items){
+			for (stack in p.get(component.Inventory).stacks){
+				g.transformation._00 = camera.scale.x;
+				g.transformation._11 = camera.scale.y;
+				system.Renderer.renderSpriteData(g,p.get(component.Inventory).itemData.get(stack.item).sprite,6,x*10);
+				
+				g.color = kha.Color.fromBytes(112,107,137);
+				if (x == inventorySelectIndex)
+					g.fillRect(1,x*10+1,1,6);
+
+				g.transformation._00 = 1;
+				g.transformation._11 = 1;
+				g.color = kha.Color.fromBytes(234,211,220);
+				g.drawString(stack.quantity+"",(3*4), (x*10*4)-8);
+				
 				x++;
-				g.drawSubImage(kha.Assets.images.Objects,x*5,10,10,2,4,4);
+				
 			}
 		}
 
 		g.transformation = kha.math.FastMatrix3.identity();
+		g.font = kha.Assets.fonts.OpenSans;
 		g.color = kha.Color.White;
 		g.fontSize = 20;
 		g.drawString("Floor "+dungeonLevel,10,kha.System.windowHeight()-30);
 
 		g.transformation = kha.math.FastMatrix3.identity();
 
+		g.color = kha.Color.fromFloats(0,0,0,overlay);
+		g.fillRect(0,0,kha.System.windowWidth(),kha.System.windowHeight());
+
+		g.color = kha.Color.White;
 		fpsGraph.render(g);
 		updateGraph.render(g);
 

@@ -17,10 +17,12 @@ class AnimatedSprite extends Component {
 		if (spriteData.tileset != null){
 			switch spriteData.tileset {
 				case "ghost": spriteMap = kha.Assets.images.Ghost;
-				case "slime": spriteMap = kha.Assets.images.Slime;
+				case "slime": spriteMap = kha.Assets.images.Slime; tilesize = 8;
 				case "projectiles": spriteMap = kha.Assets.images.Projectiles;
 				case "objects": spriteMap = kha.Assets.images.Objects; tilesize = 8;
 				case "chest": spriteMap = kha.Assets.images.Chest; tilesize = 11;
+				case "goblin": spriteMap = kha.Assets.images.Goblin; tilesize = 10;
+				case "coin": spriteMap = kha.Assets.images.Coin; tilesize = 8;
 			}
 		}
 
@@ -38,4 +40,5 @@ class AnimatedSprite extends Component {
 		currentAnimation = name;
 		return this;
 	}
+	public function setSpeed(x:Int){ this.speed = x; return this; }
 }

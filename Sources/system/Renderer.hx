@@ -70,4 +70,23 @@ class Renderer extends System {
 			g.popTransformation();
 		}
 	}
+	public static function renderSpriteData (g:kha.graphics2.Graphics,spriteData:Dynamic,x:Float,y:Float){
+		var spriteMap:kha.Image = null;
+		var tilesize:Int = 16;
+		if (spriteData.tileset != null){
+			switch spriteData.tileset {
+				case "ghost": spriteMap = kha.Assets.images.Ghost;
+				case "slime": spriteMap = kha.Assets.images.Slime; tilesize = 8;
+				case "projectiles": spriteMap = kha.Assets.images.Projectiles;
+				case "objects": spriteMap = kha.Assets.images.Objects; tilesize = 8;
+				case "chest": spriteMap = kha.Assets.images.Chest; tilesize = 11;
+				case "goblin": spriteMap = kha.Assets.images.Goblin; tilesize = 10;
+				case "coin": spriteMap = kha.Assets.images.Coin; tilesize = 8;
+			}
+			
+			var id = spriteData.id;
+			g.drawScaledSubImage(spriteMap,Math.floor((id%tilesize)*tilesize),Math.floor(Math.floor(id/tilesize)*tilesize),tilesize,tilesize,x,y,tilesize,tilesize);
+		}
+			
+	}
 }

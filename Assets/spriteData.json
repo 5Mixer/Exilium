@@ -49,6 +49,20 @@
 				"attack u" : [76,77,78,79]
 			}
 		},
+		"goblin" : {
+			"tileset" : "goblin",
+			"animations" : {
+				"idle" : [12],
+				"walk_up" : [24,25],
+				"walk_up_left" : [26,27],
+				"walk_left" : [28,29,30,29],
+				"walk_down_left" : [31,32],
+				"walk_down" : [33,34],
+				"walk_down_right" :[36,37],
+				"walk_right" : [38,39,40,39],
+				"walk_up_right" : [41,42]
+			}
+		},
 		"chest" : {
 			"tileset":"chest",
 			"width": 11,
@@ -72,10 +86,23 @@
 			"height":8
 		},
 		"gold" : {
+			"tileset":"coin",
+			"id":0,
+			"animations": {
+				"spin":[0,1,2,3]
+			}
+		},
+		"healthPotion" : {
 			"tileset":"objects",
-			"id":1,
+			"id":2,
 			"width": 8,
-			"height": 8
+			"height":8
+		},
+		"slimeGun" : {
+			"tileset":"objects",
+			"id":3,
+			"width": 8,
+			"height":8
 		}
 	}
 }

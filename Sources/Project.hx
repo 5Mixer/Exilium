@@ -174,7 +174,7 @@ class Project {
 		return map;
 	}
 	function descend (){
-		trace("You enter deeper into the dungeon...");
+		//trace("You enter deeper into the dungeon...");
 		overlay = .7;
 		dungeonLevel++;
 		save();
@@ -274,7 +274,14 @@ class Project {
 		g.color = kha.Color.White;
 		g.font = kha.Assets.fonts.trenco;
 		g.fontSize = 38;//Math.floor(frame/30);
+
+		var pinv = p.get(component.Inventory);
+		g.color = kha.Color.fromBytes(234,211,220);
+
 		if (p.has(component.Inventory)){
+			g.drawString(pinv.itemData.get(pinv.getByIndex(inventorySelectIndex).item).name,(3*4), -1*4);
+			
+			g.translate(0,8*4);
 			for (stack in p.get(component.Inventory).stacks){
 				g.transformation._00 = camera.scale.x;
 				g.transformation._11 = camera.scale.y;

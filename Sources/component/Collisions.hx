@@ -6,6 +6,7 @@ enum CollisionGroup {
 	Enemy;
 	Level;
 	Bullet;
+	Item;
 	Particle;
 }
 

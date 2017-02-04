@@ -51,7 +51,6 @@ class Project {
 	//var dungeonLevels = Array<DungeonLevel>;
 	var lastSave:Save;
 	var dungeons:Array<Dungeon> = [];
-	var inventorySelectIndex = 0;
 
 	public function new() {
 		kha.System.notifyOnRender(render);
@@ -77,9 +76,12 @@ class Project {
 		systems.add(collisionSys);
 		systems.add(new system.KeyMovement(input,entities));
 		systems.add(new system.Physics(entities,collisionSys.grid));
+		systems.add(new system.Inventory(entities));
+		systems.add(new system.TimedLife(entities));
 		systems.add(new system.TimedLife(entities));
 		systems.add(new system.Gun(input,camera,entities));
 		systems.add(new system.AI(entities,null));
+		systems.add(new system.Magnets(entities,p));
 		
 		createMap();
 
@@ -99,9 +101,10 @@ class Project {
 			minimapOpacity = 1.0;
 		});
 		input.wheelListeners.push(function(dir){
-			inventorySelectIndex += dir;
-			if (inventorySelectIndex < 0) inventorySelectIndex = p.get(component.Inventory).length-1;
-			if (inventorySelectIndex > p.get(component.Inventory).length-1) inventorySelectIndex = 0;
+			if (p.get(component.Inventory) == null) return;
+			p.get(component.Inventory).activeIndex += dir;
+			if (p.get(component.Inventory).activeIndex < 0) p.get(component.Inventory).activeIndex = p.get(component.Inventory).length-1;
+			if (p.get(component.Inventory).activeIndex > p.get(component.Inventory).length-1) p.get(component.Inventory).activeIndex = 0;
 		});
 	}
 	function registerRenderSystem(system:System){
@@ -115,7 +118,7 @@ class Project {
 		var map = entities.create();
 		map.set(new component.Transformation(new kha.math.Vector2())); 
 		map.set(new component.Tilemap());
-		map.set(new component.Collisions([component.Collisions.CollisionGroup.Level],[component.Collisions.CollisionGroup.Level]));
+		map.set(new component.Collisions([component.Collisions.CollisionGroup.Level],[]));
 		map.get(component.Collisions).fixed = true;
 		(cast systems.get(system.AI)).map = map.get(component.Tilemap);
 
@@ -207,7 +210,7 @@ class Project {
 
 		if (p.get(component.Inventory) != null){
 			var pinv = p.get(component.Inventory);
-			var itemData = pinv.itemData.get(pinv.getByIndex(inventorySelectIndex).item);
+			var itemData = pinv.itemData.get(pinv.getByIndex(pinv.activeIndex).item);
 			if (itemData.type == component.Inventory.ItemType.Gun){
 				p.get(component.Gun).gun = component.Gun.GunType.SlimeGun;
 			}else{
@@ -224,6 +227,7 @@ class Project {
 
 		systems.update(delta);
 		cast(systems.get(system.Physics),system.Physics).grid = cast(systems.get(system.Collisions),system.Collisions).grid;
+		cast(systems.get(system.Magnets),system.Magnets).p = p;
 
 		if (p != null && p.has(component.Transformation))
 			camera.pos = new kha.math.Vector2(p.get(component.Transformation).pos.x-kha.System.windowWidth()/2/camera.scale.x,p.get(component.Transformation).pos.y-kha.System.windowHeight()/2/camera.scale.y);
@@ -279,7 +283,7 @@ class Project {
 		g.color = kha.Color.fromBytes(234,211,220);
 
 		if (p.has(component.Inventory)){
-			g.drawString(pinv.itemData.get(pinv.getByIndex(inventorySelectIndex).item).name,(3*4), -1*4);
+			g.drawString(pinv.itemData.get(pinv.getByIndex(pinv.activeIndex).item).name,(3*4), -1*4);
 			
 			g.translate(0,8*4);
 			for (stack in p.get(component.Inventory).stacks){
@@ -288,7 +292,7 @@ class Project {
 				system.Renderer.renderSpriteData(g,p.get(component.Inventory).itemData.get(stack.item).sprite,6,x*10);
 				
 				g.color = kha.Color.fromBytes(112,107,137);
-				if (x == inventorySelectIndex)
+				if (x == pinv.activeIndex)
 					g.fillRect(1,x*10+1,1,6);
 
 				g.transformation._00 = 1;

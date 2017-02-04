@@ -9,8 +9,10 @@ class EntityFactory {
 		droppedItem.set(new component.Name("Dropped Item"));
 		droppedItem.set(new component.Transformation(new kha.math.Vector2(options.pos.x,options.pos.y)));
 		droppedItem.set(new component.TimedLife(5+Math.random()*3));
-		droppedItem.set(new component.Collisions([]).registerCollisionRegion(new component.Collisions.Rect(2,2,4,4)));
+		droppedItem.set(new component.Collisions([component.Collisions.CollisionGroup.Item]).registerCollisionRegion(new component.Collisions.Rect(2,2,4,4)));
 		droppedItem.set(new component.Collectable([component.Collisions.CollisionGroup.Friendly],[item]));
+		droppedItem.set(new component.Magnet());
+		droppedItem.set(new component.Physics());
 
 		if (item == component.Inventory.Item.Gold){
 			droppedItem.set(new component.AnimatedSprite(Project.spriteData.entity.gold).playAnimation("spin").setSpeed(3));
@@ -33,7 +35,7 @@ class EntityFactory {
 		p.set(new component.Physics());
 		p.set(new component.Gun());
 		p.set(new component.Inventory());
-		p.set(new component.Collisions([component.Collisions.CollisionGroup.Friendly,component.Collisions.CollisionGroup.Player],[component.Collisions.CollisionGroup.Friendly,component.Collisions.CollisionGroup.Player,component.Collisions.CollisionGroup.Bullet]));
+		p.set(new component.Collisions([component.Collisions.CollisionGroup.Friendly,component.Collisions.CollisionGroup.Player],[component.Collisions.CollisionGroup.Friendly,component.Collisions.CollisionGroup.Player,component.Collisions.CollisionGroup.Particle,component.Collisions.CollisionGroup.Item]));
 		p.get(component.Collisions).registerCollisionRegion(new component.Collisions.Rect(0,0,10,10));
 		p.set(new component.Light());
 		
@@ -94,6 +96,17 @@ class EntityFactory {
 		var b:component.Collisions.Rect = new component.Collisions.Rect(2,1,6,9);
 		goblin.get(component.Collisions).registerCollisionRegion(b);
 		return goblin;
+	}
+	public static function createPotion(entities:eskimo.EntityManager,x:Float, y:Float){
+		var potion = entities.create();
+		potion.set(new component.Name("Dropped Item"));
+		potion.set(new component.Transformation(new kha.math.Vector2(x,y)));
+		potion.set(new component.TimedLife(5+Math.random()*3));
+		potion.set(new component.Magnet());
+		potion.set(new component.Collisions([component.Collisions.CollisionGroup.Item],[component.Collisions.CollisionGroup.Bullet,component.Collisions.CollisionGroup.Enemy,component.Collisions.CollisionGroup.Friendly,component.Collisions.CollisionGroup.Player,component.Collisions.CollisionGroup.Particle,component.Collisions.CollisionGroup.Item]).registerCollisionRegion(new component.Collisions.Rect(2,2,4,4)));
+		potion.set(new component.Sprite(Project.spriteData.entity.healthPotion));
+		return potion;
+
 	}
 	public static function createLadder(entities:eskimo.EntityManager,x:Int,y:Int,onCollide:Void->Void){ 
 		var ladder = entities.create(); 

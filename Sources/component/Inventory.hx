@@ -33,6 +33,7 @@ typedef Stack = {
 class Inventory extends Component {
 	public var stacks:Array<Stack>;
 	public var length(get,null) = 0;
+	public var activeIndex:Int = 0;
 	public var itemData:Map<Item,{name:String, stackable:Bool, type: ItemType, sprite: Dynamic}> = [
 		Item.Gold => { name: "gold", stackable: true, type: ItemType.Currency, sprite:Project.spriteData.entity.gold },
 		Item.HealthPotion => { name: "gold", stackable: true, type: ItemType.Potion, sprite:Project.spriteData.entity.healthPotion },

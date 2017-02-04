@@ -141,30 +141,17 @@ class Physics extends System {
 			}
 		}
 	}
+	//If the other shape is not ignoring one of shapes groups.
 	function validCollision(shape:component.Collisions.Rect,otherShape:component.Collisions.Rect){
-		var valid = false;
-		if (otherShape.ignoreGroups.length > 0){
-			for (othersIgnore in otherShape.ignoreGroups){
-				if (shape.group.indexOf(othersIgnore) == -1){
-					//The other entity is not ignoring one of our groups, this is a valid collision.
-					valid = true;
-					break;
-				}
-			}
-		}else{
-			valid = true;
-		}
-		
-		if (valid){
-			for (ignore in shape.ignoreGroups){
-				if (otherShape.group.indexOf(ignore) != -1){
-					//The other entity is not ignoring one of our groups, this is a valid collision.
-					valid = false;
-					break;
-				}
+		//If both shapes are ignoring nothing, they should collide.
+		if (otherShape.ignoreGroups.length == 0 && shape.ignoreGroups.length == 0) return true;
+		//If the shape has a group that is being ignored by otherShape, don't collide.
+		for (group in shape.group){
+			if (otherShape.ignoreGroups.indexOf(group) != -1){
+				return false;
 			}
 		}
-		return valid;
+		return true;
 
 	}
 }

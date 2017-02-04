@@ -30,13 +30,15 @@ class Gun extends System {
 					var dir = transformation.pos.sub(camera.screenToWorld(input.mousePos.sub(new kha.math.Vector2(24,24))));
 					var a = Math.round(Math.atan2(-dir.y,-dir.x)*(180/Math.PI));
 
-					var camOffset = dir.mult(1);
-					camOffset.normalize();
-					camOffset = camOffset.mult(6+Math.random()*2);
-					camera.offset.x += camOffset.x;
-					camera.offset.y += camOffset.y;
+					if (gun.gun != null){
+						var camOffset = dir.mult(1);
+						camOffset.normalize();
+						camOffset = camOffset.mult(6+Math.random()*2);
+						camera.offset.x += camOffset.x;
+						camera.offset.y += camOffset.y;
+					}
 
-					if (entity.has(component.Physics)){
+					if (entity.has(component.Physics) && gun.gun != null){
 						var physics:component.Physics = entity.get(component.Physics);
 						
 						var knockback = .5+(Math.random()*.3);

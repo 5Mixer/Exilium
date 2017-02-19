@@ -8,4 +8,7 @@ class Health extends Component {
 		max = maxHealth;
 		current = max;
 	}
+	public function addToHealth (amount:Int){
+		current = Math.floor(Math.min(current+amount,max));
+	}
 }

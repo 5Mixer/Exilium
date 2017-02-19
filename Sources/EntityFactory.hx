@@ -74,11 +74,10 @@ class EntityFactory {
 		var contents = [];
 		contents.pushx(component.Inventory.Item.Gold,Math.floor(Math.random()*15));
 		contents.pushx(component.Inventory.Item.HealthPotion,Math.floor(Math.random()*2));
+		if (Math.random() > .5) contents.push(component.Inventory.Item.LaserGun);
 		treasure.set(new component.ReleaseOnCollision(contents,[component.Collisions.CollisionGroup.Friendly]));
 		
-		treasure.set(new component.Light());
-		treasure.get(component.Light).colour = kha.Color.fromBytes(0,0,140);//kha.Color.Green;
-		//treasure.get(component.Light).strength = 1;
+		
 
 		return treasure;
 	}

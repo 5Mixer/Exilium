@@ -7,10 +7,12 @@ class Physics extends System {
 	var colliders:eskimo.views.View;
 	public var grid:util.SpatialHash;
 	var entities:eskimo.EntityManager;
+	var collisionListeners:Array<eskimo.Entity->eskimo.Entity->Void>;
 	public function new (entities:eskimo.EntityManager,broadPhaseGrid:util.SpatialHash){
 		super();
 		this.entities = entities;
 		grid = broadPhaseGrid;
+		collisionListeners = [];
 		view = new eskimo.views.View(new eskimo.filters.Filter([component.Transformation, component.Physics]),entities);
 		colliders = new eskimo.views.View(new eskimo.filters.Filter([component.Transformation, component.Collisions]),entities);
 	}
@@ -50,6 +52,10 @@ class Physics extends System {
 							collision = true;
 							collidingShape = otherShape;
 							transformation.pos.x += c.separationX;
+							if (physics.reflect){
+								physics.velocity.x *= -1;
+								transformation.angle = Math.atan2(physics.velocity.y,physics.velocity.x) * 180/Math.PI;
+							}
 
 							onCollision(shape,otherShape);
 							onCollision(otherShape,shape);
@@ -75,6 +81,10 @@ class Physics extends System {
 							collision = true;
 							collidingShape = otherShape;
 							transformation.pos.y += c.separationY;
+							if (physics.reflect){
+								physics.velocity.y *= -1;
+								transformation.angle = Math.atan2(physics.velocity.y,physics.velocity.x) * 180/Math.PI;
+							}
 
 							onCollision(shape,otherShape);
 							onCollision(otherShape,shape);
@@ -92,6 +102,9 @@ class Physics extends System {
 	function onCollision(shape:component.Collisions.Rect,otherShape:component.Collisions.Rect){
 		var shapeEntity = shape.ofEntity;
 		var otherShapeEntity = otherShape.ofEntity;
+		for (collisionListener in collisionListeners) {
+			collisionListener(shapeEntity,otherShapeEntity);
+		}
 		if (shapeEntity.has(component.ReleaseOnCollision)){
 			var roc = shapeEntity.get(component.ReleaseOnCollision);
 			for (releaseGroup in roc.collisionGroups){
@@ -100,6 +113,9 @@ class Physics extends System {
 						var droppedItem = EntityFactory.makeItem(entities,item,{pos:{x:shapeEntity.get(component.Transformation).pos.x,y:shapeEntity.get(component.Transformation).pos.y}});
 						droppedItem.set(new component.Physics().setVelocity(new kha.math.Vector2(-6+Math.random()*12,-6+Math.random()*12)));
 					}
+					shapeEntity.set(new component.Light());
+					shapeEntity.get(component.Light).colour = kha.Color.fromBytes(250,240,180);//kha.Color.Green;
+					shapeEntity.get(component.Light).strength = .5;
 
 					if (shapeEntity.has(component.AnimatedSprite))
 						shapeEntity.get(component.AnimatedSprite).playAnimation("open","emptied");

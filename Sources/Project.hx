@@ -71,12 +71,12 @@ class Project {
 		registerRenderSystem(new system.Healthbars(entities));
 		
 		var collisionSys = new system.Collisions(entities);
-		//registerRenderSystem(new system.CollisionDebugView(entities,collisionSys.grid));
+		registerRenderSystem(new system.CollisionDebugView(entities,collisionSys.grid,true));
 		
 		systems.add(collisionSys);
 		systems.add(new system.KeyMovement(input,entities));
 		systems.add(new system.Physics(entities,collisionSys.grid));
-		systems.add(new system.Inventory(entities));
+		systems.add(new system.Inventory(input,entities));
 		systems.add(new system.TimedLife(entities));
 		systems.add(new system.TimedLife(entities));
 		systems.add(new system.Gun(input,camera,entities));
@@ -204,15 +204,21 @@ class Project {
 	}
 
 	function update() {
+		input.startUpdate();
 		
 		var delta = Scheduler.time() - lastTime;
 		var realDelta = Scheduler.realTime() - realLastTime;
 
 		if (p.get(component.Inventory) != null){
 			var pinv = p.get(component.Inventory);
-			var itemData = pinv.itemData.get(pinv.getByIndex(pinv.activeIndex).item);
-			if (itemData.type == component.Inventory.ItemType.Gun){
+			var selectedItem = pinv.getByIndex(pinv.activeIndex).item;
+			var itemData = pinv.itemData.get(selectedItem);
+			if (selectedItem == component.Inventory.Item.SlimeGun){
 				p.get(component.Gun).gun = component.Gun.GunType.SlimeGun;
+				p.get(component.Gun).fireRate = 7;
+			}else if (selectedItem == component.Inventory.Item.LaserGun) {
+				p.get(component.Gun).gun = component.Gun.GunType.LaserGun;
+				p.get(component.Gun).fireRate = 4;
 			}else{
 				p.get(component.Gun).gun = null;
 
@@ -239,6 +245,8 @@ class Project {
 
 		lastTime = Scheduler.time();
 		realLastTime = Scheduler.realTime();
+
+		input.endUpdate();
 	}
 	function render(framebuffer: Framebuffer): Void {
 		frame++;

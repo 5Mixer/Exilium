@@ -43,18 +43,24 @@ class TilemapRenderer extends System {
 						var light = lit.get(component.Light);
 						var lightTransform = lit.get(component.Transformation);
 						
+						var smootherLights = [];
+						for (sx in -1...2){
+							for (sy in -1...2){
+								if (map.get(x-sx,y-sy) == null) continue;
+								if (map.tileInfo.get(map.get(x-sx,y-sy)).collide) continue;
+								smootherLights.push({x:sx, y:sy});
+							}
+						}
 						//Can a path to the light be drawn from this tile without hitting an occluder?
-						for (ox in -1...1){
-							for (oy in -1...1){
-								if (map.tileInfo.get(map.get(x,y)).collide || !map.raycast(g,Math.floor((lightTransform.pos.x)/tilesize +ox),Math.floor((lightTransform.pos.y)/tilesize +oy),x,y)){
-									var lx = lightTransform.pos.x/tilesize;
-									var ly = lightTransform.pos.y/tilesize;
-									var l =	Math.sqrt(((x - lx) * (x - lx)) + ((y - ly) * (y - ly))); //Distance to light.
-									l = Math.max(Math.min(light.strength/l,1),0)/4; //This is the lights effect, kept in range.
+						for (smootherLight in smootherLights){
+							if (map.tileInfo.get(map.get(x,y)).collide || !map.raycast(g,Math.floor((lightTransform.pos.x)/tilesize +smootherLight.x),Math.floor((lightTransform.pos.y)/tilesize +smootherLight.y),x,y)){
+								var lx = (lightTransform.pos.x-4)/tilesize;
+								var ly = (lightTransform.pos.y-4)/tilesize;
+								var l =	Math.sqrt(((x - lx + smootherLight.x) * (x - lx + smootherLight.x)) + ((y - ly + smootherLight.y) * (y - ly + smootherLight.y))); //Distance to light.
+								l = Math.max(Math.min(light.strength/l,1),0)/smootherLights.length; //This is the lights effect, kept in range.
 
-									colours.push(kha.Color.fromFloats(light.colour.R*l,light.colour.G*l,light.colour.B*l,1)); //Add to colours
-								}
-							}	
+								colours.push(kha.Color.fromFloats(light.colour.R*l,light.colour.G*l,light.colour.B*l,1)); //Add to colours
+							}
 						}
 						
 					}

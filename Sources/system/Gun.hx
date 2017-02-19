@@ -48,6 +48,8 @@ class Gun extends System {
 
 					if (gun.gun == component.Gun.GunType.SlimeGun)
 						shootSlimeGun(entity,a);
+					if (gun.gun == component.Gun.GunType.LaserGun)
+						shootLaserGun(entity,a);
 				}
 			}
 		}
@@ -69,19 +71,57 @@ class Gun extends System {
 		p.velocity = new kha.math.Vector2(Math.cos(angle * (Math.PI / 180)) * speed,Math.sin(angle * (Math.PI / 180)) * speed);
 		bullet.set(p);
 		bullet.set(new component.Sprite(cast spriteData));
-		//bullet.get(component.Sprite).spriteMap = kha.Assets.images.Projectiles;
 
 		bullet.set(new component.TimedLife(3));
 		bullet.set(new component.DieOnCollision([component.Collisions.CollisionGroup.Enemy,component.Collisions.CollisionGroup.Level]));
 		
-		//bullet.set(new component.Light());
-		//bullet.get(component.Light).colour = kha.Color.Red;
-		//bullet.get(component.Light).strength = .5;
+		
 		bullet.set(new component.Collisions([component.Collisions.CollisionGroup.Bullet,component.Collisions.CollisionGroup.Friendly],[component.Collisions.CollisionGroup.Bullet,component.Collisions.CollisionGroup.Friendly]));
 		bullet.get(component.Collisions).registerCollisionRegion(new component.Collisions.Rect(4,4,7,7));
 
 		var particle = entities.create();
-		particle.set(new component.VisualParticle(component.VisualParticle.Effect.Smoke));
+		particle.set(new component.VisualParticle(component.VisualParticle.Effect.Spark));
+		
+
+		var t = new component.Transformation(parent.get(component.Transformation).pos.add(new kha.math.Vector2(5,5)));
+		t.angle = angle;
+		particle.set(t);
+		var phys = new component.Physics();
+		var speed = 3;
+		phys.friction = 0.6;
+		var particleAngle = angle - 6 + Math.random()*12;
+		phys.velocity = new kha.math.Vector2(Math.cos(particleAngle * (Math.PI / 180)) * speed,Math.sin(particleAngle * (Math.PI / 180)) * speed);		
+		particle.set(phys);
+		particle.set(new component.TimedLife(.15));
+		
+	}
+	public function shootLaserGun (parent:eskimo.Entity,angle){
+
+		
+		//kha.audio1.Audio.play(kha.Assets.sounds.RapidFire);
+		
+		var bullet = entities.create();
+
+		var t = new component.Transformation(parent.get(component.Transformation).pos.sub(new kha.math.Vector2(3,3)));
+		t.angle = angle;
+		bullet.set(t);
+		
+		var p = new component.Physics(true);
+		var speed = 4;
+		p.friction = 0.999;
+		p.velocity = new kha.math.Vector2(Math.cos(angle * (Math.PI / 180)) * speed,Math.sin(angle * (Math.PI / 180)) * speed);
+		bullet.set(p);
+		bullet.set(new component.Sprite(cast spriteData));
+
+		bullet.set(new component.TimedLife(3));
+		bullet.set(new component.DieOnCollision([component.Collisions.CollisionGroup.Enemy]));
+		
+		
+		bullet.set(new component.Collisions([component.Collisions.CollisionGroup.Bullet,component.Collisions.CollisionGroup.Friendly],[component.Collisions.CollisionGroup.Bullet,component.Collisions.CollisionGroup.Friendly]));
+		bullet.get(component.Collisions).registerCollisionRegion(new component.Collisions.Rect(4,4,7,7));
+
+		var particle = entities.create();
+		particle.set(new component.VisualParticle(component.VisualParticle.Effect.Spark));
 		
 
 		var t = new component.Transformation(parent.get(component.Transformation).pos.add(new kha.math.Vector2(5,5)));

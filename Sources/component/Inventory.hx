@@ -3,6 +3,7 @@ package component;
 enum Item {
 	Gold;
 	SlimeGun;
+	LaserGun;
 	Gem;
 	HealthPotion;
 	
@@ -36,8 +37,9 @@ class Inventory extends Component {
 	public var activeIndex:Int = 0;
 	public var itemData:Map<Item,{name:String, stackable:Bool, type: ItemType, sprite: Dynamic}> = [
 		Item.Gold => { name: "gold", stackable: true, type: ItemType.Currency, sprite:Project.spriteData.entity.gold },
-		Item.HealthPotion => { name: "gold", stackable: true, type: ItemType.Potion, sprite:Project.spriteData.entity.healthPotion },
-		Item.SlimeGun => { name: "slime gun", stackable: false, type: ItemType.Gun, sprite:Project.spriteData.entity.slimeGun }
+		Item.HealthPotion => { name: "health potion", stackable: true, type: ItemType.Potion, sprite:Project.spriteData.entity.healthPotion },
+		Item.SlimeGun => { name: "slime gun", stackable: false, type: ItemType.Gun, sprite:Project.spriteData.entity.slimeGun },
+		Item.LaserGun => { name: "laser gun", stackable: false, type: ItemType.Gun, sprite:Project.spriteData.entity.laserGun },
 	];
 	override public function new (){
 		super();
@@ -54,6 +56,15 @@ class Inventory extends Component {
 		if (exists(item)){
 			if (getStack(item).quantity >= quantity){
 				getStack(item).quantity -= quantity;
+				if (getStack(item).quantity < 1){
+					stacks.remove(getStack(item));
+					if (activeIndex < 0) {
+						activeIndex = 0;
+					}
+					if (activeIndex > stacks.length-1){
+						activeIndex = stacks.length-1;
+					}
+				}
 				return true;
 			}
 		}

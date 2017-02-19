@@ -103,6 +103,12 @@
 			"id":3,
 			"width": 8,
 			"height":8
+		},
+		"laserGun" : {
+			"tileset":"objects",
+			"id":4,
+			"width": 8,
+			"height":8
 		}
 	}
 }

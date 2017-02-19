@@ -17,6 +17,7 @@ class Input {
 		left: false,
 		right: false
 	};
+	public var mouseReleased = false;
 	public var wheelListeners:Array<Int->Void> = [];
 
 	public var listeners:Array<Listener> = [];
@@ -34,7 +35,7 @@ class Input {
 		if (button==1) mouseButtons.right=true;
 	}
 	public function mouseUp(button,y,z){
-		if (button==0) mouseButtons.left=false;
+		if (button==0) { mouseButtons.left=false; mouseReleased = true; }
 		if (button==1) mouseButtons.right=false;
 
 	}
@@ -45,6 +46,13 @@ class Input {
 	public function mouseWheel(direction){
 		for (listener in wheelListeners)
 			listener(direction);
+	}
+
+	public function startUpdate (){
+	}
+	public function endUpdate() {
+		mouseReleased = false;
+
 	}
 
 

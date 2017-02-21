@@ -134,18 +134,31 @@ class Project {
 		minimap.g2.begin();
 		minimap.g2.clear(kha.Color.fromBytes(0,0,0,200));
 		var t = 0;
-		for (tile in generator.tiles){
+		while (t < generator.tiles.length-1){
+			var tile = generator.tiles[t];
 			if (map.get(component.Tilemap).tileInfo.get(tile).collide){
+				var x = t%map.get(component.Tilemap).width;
+				var y = Math.floor(t/map.get(component.Tilemap).width);
+				var width = 1;
+				var height = 1;
+				while (map.get(component.Tilemap).tileInfo.get(generator.tiles[t+width]).collide && Math.floor((t+width)/map.get(component.Tilemap).width) == y){
+				
+					width += 1;
+				}
 				map.get(component.Collisions).registerCollisionRegion(new component.Collisions.Rect(
-					t%map.get(component.Tilemap).width*16,Math.floor(t/map.get(component.Tilemap).width)*16,
-					16,16));
+					x*16,y*16,
+					width*16,height*16));
+
+				t += width;
 
 				minimap.g2.color = map.get(component.Tilemap).tileInfo.get(tile).colour;
 				minimap.g2.fillRect(t%map.get(component.Tilemap).width,Math.floor(t/map.get(component.Tilemap).width),1,1);
 				
+			}else{
+				t+=1;
 			}
-			t++;
 		}
+		trace(map.get(component.Collisions).collisionRegions.length);
 		minimap.g2.color = kha.Color.Red;
 		minimap.g2.fillRect(generator.spawnPoint.x,generator.spawnPoint.y,1,1);
 
@@ -245,6 +258,7 @@ class Project {
 
 		lastTime = Scheduler.time();
 		realLastTime = Scheduler.realTime();
+		
 
 		input.endUpdate();
 	}

@@ -6,7 +6,7 @@ enum Item {
 	LaserGun;
 	Gem;
 	HealthPotion;
-	
+	GrapplingHook;
 }
 enum ItemType {
 	Gun;
@@ -40,6 +40,7 @@ class Inventory extends Component {
 		Item.HealthPotion => { name: "health potion", stackable: true, type: ItemType.Potion, sprite:Project.spriteData.entity.healthPotion },
 		Item.SlimeGun => { name: "slime gun", stackable: false, type: ItemType.Gun, sprite:Project.spriteData.entity.slimeGun },
 		Item.LaserGun => { name: "laser gun", stackable: false, type: ItemType.Gun, sprite:Project.spriteData.entity.laserGun },
+		Item.GrapplingHook => { name: "grappling gun", stackable: false, type: ItemType.Gun, sprite:Project.spriteData.entity.grapplingHook }
 	];
 	override public function new (){
 		super();

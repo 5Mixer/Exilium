@@ -8,9 +8,11 @@ class Physics extends System {
 	public var grid:util.SpatialHash;
 	var entities:eskimo.EntityManager;
 	var collisionListeners:Array<eskimo.Entity->eskimo.Entity->Void>;
-	public function new (entities:eskimo.EntityManager,broadPhaseGrid:util.SpatialHash){
+	var collisionSys:system.Collisions;
+	public function new (entities:eskimo.EntityManager,broadPhaseGrid:util.SpatialHash,collisionSys:system.Collisions){
 		super();
 		this.entities = entities;
+		this.collisionSys = collisionSys;
 		grid = broadPhaseGrid;
 		collisionListeners = [];
 		view = new eskimo.views.View(new eskimo.filters.Filter([component.Transformation, component.Physics]),entities);
@@ -34,7 +36,17 @@ class Physics extends System {
 			}else{
 				var collision = false;
 				var collidingShape:component.Collisions.Rect = null;
+				//Cast ray so fast movement doesn't go through walls
+				
+				var px = transformation.pos.x + (collider.collisionRegions[0].width/2) +1;
+				var py = transformation.pos.y + (collider.collisionRegions[0].height/2) +1;
+				var velocityRayLength = collisionSys.fireRay(new differ.shapes.Ray(new differ.math.Vector(px,py),new differ.math.Vector(px + physics.velocity.x,py + physics.velocity.y)),[component.Collisions.CollisionGroup.Player]);
+				
+				//physics.velocity.x*=velocityRayLength;
+				//physics.velocity.y*=velocityRayLength;
 
+				var width = 5;
+			
 				transformation.pos.x += physics.velocity.x;
 				for (shape in collider.collisionRegions){
 
@@ -65,6 +77,7 @@ class Physics extends System {
 					}
 				}
 
+				
 				transformation.pos.y += physics.velocity.y;
 				
 				for (shape in collider.collisionRegions){

@@ -37,10 +37,14 @@ class Collisions extends Component{
 	var validCollision = false;
 	var result:differ.data.ShapeCollision = null;
 	public var fixed = false;
-	
+	public var AABB:component.Collisions.Rect;
+	public var midpoint:kha.math.Vector2;
+
 	override public function new (?collisionGroups:Array<CollisionGroup>,?ignoreCollisionGroups:Array<CollisionGroup>) {
 		collisionRegions = new Array<Rect>();
 		result = new differ.data.ShapeCollision();
+		AABB = new component.Collisions.Rect(0,0,0,0);
+		midpoint = new kha.math.Vector2(0,0);
 
 		if (collisionGroups != null)
 			this.collisionGroups = collisionGroups;
@@ -54,6 +58,10 @@ class Collisions extends Component{
 		collisionRegions.push(collisionShape);
 		collisionShape.group = this.collisionGroups;
 		collisionShape.ignoreGroups = this.ignoreGroups;
+		AABB.width = Math.ceil(Math.max(AABB.width,collisionShape.width));
+		AABB.height = Math.ceil(Math.max(AABB.height,collisionShape.height));
+		midpoint.x = AABB.width/2;
+		midpoint.y = AABB.height/2;
 		return this;
 	}
 	public function getCollisionWithCollider(other:Collisions){

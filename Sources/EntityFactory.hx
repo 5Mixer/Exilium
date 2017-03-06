@@ -75,6 +75,7 @@ class EntityFactory {
 		contents.pushx(component.Inventory.Item.Gold,Math.floor(Math.random()*15));
 		contents.pushx(component.Inventory.Item.HealthPotion,Math.floor(Math.random()*2));
 		if (Math.random() > .5) contents.push(component.Inventory.Item.LaserGun);
+		if (Math.random() > .75) contents.push(component.Inventory.Item.GrapplingHook);
 		treasure.set(new component.ReleaseOnCollision(contents,[component.Collisions.CollisionGroup.Friendly]));
 		
 		

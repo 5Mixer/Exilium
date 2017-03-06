@@ -75,13 +75,14 @@ class Project {
 		
 		systems.add(collisionSys);
 		systems.add(new system.KeyMovement(input,entities));
-		systems.add(new system.Physics(entities,collisionSys.grid));
+		systems.add(new system.Physics(entities,collisionSys.grid,collisionSys));
 		systems.add(new system.Inventory(input,entities));
 		systems.add(new system.TimedLife(entities));
 		systems.add(new system.TimedLife(entities));
 		systems.add(new system.Gun(input,camera,entities));
 		systems.add(new system.AI(entities,null));
 		systems.add(new system.Magnets(entities,p));
+		systems.add(new system.GrappleHooker(input,camera,entities,collisionSys));
 		
 		createMap();
 
@@ -134,6 +135,7 @@ class Project {
 		minimap.g2.begin();
 		minimap.g2.clear(kha.Color.fromBytes(0,0,0,200));
 		var t = 0;
+		var collisionRects = [];
 		while (t < generator.tiles.length-1){
 			var tile = generator.tiles[t];
 			if (map.get(component.Tilemap).tileInfo.get(tile).collide){
@@ -141,13 +143,12 @@ class Project {
 				var y = Math.floor(t/map.get(component.Tilemap).width);
 				var width = 1;
 				var height = 1;
-				while (map.get(component.Tilemap).tileInfo.get(generator.tiles[t+width]).collide && Math.floor((t+width)/map.get(component.Tilemap).width) == y){
+				/*while (map.get(component.Tilemap).tileInfo.get(generator.tiles[t+width]).collide && Math.floor((t+width)/map.get(component.Tilemap).width) == y){
 				
 					width += 1;
-				}
-				map.get(component.Collisions).registerCollisionRegion(new component.Collisions.Rect(
-					x*16,y*16,
-					width*16,height*16));
+				}*/
+				
+				collisionRects.push({x:x,y:y,width:width,height:height,resolved:false,t:t});
 
 				t += width;
 
@@ -158,6 +159,19 @@ class Project {
 				t+=1;
 			}
 		}
+		for (rect in collisionRects){
+			if (rect.resolved) continue;
+			var width = 1;
+			/*while (generator.tiles[rect.t+width] != null && map.get(component.Tilemap).tileInfo.get(generator.tiles[rect.t+width]).collide && Math.floor((rect.t+width)/map.get(component.Tilemap).width) == rect.y){
+				width += 1;
+				collisionRects[rect.t+width].resolved=true;
+				rect.resolved = true;
+			}*/
+			map.get(component.Collisions).registerCollisionRegion(new component.Collisions.Rect(
+					rect.x*16,rect.y*16,
+					width*16,rect.height*16));
+		}
+
 		trace(map.get(component.Collisions).collisionRegions.length);
 		minimap.g2.color = kha.Color.Red;
 		minimap.g2.fillRect(generator.spawnPoint.x,generator.spawnPoint.y,1,1);
@@ -276,6 +290,44 @@ class Project {
 		for (system in renderSystems)
 			system.render(g);
 
+		var transformation = p.get(component.Transformation);
+		var collisions = p.get(component.Collisions);
+		var pinv = p.get(component.Inventory);
+		if (transformation != null){
+			if (pinv.getByIndex(pinv.activeIndex).item == component.Inventory.Item.GrapplingHook){
+				var collisionSystem:system.Collisions = cast systems.get(system.Collisions);
+				var dir = transformation.pos.sub(camera.screenToWorld(input.mousePos.sub(new kha.math.Vector2(24,24))));
+				var a = Math.atan2(-dir.y,-dir.x)*(180/Math.PI);
+				var endx = Math.cos(a*(Math.PI/180))*200;
+				var endy = Math.sin(a*(Math.PI/180))*200;
+				var px = transformation.pos.x + collisions.midpoint.x;
+				var py = transformation.pos.y + collisions.midpoint.y;
+				var l = collisionSystem.fireRay(new differ.shapes.Ray(new differ.math.Vector(px,py),new differ.math.Vector(px+endx,py+endy)),[component.Collisions.CollisionGroup.Player]);
+				g.drawLine(px,py,px+endx*l,py+endy*l);
+				var rayDist = l * Math.sqrt(Math.pow(endx,2)+Math.pow(endy,2));
+				
+				var hookLength = 8;
+				var hooks = Math.floor(rayDist/hookLength);
+				
+				//Refer to kha2d for rotating sprite help
+				g.pushTransformation(g.transformation.multmat(kha.math.FastMatrix3.translation(px, py)).multmat(kha.math.FastMatrix3.rotation(a*(Math.PI/180))).multmat(kha.math.FastMatrix3.translation(-px - collisions.midpoint.x, -py - collisions.midpoint.y+1)));
+				for (i in 0...hooks){
+					g.drawSubImage(kha.Assets.images.Objects,px+(i*hookLength),py,6*8,0,8,8);
+				}
+				var clawx:Float = px+(hooks*hookLength);
+				//Extra half a chain
+				if (rayDist%hookLength > .5*hookLength){
+					clawx += hookLength/2;
+					g.drawSubImage(kha.Assets.images.Objects,px+((hooks)*hookLength),py,6*8,0,4,8);
+
+				}
+				//Final claw
+				g.drawSubImage(kha.Assets.images.Objects,clawx,py,7*8,0,8,8);
+				g.popTransformation();
+
+			}
+		}
+		
 		camera.restore(g);
 		
 		//Draw mouse cursor.

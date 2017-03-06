@@ -107,6 +107,14 @@ class SpatialHash {
 		
 		return c;
 	}
+	public function query(minx,miny,maxx,maxy){
+		var a = aabbToGrid(minx,miny,maxx,maxy);
+		var e:Array<component.Collisions.Rect> = [];
+		for (index in a){
+			e = e.concat(grid.get(index));
+		}
+		return e;
+	}
 
 	inline function aabbToGrid(_minx:Float,_miny:Float, _maxx:Float,_maxy):Array<Int> {
 		var ret:Array<Int> = [];//_tmp_getGridIndexesArray.splice(0,_tmp_getGridIndexesArray.length);

@@ -46,68 +46,76 @@ class Physics extends System {
 				//physics.velocity.y*=velocityRayLength;
 
 				var width = 5;
-			
-				transformation.pos.x += physics.velocity.x;
-				for (shape in collider.collisionRegions){
 
-					for (otherShape in grid.findContacts(shape)){
-						if (!validCollision(shape,otherShape)) continue;
-						if (!otherShape.ofEntity.has(component.Transformation)) continue;
+				var sampleMaxLength = 1;
+				var multiSamples = Math.ceil(Math.sqrt(Math.pow(physics.velocity.x,2)+Math.pow(physics.velocity.y,2))/sampleMaxLength);
+				var sampleMultiplier = 1/multiSamples;
+				var reflectx = false;
+				var reflecty = false;
+				for (sample in 0...multiSamples){
+					transformation.pos.x += physics.velocity.x*sampleMultiplier;
+					for (shape in collider.collisionRegions){
 
-						var otherTransform = otherShape.ofEntity.get(component.Transformation).pos;
+						for (otherShape in grid.findContacts(shape)){
+							if (!validCollision(shape,otherShape)) continue;
+							if (!otherShape.ofEntity.has(component.Transformation)) continue;
 
-						var c = differ.Collision.shapeWithShape(
-							differ.shapes.Polygon.rectangle(shape.x+transformation.pos.x,shape.y+transformation.pos.y,shape.width,shape.height,false),
-							differ.shapes.Polygon.rectangle(otherShape.x+otherTransform.x,otherShape.y+otherTransform.y,otherShape.width,otherShape.height,false));
-						
-						if (c != null && c.separationX != 0){
-							collision = true;
-							collidingShape = otherShape;
-							transformation.pos.x += c.separationX;
-							if (physics.reflect){
-								physics.velocity.x *= -1;
-								transformation.angle = Math.atan2(physics.velocity.y,physics.velocity.x) * 180/Math.PI;
+							var otherTransform = otherShape.ofEntity.get(component.Transformation).pos;
+
+							var c = differ.Collision.shapeWithShape(
+								differ.shapes.Polygon.rectangle(shape.x+transformation.pos.x,shape.y+transformation.pos.y,shape.width,shape.height,false),
+								differ.shapes.Polygon.rectangle(otherShape.x+otherTransform.x,otherShape.y+otherTransform.y,otherShape.width,otherShape.height,false));
+							
+							if (c != null && c.separationX != 0){
+								collision = true;
+								collidingShape = otherShape;
+								transformation.pos.x += c.separationX;
+								if (physics.reflect){
+									reflectx = true;
+								}
+
+								onCollision(shape,otherShape);
+								onCollision(otherShape,shape);
+									
 							}
+						}
+					}
+					
+					transformation.pos.y += physics.velocity.y*sampleMultiplier;
+					
+					for (shape in collider.collisionRegions){
+						for (otherShape in grid.findContacts(shape)){
+							
+							if (!validCollision(shape,otherShape)) continue;
+							if (!otherShape.ofEntity.has(component.Transformation)) continue;
+							var otherTransform = otherShape.ofEntity.get(component.Transformation).pos;
+							var c = differ.Collision.shapeWithShape(
+								differ.shapes.Polygon.rectangle(shape.x+transformation.pos.x,shape.y+transformation.pos.y,shape.width,shape.height,false),
+								differ.shapes.Polygon.rectangle(otherShape.x+otherTransform.x,otherShape.y+otherTransform.y,otherShape.width,otherShape.height,false));
+							
+							if (c != null && c.separationY != 0){
+								collision = true;
+								collidingShape = otherShape;
+								transformation.pos.y += c.separationY;
+								if (physics.reflect){
+									reflecty = true;
+								}
 
-							onCollision(shape,otherShape);
-							onCollision(otherShape,shape);
-								
-							break;
+								onCollision(shape,otherShape);
+								onCollision(otherShape,shape);
+
+							}
 						}
 					}
 				}
-
-				
-				transformation.pos.y += physics.velocity.y;
-				
-				for (shape in collider.collisionRegions){
-					for (otherShape in grid.findContacts(shape)){
-						
-						if (!validCollision(shape,otherShape)) continue;
-						if (!otherShape.ofEntity.has(component.Transformation)) continue;
-						var otherTransform = otherShape.ofEntity.get(component.Transformation).pos;
-						var c = differ.Collision.shapeWithShape(
-							differ.shapes.Polygon.rectangle(shape.x+transformation.pos.x,shape.y+transformation.pos.y,shape.width,shape.height,false),
-							differ.shapes.Polygon.rectangle(otherShape.x+otherTransform.x,otherShape.y+otherTransform.y,otherShape.width,otherShape.height,false));
-						
-						if (c != null && c.separationY != 0){
-							collision = true;
-							collidingShape = otherShape;
-							transformation.pos.y += c.separationY;
-							if (physics.reflect){
-								physics.velocity.y *= -1;
-								transformation.angle = Math.atan2(physics.velocity.y,physics.velocity.x) * 180/Math.PI;
-							}
-
-							onCollision(shape,otherShape);
-							onCollision(otherShape,shape);
-
-							break;
-						}
-					}
+				if (reflectx){
+					physics.velocity.x *= -1;
+					transformation.angle = Math.atan2(physics.velocity.y,physics.velocity.x) * 180/Math.PI;	
 				}
-				
-			
+				if (reflecty){
+					physics.velocity.y *= -1;
+					transformation.angle = Math.atan2(physics.velocity.y,physics.velocity.x) * 180/Math.PI;
+				}
 					
 			}
 		}

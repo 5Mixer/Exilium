@@ -2,7 +2,6 @@ package;
 
 import kha.Framebuffer;
 import kha.Scheduler;
-//import entity.Player;
 
 typedef Dungeon = {
 	var seed:Int;
@@ -21,7 +20,6 @@ typedef Save  = {
 class Project {
 	public var camera:Camera;
 	var frame = 0;
-	//var player:Player;
 	var input:Input;
 
 	var lastTime:Float;
@@ -30,27 +28,24 @@ class Project {
 	public var entities:eskimo.EntityManager;
 
 	var systems:eskimo.systems.SystemManager;
-
 	var renderSystems = new Array<System>();
+	var renderview:eskimo.views.View;
 	
 	var p:eskimo.Entity;
-
-	var renderview:eskimo.views.View;
 
 	var minimap:kha.Image;
 	var minimapOpacity = 1.0;
 	
-	//var ui:Zui;
 	public static var spriteData = CompileTime.parseJsonFile('../assets/spriteData.json');
-	var fpsGraph:ui.Graph;
-	var updateGraph:ui.Graph;
+	
 	var dungeonLevel = 1;
 
 	var overlay:Float = 0.0;
 
-	//var dungeonLevels = Array<DungeonLevel>;
 	var lastSave:Save;
 	var dungeons:Array<Dungeon> = [];
+	
+	var debugInterface:ui.DebugInterface;
 
 	public function new() {
 		kha.System.notifyOnRender(render);
@@ -90,13 +85,11 @@ class Project {
 		realLastTime = Scheduler.realTime();
 		lastRenderTime = Scheduler.time();
 
-		fpsGraph = new ui.Graph(new kha.math.Vector2(5,30),new kha.math.Vector2(200,60));
-		updateGraph = new ui.Graph(new kha.math.Vector2(5,100),new kha.math.Vector2(200,60));
+		debugInterface = new ui.DebugInterface();
 		
 		input.listenToKeyRelease('r', descend);
 		input.listenToKeyRelease('q',function (){
-			fpsGraph.visible = !fpsGraph.visible;
-			updateGraph.visible = ! updateGraph.visible;
+			debugInterface.visible = !debugInterface.visible;
 		});
 		input.listenToKeyRelease('m', function (){
 			minimapOpacity = 1.0;
@@ -107,6 +100,7 @@ class Project {
 			if (p.get(component.Inventory).activeIndex < 0) p.get(component.Inventory).activeIndex = p.get(component.Inventory).length-1;
 			if (p.get(component.Inventory).activeIndex > p.get(component.Inventory).length-1) p.get(component.Inventory).activeIndex = 0;
 		});
+		
 	}
 	function registerRenderSystem(system:System){
 		renderSystems.push(system);
@@ -172,7 +166,6 @@ class Project {
 					width*16,rect.height*16));
 		}
 
-		trace(map.get(component.Collisions).collisionRegions.length);
 		minimap.g2.color = kha.Color.Red;
 		minimap.g2.fillRect(generator.spawnPoint.x,generator.spawnPoint.y,1,1);
 
@@ -204,7 +197,6 @@ class Project {
 		return map;
 	}
 	function descend (){
-		//trace("You enter deeper into the dungeon...");
 		overlay = .7;
 		dungeonLevel++;
 		save();
@@ -265,7 +257,7 @@ class Project {
 		if (p != null && p.has(component.Transformation))
 			camera.pos = new kha.math.Vector2(p.get(component.Transformation).pos.x-kha.System.windowWidth()/2/camera.scale.x,p.get(component.Transformation).pos.y-kha.System.windowHeight()/2/camera.scale.y);
 		
-		fpsGraph.pushValue(1/delta/fpsGraph.size.y);
+		debugInterface.fpsGraph.pushValue(1/delta/debugInterface.fpsGraph.size.y);
 		
 		if (overlay > 0.0) overlay -= delta;
 		if (overlay < 0.0) overlay = 0.0;
@@ -391,14 +383,13 @@ class Project {
 		g.fillRect(0,0,kha.System.windowWidth(),kha.System.windowHeight());
 
 		g.color = kha.Color.White;
-		fpsGraph.render(g);
-		updateGraph.render(g);
 
 		g.popTransformation();
 		
 		g.end();
+		debugInterface.render(g);
 
-		updateGraph.pushValue(1/renderDelta/updateGraph.size.y);
+		debugInterface.updateGraph.pushValue(1/renderDelta/debugInterface.updateGraph.size.y);
 		
 
 		lastRenderTime = Scheduler.time();

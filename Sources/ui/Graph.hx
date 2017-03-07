@@ -6,7 +6,7 @@ class Graph {
 	var bgColor:kha.Color;
 	var fgColor:kha.Color;
 	var values = new Array<Float>();
-	public var visible = false;
+	public var visible = true;
 	public function new (pos:kha.math.Vector2,size:kha.math.Vector2){
 		this.pos = pos;
 		this.size = size;
@@ -28,5 +28,13 @@ class Graph {
 			g.drawLine(this.pos.x-startValueIndex+i,this.pos.y+this.size.y,this.pos.x-startValueIndex+i,this.pos.y+this.size.y - (this.size.y*values[i]));
 		}
 
+	}
+	//Remember to call this outside any other .begin/.end graphics!
+	public function renderToImage (){
+		var tempImg = kha.Image.createRenderTarget(Math.ceil(this.size.x),Math.ceil(this.size.y));
+		tempImg.g2.begin(true,kha.Color.fromBytes(0,0,0,0));
+		render(tempImg.g2);
+		tempImg.g2.end();
+		return tempImg;
 	}
 }

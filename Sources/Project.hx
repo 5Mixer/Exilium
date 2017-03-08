@@ -264,6 +264,9 @@ class Project {
 
 		lastTime = Scheduler.time();
 		realLastTime = Scheduler.realTime();
+
+		cast(systems.get(system.CollisionDebugView),system.CollisionDebugView).showActiveEntities = (debugInterface.activeCollisionRegionsShown);
+		cast(systems.get(system.CollisionDebugView),system.CollisionDebugView).showStaticEntities = (debugInterface.staticCollisionRegionsShown);
 		
 
 		input.endUpdate();
@@ -323,8 +326,15 @@ class Project {
 		camera.restore(g);
 		
 		//Draw mouse cursor.
-		g.color = kha.Color.White;
-		g.drawSubImage(kha.Assets.images.Entities,input.mousePos.x/4 -8,input.mousePos.y/4 -8,2*16,0,16,16);
+		if (debugInterface.visible){
+			kha.input.Mouse.get().showSystemCursor();
+			input.mouseEvents = false;
+		}else{
+			input.mouseEvents = true;
+			kha.input.Mouse.get().hideSystemCursor();
+			g.color = kha.Color.White;
+			g.drawSubImage(kha.Assets.images.Entities,input.mousePos.x/4 -8,input.mousePos.y/4 -8,2*16,0,16,16);
+		}
 
 		//Clear any transformation for the UI.
 		g.pushTransformation(kha.math.FastMatrix3.identity());

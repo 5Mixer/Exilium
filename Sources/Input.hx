@@ -12,6 +12,7 @@ class Input {
 	public var right: Bool;
 	public var up: Bool;
 	public var down: Bool;
+	public var mouseEvents = true;
 	public var mousePos:kha.math.Vector2 = new kha.math.Vector2(0,0);
 	public var mouseButtons:{left:Bool, right:Bool} = {
 		left: false,
@@ -19,6 +20,7 @@ class Input {
 	};
 	public var mouseReleased = false;
 	public var wheelListeners:Array<Int->Void> = [];
+	
 
 	public var listeners:Array<Listener> = [];
 	public function listenToKeyRelease(char:String,listener:Void->Void){
@@ -31,10 +33,12 @@ class Input {
 
 	}
 	public function mouseDown(button,y,z){
+		if (!mouseEvents) return;
 		if (button==0) mouseButtons.left=true;
 		if (button==1) mouseButtons.right=true;
 	}
 	public function mouseUp(button,y,z){
+		if (!mouseEvents) return;
 		if (button==0) { mouseButtons.left=false; mouseReleased = true; }
 		if (button==1) mouseButtons.right=false;
 

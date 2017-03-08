@@ -7,6 +7,10 @@ class DebugInterface {
 	public var fpsGraph:ui.Graph;
 	public var updateGraph:ui.Graph;
 	public var visible = true;
+
+	public var activeCollisionRegionsShown = false;
+	public var staticCollisionRegionsShown = false;
+
 	public function new (){
 		debugui = new Zui({font: kha.Assets.fonts.OpenSans});
 		fpsGraph = new ui.Graph(new kha.math.Vector2(0,0),new kha.math.Vector2(180,60));
@@ -39,6 +43,9 @@ class DebugInterface {
 				debugui.image(fpsImage);
 				debugui.text("UPS");
 				debugui.image(upsImage);
+				debugui.separator();
+				staticCollisionRegionsShown = (debugui.check(Id.handle(),"Static Collision Regions."));
+				activeCollisionRegionsShown = (debugui.check(Id.handle(),"Active Collision Regions."));
 
 			}
 		}

@@ -30,6 +30,7 @@ class Healthbars extends System {
 		for (entity in view.entities){
 			var health:component.Health = entity.get(component.Health);
 			if (health.current < 0){
+				entity.get(component.Events).callEvent(component.Events.Event.Death,null);
 				entity.destroy();
 				trace("Destroy");
 			}

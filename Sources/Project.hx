@@ -47,6 +47,8 @@ class Project {
 	
 	var debugInterface:ui.DebugInterface;
 
+	var states:Array<states.State> = [];
+
 	public function new() {
 		kha.System.notifyOnRender(render);
 		Scheduler.addTimeTask(update, 0, 1 / 60);
@@ -185,6 +187,9 @@ class Project {
 
 		p = EntityFactory.createPlayer(entities,{x:generator.spawnPoint.x, y:generator.spawnPoint.y});
 		p.get(component.Inventory).putIntoInventory(component.Inventory.Item.SlimeGun);
+		p.get(component.Events).listenToEvent(component.Events.Event.Death,function (args){
+			states.push(new states.Dead());
+		});
 		if (lastSave != null && lastSave.player != null){
 			p.get(component.Health).current = lastSave.player.health;
 			p.get(component.Inventory).stacks = lastSave.player.inventory;
@@ -197,6 +202,7 @@ class Project {
 		return map;
 	}
 	function descend (){
+		states = [];
 		overlay = .7;
 		dungeonLevel++;
 		save();
@@ -268,6 +274,9 @@ class Project {
 		cast(systems.get(system.CollisionDebugView),system.CollisionDebugView).showActiveEntities = (debugInterface.activeCollisionRegionsShown);
 		cast(systems.get(system.CollisionDebugView),system.CollisionDebugView).showStaticEntities = (debugInterface.staticCollisionRegionsShown);
 		
+		
+		for (state in states)
+			state.update(delta);
 
 		input.endUpdate();
 	}
@@ -346,14 +355,11 @@ class Project {
 		g.drawImage(minimap,0,0);
 
 		g.transformation = kha.math.FastMatrix3.identity();
-
-		g.color = kha.Color.White;
-		g.font = kha.Assets.fonts.trenco;
 		
 		var x = 0;
 		g.color = kha.Color.White;
 		g.font = kha.Assets.fonts.trenco;
-		g.fontSize = 38;//Math.floor(frame/30);
+		g.fontSize = 38;
 
 		var pinv = p.get(component.Inventory);
 		g.color = kha.Color.fromBytes(234,211,220);
@@ -400,6 +406,11 @@ class Project {
 		debugInterface.render(g);
 
 		debugInterface.updateGraph.pushValue(1/renderDelta/debugInterface.updateGraph.size.y);
+
+		g.transformation = kha.math.FastMatrix3.identity();
+
+		for (state in states)
+			state.render(framebuffer);
 		
 
 		lastRenderTime = Scheduler.time();

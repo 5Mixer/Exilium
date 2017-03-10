@@ -52,12 +52,14 @@ class Gun extends System {
 						shootLaserGun(entity,a);
 				}
 			}
+		}else{
+			frame = -1;
 		}
 	}
 	public function shootSlimeGun (parent:eskimo.Entity,angle){
 
 		
-		//kha.audio1.Audio.play(kha.Assets.sounds.RapidFire);
+		kha.audio1.Audio.play(kha.Assets.sounds.RapidFire);
 		
 		var bullet = entities.create();
 

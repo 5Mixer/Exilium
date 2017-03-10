@@ -6,5 +6,5 @@ enum GunType {
 }
 class Gun extends Component {
 	public var gun:GunType;
-	public var fireRate = 7;
+	public var fireRate = 12;
 }

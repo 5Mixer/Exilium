@@ -26,6 +26,7 @@ class EntityFactory {
 		var p = entities.create();
 		p.set(new component.Name("Ghost"));
 		p.set(new component.Transformation(new kha.math.Vector2(spawnPoint.x*16,spawnPoint.y*16)));
+		p.set(new component.Events());
 		p.set(new component.AnimatedSprite(Project.spriteData.entity.ghost));
 		p.set(new component.AITarget());
 		p.set(new component.Health(150));

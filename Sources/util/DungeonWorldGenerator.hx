@@ -29,6 +29,7 @@ class DungeonWorldGenerator {
 	var random:util.Random;
 	public var spawnPoint:{x:Int, y:Int};
 	public var seed:Int;
+	var probabilityForTreasureInRoom = .3;
 
 	public function new (width,height){
 		this.width = width;
@@ -74,7 +75,9 @@ class DungeonWorldGenerator {
 	function placeThingInRoom (room:Room){
 		if (room.id < 2) return; //Don't place in start room
 		var thing = {x:room.x+Math.floor(room.width/2),y:room.y+Math.floor(room.height/2)};
-		treasure.push(thing);
+		
+		if (random.generate() > probabilityForTreasureInRoom)
+			treasure.push(thing);
 
 		var enemy = {x: room.x+2+Math.floor(random.generate()*(room.width-4)),y: room.y+2+Math.floor(random.generate()*(room.height-4))};
 		if (thing.x != enemy.x && thing.y != enemy.y)

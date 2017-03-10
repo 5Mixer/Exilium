@@ -22,14 +22,15 @@ class Inventory extends System {
 			if (activeItem.item == component.Inventory.Item.HealthPotion){
 				if (input.mouseReleased){
 					if (entity.has(component.Health)){
+						kha.audio1.Audio.play(kha.Assets.sounds.DrinkPotion);
 						entity.get(component.Health).addToHealth(40);
 						var particle = entities.create();
 						particle.set(new component.VisualParticle(component.VisualParticle.Effect.Text("+"+40)));
 						
 						particle.set(new component.Transformation(entity.get(component.Transformation).pos.add(new kha.math.Vector2(4,0))));
 						var phys = new component.Physics();
-						var speed = 7+Math.random()*4;
-						phys.friction = 0.5;
+						var speed = 9+Math.random()*4;
+						phys.friction = 0.8;
 						var particleAngle = - 6 + Math.random()*12 - 90;
 						phys.velocity = new kha.math.Vector2(Math.cos(particleAngle * (Math.PI / 180)) * speed,Math.sin(particleAngle * (Math.PI / 180)) * speed);		
 						particle.set(phys);

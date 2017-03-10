@@ -46,13 +46,15 @@ class TilemapRenderer extends System {
 						var smootherLights = [];
 						for (sx in -1...2){
 							for (sy in -1...2){
-								if (map.get(x-sx,y-sy) == null) continue;
+								if (map.get(x-sx,y-sy) < 0) continue;
+								// 
 								if (map.tileInfo.get(map.get(x-sx,y-sy)).collide) continue;
 								smootherLights.push({x:sx, y:sy});
 							}
 						}
 						//Can a path to the light be drawn from this tile without hitting an occluder?
 						for (smootherLight in smootherLights){
+							
 							if (map.tileInfo.get(map.get(x,y)).collide || !map.raycast(g,Math.floor((lightTransform.pos.x)/tilesize +smootherLight.x),Math.floor((lightTransform.pos.y)/tilesize +smootherLight.y),x,y)){
 								var lx = (lightTransform.pos.x-4)/tilesize;
 								var ly = (lightTransform.pos.y-4)/tilesize;
@@ -79,6 +81,7 @@ class TilemapRenderer extends System {
 					}
 					//Now actually apply the tint, again, within a range.
 					g.color = kha.Color.fromFloats(Math.min(c.r,1),Math.min(c.g,1),Math.min(c.b,1),1);
+					
 					
 					var id = tileData.id;
 					var sourcePos = { x: (id%Math.floor(kha.Assets.images.Dungeonsets.width/tilesize))*tilesize, y:Math.floor(id/Math.floor(kha.Assets.images.Dungeonsets.width/tilesize))*tilesize };

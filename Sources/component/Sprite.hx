@@ -24,6 +24,7 @@ class Sprite extends Component {
 				case "projectiles": spriteMap = kha.Assets.images.Projectiles;
 				case "objects": spriteMap = kha.Assets.images.Objects; tilesize = 8;
 				case "chest": spriteMap = kha.Assets.images.Chest; tilesize = 11;
+				case "tileset": {spriteMap = kha.Assets.images.Tileset; tilesize = 16;}
 			}
 		}
 		super();

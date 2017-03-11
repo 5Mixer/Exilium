@@ -25,6 +25,7 @@ class DungeonWorldGenerator {
 	var rooms = new Array<Room>();
 	public var treasure = new Array<{x:Int, y:Int}>();
 	public var enemies = new Array<{x:Int, y:Int}>();
+	public var spikes = new Array<{x:Int, y:Int}>();
 	public var exitPoint:{x:Int, y:Int};
 	var random:util.Random;
 	public var spawnPoint:{x:Int, y:Int};
@@ -81,7 +82,11 @@ class DungeonWorldGenerator {
 
 		var enemy = {x: room.x+2+Math.floor(random.generate()*(room.width-4)),y: room.y+2+Math.floor(random.generate()*(room.height-4))};
 		if (thing.x != enemy.x && thing.y != enemy.y)
+			if (Math.random()>.5){
 				enemies.push(enemy);
+			}else{
+				spikes.push(enemy);
+			}
 		
 	}
 	var roomCount = 0;

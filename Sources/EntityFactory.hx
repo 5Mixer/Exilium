@@ -118,5 +118,16 @@ class EntityFactory {
 		ladder.get(component.Collisions).registerCollisionRegion(new component.Collisions.Rect(0,0,8,8)); 
 		ladder.set(new component.CustomCollisionHandler([component.Collisions.CollisionGroup.Player],onCollide)); 
 		return ladder; 
+	}
+	public static function createSpike(entities:eskimo.EntityManager,x:Int,y:Int){ 
+		var spikes = entities.create(); 
+		spikes.set(new component.Name("Spike")); 
+		spikes.set(new component.Transformation(new kha.math.Vector2(x,y)));
+		spikes.set(new component.Damager(5));
+		spikes.set(new component.Spike());
+		spikes.set(new component.Sprite(Project.spriteData.entity.spikes));
+		spikes.set(new component.Collisions([component.Collisions.CollisionGroup.Enemy],null,false)); 
+		spikes.get(component.Collisions).registerCollisionRegion(new component.Collisions.Rect(0,0,16,16));
+		return spikes; 
 	} 
 }

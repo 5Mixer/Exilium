@@ -29,9 +29,32 @@ class Physics extends System {
 
 			physics.velocity = physics.velocity.mult(physics.friction);
 
-			if (collider == null){
+			if (collider == null || !collider.stopMovement){
 				transformation.pos.x += physics.velocity.x;
 				transformation.pos.y += physics.velocity.y;
+
+				if (!collider.stopMovement){
+					for (shape in collider.collisionRegions){
+
+						for (otherShape in grid.findContacts(shape)){
+							if (!validCollision(shape,otherShape)) continue;
+							if (!otherShape.ofEntity.has(component.Transformation)) continue;
+
+							var otherTransform = otherShape.ofEntity.get(component.Transformation).pos;
+
+							var c = differ.Collision.shapeWithShape(
+								differ.shapes.Polygon.rectangle(shape.x+transformation.pos.x,shape.y+transformation.pos.y,shape.width,shape.height,false),
+								differ.shapes.Polygon.rectangle(otherShape.x+otherTransform.x,otherShape.y+otherTransform.y,otherShape.width,otherShape.height,false));
+							
+							if (c != null){
+
+								onCollision(shape,otherShape);
+								onCollision(otherShape,shape);
+									
+							}
+						}
+					}
+				}
 
 			}else{
 				var collision = false;
@@ -45,7 +68,6 @@ class Physics extends System {
 				//physics.velocity.x*=velocityRayLength;
 				//physics.velocity.y*=velocityRayLength;
 
-				var width = 5;
 
 				var sampleMaxLength = 1;
 				var multiSamples = Math.ceil(Math.sqrt(Math.pow(physics.velocity.x,2)+Math.pow(physics.velocity.y,2))/sampleMaxLength);
@@ -153,6 +175,14 @@ class Physics extends System {
 				if (otherShape.group.indexOf(killingGroup) != -1){
 					shapeEntity.destroy();
 					break;
+				}
+			}
+		}
+		if (shapeEntity.has(component.Health)){
+			if (otherShapeEntity.has(component.Damager)){
+				var damager = otherShapeEntity.get(component.Damager);
+				if (damager.active){
+					shapeEntity.get(component.Health).current -= Math.floor(-damager.damage);
 				}
 			}
 		}

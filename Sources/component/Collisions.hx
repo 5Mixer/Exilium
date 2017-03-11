@@ -39,12 +39,14 @@ class Collisions extends Component{
 	public var fixed = false;
 	public var AABB:component.Collisions.Rect;
 	public var midpoint:kha.math.Vector2;
+	public var stopMovement = true;
 
-	override public function new (?collisionGroups:Array<CollisionGroup>,?ignoreCollisionGroups:Array<CollisionGroup>) {
+	override public function new (?collisionGroups:Array<CollisionGroup>,?ignoreCollisionGroups:Array<CollisionGroup>,stopMovement = true) {
 		collisionRegions = new Array<Rect>();
 		result = new differ.data.ShapeCollision();
 		AABB = new component.Collisions.Rect(0,0,0,0);
 		midpoint = new kha.math.Vector2(0,0);
+		this.stopMovement = stopMovement;
 
 		if (collisionGroups != null)
 			this.collisionGroups = collisionGroups;

@@ -66,6 +66,7 @@ class Project {
 		registerRenderSystem(new system.Renderer(entities));
 		registerRenderSystem(new system.DebugView(entities));
 		registerRenderSystem(new system.Healthbars(entities));
+		registerRenderSystem(new system.SpikeHandler(entities));
 		
 		var collisionSys = new system.Collisions(entities);
 		registerRenderSystem(new system.CollisionDebugView(entities,collisionSys.grid,true));
@@ -181,6 +182,9 @@ class Project {
 		for (e in generator.enemies){
 			EntityFactory.createSlime(entities,e.x*16,e.y*16);
 			EntityFactory.createGoblin(entities,e.x*16,e.y*16);
+		}
+		for (s in generator.spikes){
+			EntityFactory.createSpike(entities,s.x*16,s.y*16);
 		}
 
 		EntityFactory.createLadder(entities,generator.exitPoint.x*16,generator.exitPoint.y*16,descend);

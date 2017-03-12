@@ -173,10 +173,16 @@ class DungeonWorldGenerator {
 					if (get (room.x+x,room.y+y) != 0) continue;
 					set(room.x+x,room.y+y,1);
 
-					if ((x==0 || x==room.width-1))
+					if (x==0)
 						set(room.x+x,room.y+y,4);
 
-					if ((y==0  || y==room.height-1))
+					if ((x==room.width-1))
+						set(room.x+x,room.y+y,4);
+
+					if ((y==0))
+						set(room.x+x,room.y+y,3);
+
+					if (y==room.height-1)
 						set(room.x+x,room.y+y,3);
 
 					//Corner tiles.

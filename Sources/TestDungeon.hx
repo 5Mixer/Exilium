@@ -3,11 +3,15 @@ class TestDungeon {
 		trace("Building map.");
 		var asciimap = [
 			0 => ' ',
-			1 => '_',
+			1 => ' ',
 			2 => '#',
-			3 => '|'
+			3 => String.fromCharCode(205),
+			4 => String.fromCharCode(205),
+			5 => String.fromCharCode(186),
+			6 => '^',
+			7 => '.'
 		];
-        var generator = new util.DungeonWorldGenerator(100,100);
+        var generator = new util.DungeonWorldGenerator(50,50);
 		for (y in 0...generator.width){
 			for (x in 0...generator.height){
 				print(asciimap.get(generator.tiles[y*generator.width+x]));

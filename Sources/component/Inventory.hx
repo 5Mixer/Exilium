@@ -36,11 +36,11 @@ class Inventory extends Component {
 	public var length(get,null) = 0;
 	public var activeIndex:Int = 0;
 	public var itemData:Map<Item,{name:String, stackable:Bool, type: ItemType, sprite: Dynamic}> = [
-		Item.Gold => { name: "gold", stackable: true, type: ItemType.Currency, sprite:Project.spriteData.entity.gold },
-		Item.HealthPotion => { name: "health potion", stackable: true, type: ItemType.Potion, sprite:Project.spriteData.entity.healthPotion },
-		Item.SlimeGun => { name: "slime gun", stackable: false, type: ItemType.Gun, sprite:Project.spriteData.entity.slimeGun },
-		Item.LaserGun => { name: "laser gun", stackable: false, type: ItemType.Gun, sprite:Project.spriteData.entity.laserGun },
-		Item.GrapplingHook => { name: "grappling gun", stackable: false, type: ItemType.Gun, sprite:Project.spriteData.entity.grapplingHook }
+		Item.Gold => { name: "gold", stackable: true, type: ItemType.Currency, sprite:states.Play.spriteData.entity.gold },
+		Item.HealthPotion => { name: "health potion", stackable: true, type: ItemType.Potion, sprite:states.Play.spriteData.entity.healthPotion },
+		Item.SlimeGun => { name: "slime gun", stackable: false, type: ItemType.Gun, sprite:states.Play.spriteData.entity.slimeGun },
+		Item.LaserGun => { name: "laser gun", stackable: false, type: ItemType.Gun, sprite:states.Play.spriteData.entity.laserGun },
+		Item.GrapplingHook => { name: "grappling gun", stackable: false, type: ItemType.Gun, sprite:states.Play.spriteData.entity.grapplingHook }
 	];
 	override public function new (){
 		super();

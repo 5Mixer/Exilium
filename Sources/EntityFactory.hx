@@ -15,10 +15,10 @@ class EntityFactory {
 		droppedItem.set(new component.Physics());
 
 		if (item == component.Inventory.Item.Gold){
-			droppedItem.set(new component.AnimatedSprite(Project.spriteData.entity.gold).playAnimation("spin").setSpeed(3));
+			droppedItem.set(new component.AnimatedSprite(states.Play.spriteData.entity.gold).playAnimation("spin").setSpeed(3));
 		}
 		if (item == component.Inventory.Item.HealthPotion){
-			droppedItem.set(new component.Sprite(Project.spriteData.entity.healthPotion));
+			droppedItem.set(new component.Sprite(states.Play.spriteData.entity.healthPotion));
 		}
 		return droppedItem;
 	}
@@ -27,7 +27,7 @@ class EntityFactory {
 		p.set(new component.Name("Ghost"));
 		p.set(new component.Transformation(new kha.math.Vector2(spawnPoint.x*16,spawnPoint.y*16)));
 		p.set(new component.Events());
-		p.set(new component.AnimatedSprite(Project.spriteData.entity.ghost));
+		p.set(new component.AnimatedSprite(states.Play.spriteData.entity.ghost));
 		p.set(new component.AITarget());
 		p.set(new component.Health(150));
 		p.get(component.AnimatedSprite).spriteMap = kha.Assets.images.Ghost;
@@ -52,7 +52,7 @@ class EntityFactory {
 		var slime = entities.create();
 		slime.set(new component.Name("Slime"));
 		slime.set(new component.Transformation(new kha.math.Vector2(x,y)));
-		slime.set(new component.AnimatedSprite(Project.spriteData.entity.slime));
+		slime.set(new component.AnimatedSprite(states.Play.spriteData.entity.slime));
 		slime.set(new component.Health(5));
 		slime.get(component.AnimatedSprite).speed = 4;
 		slime.set(new component.Physics());
@@ -67,7 +67,7 @@ class EntityFactory {
 		var treasure = entities.create();
 		treasure.set(new component.Name("Treasure"));
 		treasure.set(new component.Transformation(new kha.math.Vector2(x,y)));
-		treasure.set(new component.AnimatedSprite(cast Project.spriteData.entity.chest));
+		treasure.set(new component.AnimatedSprite(cast states.Play.spriteData.entity.chest));
 		treasure.get(component.AnimatedSprite).speed = 2;
 		treasure.set(new component.Collisions([component.Collisions.CollisionGroup.Level],[component.Collisions.CollisionGroup.Level]));
 		treasure.get(component.Collisions).registerCollisionRegion(new component.Collisions.Rect(2,3,8,8));
@@ -87,7 +87,7 @@ class EntityFactory {
 		var goblin = entities.create();
 		goblin.set(new component.Name("Goblin"));
 		goblin.set(new component.Transformation(new kha.math.Vector2(x,y)));
-		goblin.set(new component.AnimatedSprite(Project.spriteData.entity.goblin));
+		goblin.set(new component.AnimatedSprite(states.Play.spriteData.entity.goblin));
 		goblin.set(new component.Health(15));
 		goblin.get(component.AnimatedSprite).speed = 13;
 		goblin.set(new component.Physics());
@@ -105,7 +105,7 @@ class EntityFactory {
 		potion.set(new component.TimedLife(5+Math.random()*3));
 		potion.set(new component.Magnet());
 		potion.set(new component.Collisions([component.Collisions.CollisionGroup.Item],[component.Collisions.CollisionGroup.Bullet,component.Collisions.CollisionGroup.Enemy,component.Collisions.CollisionGroup.Friendly,component.Collisions.CollisionGroup.Player,component.Collisions.CollisionGroup.Particle,component.Collisions.CollisionGroup.Item]).registerCollisionRegion(new component.Collisions.Rect(2,2,4,4)));
-		potion.set(new component.Sprite(Project.spriteData.entity.healthPotion));
+		potion.set(new component.Sprite(states.Play.spriteData.entity.healthPotion));
 		return potion;
 
 	}
@@ -113,7 +113,7 @@ class EntityFactory {
 		var ladder = entities.create(); 
 		ladder.set(new component.Name("Ladder")); 
 		ladder.set(new component.Transformation(new kha.math.Vector2(x,y))); 
-		ladder.set(new component.Sprite(Project.spriteData.entity.ladder)); 
+		ladder.set(new component.Sprite(states.Play.spriteData.entity.ladder)); 
 		ladder.set(new component.Collisions([component.Collisions.CollisionGroup.Level])); 
 		ladder.get(component.Collisions).registerCollisionRegion(new component.Collisions.Rect(0,0,8,8)); 
 		ladder.set(new component.CustomCollisionHandler([component.Collisions.CollisionGroup.Player],onCollide)); 
@@ -125,7 +125,7 @@ class EntityFactory {
 		spikes.set(new component.Transformation(new kha.math.Vector2(x,y)));
 		spikes.set(new component.Damager(1));
 		spikes.set(new component.Spike());
-		spikes.set(new component.AnimatedSprite(Project.spriteData.entity.spikes));
+		spikes.set(new component.AnimatedSprite(states.Play.spriteData.entity.spikes));
 		spikes.set(new component.Collisions([component.Collisions.CollisionGroup.Enemy],component.Collisions.CollisionGroup.createAll(),false)); 
 		spikes.get(component.Collisions).registerCollisionRegion(new component.Collisions.Rect(0,0,16,16));
 		return spikes; 

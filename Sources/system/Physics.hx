@@ -29,34 +29,14 @@ class Physics extends System {
 
 			physics.velocity = physics.velocity.mult(physics.friction);
 
-			if (collider == null || !collider.stopMovement){
+			
+
+			if (collider == null){
 				transformation.pos.x += physics.velocity.x;
 				transformation.pos.y += physics.velocity.y;
-
-				if (!collider.stopMovement){
-					for (shape in collider.collisionRegions){
-
-						for (otherShape in grid.findContacts(shape)){
-							if (!validCollision(shape,otherShape)) continue;
-							if (!otherShape.ofEntity.has(component.Transformation)) continue;
-
-							var otherTransform = otherShape.ofEntity.get(component.Transformation).pos;
-
-							var c = differ.Collision.shapeWithShape(
-								differ.shapes.Polygon.rectangle(shape.x+transformation.pos.x,shape.y+transformation.pos.y,shape.width,shape.height,false),
-								differ.shapes.Polygon.rectangle(otherShape.x+otherTransform.x,otherShape.y+otherTransform.y,otherShape.width,otherShape.height,false));
-							
-							if (c != null){
-
-								onCollision(shape,otherShape);
-								onCollision(otherShape,shape);
-									
-							}
-						}
-					}
-				}
-
 			}else{
+				
+
 				var collision = false;
 				var collidingShape:component.Collisions.Rect = null;
 				//Cast ray so fast movement doesn't go through walls
@@ -148,65 +128,8 @@ class Physics extends System {
 		for (collisionListener in collisionListeners) {
 			collisionListener(shapeEntity,otherShapeEntity);
 		}
-		if (shapeEntity.has(component.ReleaseOnCollision)){
-			var roc = shapeEntity.get(component.ReleaseOnCollision);
-			for (releaseGroup in roc.collisionGroups){
-				if (otherShape.group.indexOf(releaseGroup) != -1){
-					for (item in roc.release){
-						var droppedItem = EntityFactory.makeItem(entities,item,{pos:{x:shapeEntity.get(component.Transformation).pos.x,y:shapeEntity.get(component.Transformation).pos.y}});
-						droppedItem.set(new component.Physics().setVelocity(new kha.math.Vector2(-6+Math.random()*12,-6+Math.random()*12)));
-					}
-					shapeEntity.set(new component.Light());
-					shapeEntity.get(component.Light).colour = kha.Color.fromBytes(250,240,180);//kha.Color.Green;
-					shapeEntity.get(component.Light).strength = .5;
-
-					if (shapeEntity.has(component.AnimatedSprite))
-						shapeEntity.get(component.AnimatedSprite).playAnimation("open","emptied");
-
-					if (roc.once)
-						shapeEntity.remove(component.ReleaseOnCollision);
-
-					break;
-				}
-			}
-		}
-		if (shapeEntity.has(component.DieOnCollision)){
-			for (killingGroup in shapeEntity.get(component.DieOnCollision).collisionGroups){
-				if (otherShape.group.indexOf(killingGroup) != -1){
-					shapeEntity.destroy();
-					break;
-				}
-			}
-		}
-		if (shapeEntity.has(component.Health)){
-			if (otherShapeEntity.has(component.Damager)){
-				var damager = otherShapeEntity.get(component.Damager);
-				if (damager.active){
-					shapeEntity.get(component.Health).current -= Math.floor(-damager.damage);
-				}
-			}
-		}
-		if (shapeEntity.has(component.Collectable)){
-			if (otherShapeEntity.has(component.Inventory)){
-				for (group in shapeEntity.get(component.Collectable).collisionGroups){
-					if (otherShape.group.indexOf(group) != -1){
-						for (thing in shapeEntity.get(component.Collectable).items)
-							otherShapeEntity.get(component.Inventory).putIntoInventory(thing);
-					
-						shapeEntity.destroy();
-						break;
-					}
-				}
-			}
-		}
-		if (shapeEntity.has(component.CustomCollisionHandler)){
-			for (group in shapeEntity.get(component.CustomCollisionHandler).collisionGroups){
-				if (otherShape.group.indexOf(group) != -1){
-					shapeEntity.get(component.CustomCollisionHandler).handler();
-					break;
-				}
-			}
-		}
+		
+		collisionSys.onCollision(shape,otherShape);
 	}
 	//If the other shape is not ignoring one of shapes groups.
 	function validCollision(shape:component.Collisions.Rect,otherShape:component.Collisions.Rect){

@@ -14,6 +14,10 @@ class AnimatedSprite extends Component {
 		this.spriteData = spriteData;
 		spriteMap = kha.Assets.images.Entities;
 
+		if (this.spriteData.speed != null){
+			this.speed = this.spriteData.speed;
+		}
+
 		if (spriteData.tileset != null){
 			switch spriteData.tileset {
 				case "ghost": spriteMap = kha.Assets.images.Ghost;
@@ -23,6 +27,7 @@ class AnimatedSprite extends Component {
 				case "chest": spriteMap = kha.Assets.images.Chest; tilesize = 11;
 				case "goblin": spriteMap = kha.Assets.images.Goblin; tilesize = 10;
 				case "coin": spriteMap = kha.Assets.images.Coin; tilesize = 8;
+				case "tileset": {spriteMap = kha.Assets.images.Tileset; tilesize = 16;}
 			}
 		}
 

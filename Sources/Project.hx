@@ -62,11 +62,11 @@ class Project {
 		systems = new eskimo.systems.SystemManager(entities);		
 
 		registerRenderSystem(new system.TilemapRenderer(camera,entities));
-		registerRenderSystem(new system.ParticleRenderer(entities));
 		registerRenderSystem(new system.Renderer(entities));
+		registerRenderSystem(new system.SpikeHandler(entities));
+		registerRenderSystem(new system.ParticleRenderer(entities));
 		registerRenderSystem(new system.DebugView(entities));
 		registerRenderSystem(new system.Healthbars(entities));
-		registerRenderSystem(new system.SpikeHandler(entities));
 		
 		var collisionSys = new system.Collisions(entities);
 		registerRenderSystem(new system.CollisionDebugView(entities,collisionSys.grid,true));

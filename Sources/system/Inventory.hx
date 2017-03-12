@@ -37,8 +37,8 @@ class Inventory extends System {
 						particle.set(new component.TimedLife(.75));
 					}
 					var pos = entity.get(component.Transformation).pos.mult(1);
-					var p = EntityFactory.createPotion(entities,pos.x+0,pos.y+0);
-					p.set(new component.Physics().setVelocity(new kha.math.Vector2(-5+Math.random()*10,-5+Math.random()*10)));
+					//var p = EntityFactory.createPotion(entities,pos.x+0,pos.y+0);
+					//p.set(new component.Physics().setVelocity(new kha.math.Vector2(-5+Math.random()*10,-5+Math.random()*10)));
 					inventory.takeFromInventory(component.Inventory.Item.HealthPotion);
 				}
 			}

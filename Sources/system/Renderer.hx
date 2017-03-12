@@ -51,7 +51,7 @@ class Renderer extends System {
 					animation.frame = 0;
 					animation.currentAnimation = animation.whenFinishedStart;	
 				}
-				baseFrame = Reflect.field(animation.spriteData.animations,animation.currentAnimation)[0];
+				baseFrame = Reflect.field(animation.spriteData.animations,animation.currentAnimation)[animation.frame];
 			}else{
 				animation.frame = 0;
 			}
@@ -63,9 +63,11 @@ class Renderer extends System {
 			var y = transformation.pos.y;
 			var angle = transformation.angle;
 
+			var actualFrameIndex = baseFrame;
+
 			g.pushTransformation(g.transformation.multmat(kha.math.FastMatrix3.translation(x + originX, y + originY)).multmat(kha.math.FastMatrix3.rotation(angle*(Math.PI / 180))).multmat(kha.math.FastMatrix3.translation(-x - originX, -y - originY)));
 					
-			g.drawScaledSubImage(animation.spriteMap,Math.floor(((baseFrame+animation.frame)%Math.floor(animation.spriteMap.width/tilesize))*tilesize),Math.floor(Math.floor((baseFrame+animation.frame)/Math.floor(animation.spriteMap.width/tilesize))*tilesize),tilesize,tilesize,x,y,tilesize,tilesize);
+			g.drawScaledSubImage(animation.spriteMap,Math.floor(((actualFrameIndex)%Math.floor(animation.spriteMap.width/tilesize))*tilesize),Math.floor(Math.floor((actualFrameIndex)/Math.floor(animation.spriteMap.width/tilesize))*tilesize),tilesize,tilesize,x,y,tilesize,tilesize);
 			
 			g.popTransformation();
 		}

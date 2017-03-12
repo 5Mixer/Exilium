@@ -12,7 +12,7 @@ class DebugView extends System {
 	var messageFadeOutTime = 10;
 	public function new (entities:eskimo.EntityManager){
 		super();
-		//haxe.Log.trace = traceLog;
+		haxe.Log.trace = traceLog;
 		//view = new eskimo.views.View(new eskimo.filters.Filter([component.Transformation,component.Collisions]),entities);
 	}
 

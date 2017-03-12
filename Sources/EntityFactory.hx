@@ -123,10 +123,10 @@ class EntityFactory {
 		var spikes = entities.create(); 
 		spikes.set(new component.Name("Spike")); 
 		spikes.set(new component.Transformation(new kha.math.Vector2(x,y)));
-		spikes.set(new component.Damager(5));
+		spikes.set(new component.Damager(1));
 		spikes.set(new component.Spike());
-		spikes.set(new component.Sprite(Project.spriteData.entity.spikes));
-		spikes.set(new component.Collisions([component.Collisions.CollisionGroup.Enemy],null,false)); 
+		spikes.set(new component.AnimatedSprite(Project.spriteData.entity.spikes));
+		spikes.set(new component.Collisions([component.Collisions.CollisionGroup.Enemy],component.Collisions.CollisionGroup.createAll(),false)); 
 		spikes.get(component.Collisions).registerCollisionRegion(new component.Collisions.Rect(0,0,16,16));
 		return spikes; 
 	} 

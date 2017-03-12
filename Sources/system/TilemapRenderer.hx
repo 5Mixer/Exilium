@@ -48,6 +48,7 @@ class TilemapRenderer extends System {
 							for (sy in -1...2){
 								if (map.get(x-sx,y-sy) < 0) continue;
 								// 
+								if (map.tileInfo.get(map.get(x-sx,y-sy)) == null) {trace("Why?"); continue; }
 								if (map.tileInfo.get(map.get(x-sx,y-sy)).collide) continue;
 								smootherLights.push({x:sx, y:sy});
 							}

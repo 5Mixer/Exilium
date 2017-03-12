@@ -14,8 +14,8 @@ class SpikeHandler extends System {
 			
 			var spike:component.Spike = entity.get(component.Spike);
 			if (entity.has(component.Sprite)){
-				var sprite = entity.get(component.Sprite);
-				sprite.textureId = spike.isUp ? 6 : 7;
+				//var sprite = entity.get(component.Sprite);
+				//sprite.textureId = spike.isUp ? 6 : 7;
 			}
 			
 		}
@@ -33,6 +33,15 @@ class SpikeHandler extends System {
 				if(entity.has(component.Damager)){
 					var damager = entity.get(component.Damager);
 					damager.active = !damager.active;
+
+					var animation = entity.get(component.AnimatedSprite);
+					if (animation != null){
+						if (damager.active){
+							animation.playAnimation("raise","up");
+						}else{
+							animation.playAnimation("lower","down");
+						}
+					}
 				}
 			}
 			

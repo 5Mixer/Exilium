@@ -89,7 +89,14 @@
 			"tileset":"tileset",
 			"id":6,
 			"width":16,
-			"height":16
+			"height":16,
+			"speed":4,
+			"animations" : {
+				"down" : [6],
+				"raise" : [6,7,8],
+				"up" : [8],
+				"lower" : [8,7,6]
+			}
 		},
 		"gold" : {
 			"tileset":"coin",

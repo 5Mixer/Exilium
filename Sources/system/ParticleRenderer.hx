@@ -16,6 +16,10 @@ class ParticleRenderer extends System {
 			var transform = entity.get(component.Transformation);
 			var particle = entity.get(component.VisualParticle);
 			switch(particle.effect){
+				case Effect.Blood: {
+					var variant = Math.floor(particle.rand*5);
+					g.drawSubImage(kha.Assets.images.Blood,transform.pos.x,transform.pos.y,8*variant,0,8,8);
+				}
 				case Effect.Spark: {
 					if (entity.has(component.TimedLife)){
 						var life = entity.get(component.TimedLife);

@@ -29,7 +29,7 @@ class Renderer extends System {
 
 			g.pushTransformation(g.transformation.multmat(kha.math.FastMatrix3.translation(x + originX, y + originY)).multmat(kha.math.FastMatrix3.rotation(angle*(Math.PI / 180))).multmat(kha.math.FastMatrix3.translation(-x - originX, -y - originY)));
 					
-			g.drawScaledSubImage(sprite.spriteMap,Math.floor((sprite.textureId%tilesize)*tilesize),Math.floor(Math.floor(sprite.textureId/tilesize)*tilesize),tilesize,tilesize,x,y,tilesize,tilesize);
+			g.drawScaledSubImage(sprite.spriteMap,Math.floor((sprite.textureId%Math.floor(sprite.spriteMap.width/tilesize))*tilesize),Math.floor(Math.floor(sprite.textureId/Math.floor(sprite.spriteMap.width/tilesize))*tilesize),tilesize,tilesize,x,y,tilesize,tilesize);
 			
 			g.popTransformation();
 		}

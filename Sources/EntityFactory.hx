@@ -69,7 +69,7 @@ class EntityFactory {
 		treasure.set(new component.Transformation(new kha.math.Vector2(x,y)));
 		treasure.set(new component.AnimatedSprite(cast states.Play.spriteData.entity.chest));
 		treasure.get(component.AnimatedSprite).speed = 2;
-		treasure.set(new component.Collisions([component.Collisions.CollisionGroup.Level],[component.Collisions.CollisionGroup.Level]));
+		treasure.set(new component.Collisions([],[component.Collisions.CollisionGroup.Level]));
 		treasure.get(component.Collisions).registerCollisionRegion(new component.Collisions.Rect(2,3,8,8));
 		
 		var contents = [];
@@ -82,6 +82,31 @@ class EntityFactory {
 		
 
 		return treasure;
+	}
+	public static function createShooterTrap(entities:eskimo.EntityManager,x:Int,y:Int){
+		var shooter = entities.create();
+		shooter.set(new component.Name("Shooter"));
+		
+		shooter.set(new component.Transformation(new kha.math.Vector2(x,y)));
+		var angle = Math.round(Math.random()*360/45)*45;
+		shooter.get(component.Transformation).angle = angle;
+
+		shooter.set(new component.Sprite(cast states.Play.spriteData.entity.shooter));
+		shooter.set(new component.Collisions([],[component.Collisions.CollisionGroup.Level,component.Collisions.CollisionGroup.Enemy]));
+		shooter.get(component.Collisions).registerCollisionRegion(new component.Collisions.Rect(5,5,6,6));
+
+		shooter.set(new component.TimedShoot(10));
+		
+		var contents = [];
+		contents.pushx(component.Inventory.Item.Gold,Math.floor(Math.random()*15));
+		contents.pushx(component.Inventory.Item.HealthPotion,Math.floor(Math.random()*2));
+		if (Math.random() > .5) contents.push(component.Inventory.Item.LaserGun);
+		if (Math.random() > .75) contents.push(component.Inventory.Item.GrapplingHook);
+		shooter.set(new component.ReleaseOnCollision(contents,[component.Collisions.CollisionGroup.Friendly]));
+		
+		
+
+		return shooter;
 	}
 	public static function createGoblin (entities:eskimo.EntityManager,x:Int, y:Int){
 		var goblin = entities.create();

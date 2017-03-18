@@ -78,6 +78,20 @@ class Collisions extends System {
 		var shapeEntity = shape.ofEntity;
 		var otherShapeEntity = otherShape.ofEntity;
 
+		CollectHandler(shape,otherShape);
+		CustomCollisionHandler(shape,otherShape);
+		ReleaseHandler(shape,otherShape);
+
+		DamageHandler(shape,otherShape);
+		DamageHandler(otherShape,shape);
+		
+		DieHandler(shape,otherShape);
+		
+	}
+	public function CollectHandler(shape:component.Collisions.Rect,otherShape:component.Collisions.Rect){
+		var shapeEntity = shape.ofEntity;
+		var otherShapeEntity = otherShape.ofEntity;
+
 		if (shapeEntity.has(component.Collectable)){
 			if (otherShapeEntity.has(component.Inventory)){
 				for (group in shapeEntity.get(component.Collectable).collisionGroups){
@@ -91,6 +105,11 @@ class Collisions extends System {
 				}
 			}
 		}
+	}
+	public function CustomCollisionHandler(shape:component.Collisions.Rect,otherShape:component.Collisions.Rect){
+		var shapeEntity = shape.ofEntity;
+		var otherShapeEntity = otherShape.ofEntity;
+
 		if (shapeEntity.has(component.CustomCollisionHandler)){
 			for (group in shapeEntity.get(component.CustomCollisionHandler).collisionGroups){
 				if (otherShape.group.indexOf(group) != -1){
@@ -99,15 +118,10 @@ class Collisions extends System {
 				}
 			}
 		}
-		
-		if (shapeEntity.has(component.DieOnCollision)){
-			for (killingGroup in shapeEntity.get(component.DieOnCollision).collisionGroups){
-				if (otherShape.group.indexOf(killingGroup) != -1){
-					shapeEntity.destroy();
-					break;
-				}
-			}
-		}
+	}
+	public function ReleaseHandler(shape:component.Collisions.Rect,otherShape:component.Collisions.Rect){
+		var shapeEntity = shape.ofEntity;
+		var otherShapeEntity = otherShape.ofEntity;
 
 		if (shapeEntity.has(component.ReleaseOnCollision)){
 			var roc = shapeEntity.get(component.ReleaseOnCollision);
@@ -131,7 +145,11 @@ class Collisions extends System {
 				}
 			}
 		}
+	}
 
+	public function DamageHandler(shape:component.Collisions.Rect,otherShape:component.Collisions.Rect){
+		var shapeEntity = shape.ofEntity;
+		var otherShapeEntity = otherShape.ofEntity;
 		if (shapeEntity.has(component.Health)){
 			if (otherShapeEntity.has(component.Damager)){
 				var damager = otherShapeEntity.get(component.Damager);
@@ -151,6 +169,19 @@ class Collisions extends System {
 						particle.set(phys);
 						particle.set(new component.TimedLife(1));
 					}
+				}
+			}
+		}
+	}
+
+	public function DieHandler(shape:component.Collisions.Rect,otherShape:component.Collisions.Rect){
+		var shapeEntity = shape.ofEntity;
+		var otherShapeEntity = otherShape.ofEntity;
+		if (shapeEntity.has(component.DieOnCollision)){
+			for (killingGroup in shapeEntity.get(component.DieOnCollision).collisionGroups){
+				if (otherShape.group.indexOf(killingGroup) != -1){
+					shapeEntity.destroy();
+					break;
 				}
 			}
 		}

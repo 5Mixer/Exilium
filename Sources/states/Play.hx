@@ -73,6 +73,7 @@ class Play extends states.State {
 		systems.add(new system.Gun(input,camera,entities));
 		systems.add(new system.AI(entities,null));
 		systems.add(new system.Magnets(entities,p));
+		systems.add(new system.TimedShoot(entities));
 		systems.add(new system.GrappleHooker(input,camera,entities,collisionSys));
 		
 		createMap();
@@ -92,7 +93,7 @@ class Play extends states.State {
 			if (p.get(component.Inventory).activeIndex < 0) p.get(component.Inventory).activeIndex = p.get(component.Inventory).length-1;
 			if (p.get(component.Inventory).activeIndex > p.get(component.Inventory).length-1) p.get(component.Inventory).activeIndex = 0;
 		});
-		
+
 		lastRenderTime = kha.Scheduler.time();
 	}
 	function registerRenderSystem(system:System){
@@ -112,7 +113,7 @@ class Play extends states.State {
 		(cast systems.get(system.AI)).map = map.get(component.Tilemap);
 
 
-		var generator = new util.DungeonWorldGenerator(60,60);
+		var generator:util.WorldGenerator = new util.DungeonWorldGenerator(60,60);
 		map.get(component.Tilemap).tiles = generator.tiles;
 		map.get(component.Tilemap).width = 60;
 		map.get(component.Tilemap).height = 60;
@@ -167,15 +168,15 @@ class Play extends states.State {
 		minimap.g2.fillRect(generator.exitPoint.x,generator.exitPoint.y,1,1);
 		minimap.g2.end();
 		
-		for (t in generator.treasure){
-			EntityFactory.createTreasure(entities,t.x*16,t.y*16);
-		}
-		for (e in generator.enemies){
-			EntityFactory.createSlime(entities,e.x*16,e.y*16);
-			EntityFactory.createGoblin(entities,e.x*16,e.y*16);
-		}
-		for (s in generator.spikes){
-			EntityFactory.createSpike(entities,s.x*16,s.y*16);
+		for (e in generator.entities){
+			switch e.type {
+				case util.WorldGenerator.EntityType.Treasure: EntityFactory.createTreasure(entities,e.x*16,e.y*16);
+				case util.WorldGenerator.EntityType.Enemy: EntityFactory.createSlime(entities,e.x*16,e.y*16);
+				case util.WorldGenerator.EntityType.Spike: EntityFactory.createSpike(entities,e.x*16,e.y*16);
+				case util.WorldGenerator.EntityType.Shooter: EntityFactory.createShooterTrap(entities,e.x*16,e.y*16);
+			}
+			
+			//EntityFactory.createGoblin(entities,e.x*16,e.y*16);
 		}
 
 		EntityFactory.createLadder(entities,generator.exitPoint.x*16,generator.exitPoint.y*16,descend);

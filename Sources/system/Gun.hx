@@ -79,7 +79,7 @@ class Gun extends System {
 		
 		
 		bullet.set(new component.Collisions([component.Collisions.CollisionGroup.Bullet,component.Collisions.CollisionGroup.Friendly],[component.Collisions.CollisionGroup.Bullet,component.Collisions.CollisionGroup.Friendly]));
-		bullet.get(component.Collisions).registerCollisionRegion(new component.Collisions.Rect(4,4,7,7));
+		bullet.get(component.Collisions).registerCollisionRegion(new component.Collisions.Rect(4,4,8,8));
 
 		var particle = entities.create();
 		particle.set(new component.VisualParticle(component.VisualParticle.Effect.Spark));
@@ -120,7 +120,7 @@ class Gun extends System {
 		
 		
 		bullet.set(new component.Collisions([component.Collisions.CollisionGroup.Bullet,component.Collisions.CollisionGroup.Friendly],[component.Collisions.CollisionGroup.Bullet,component.Collisions.CollisionGroup.Friendly]));
-		bullet.get(component.Collisions).registerCollisionRegion(new component.Collisions.Rect(4,4,7,7));
+		bullet.get(component.Collisions).registerCollisionRegion(new component.Collisions.Rect(4,7,8,8));
 
 		var particle = entities.create();
 		particle.set(new component.VisualParticle(component.VisualParticle.Effect.Spark));

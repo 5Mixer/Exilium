@@ -73,11 +73,23 @@
 				"emptied" : [6]
 			}
 		},
+		"shooter" : {
+			"tileset":"tileset",
+			"width": 16,
+			"height": 16,
+			"id": 9
+		},
 		"bullet_basic" : {
 			"tileset":"projectiles",
 			"id":0,
-			"width":8,
-			"height":8
+			"width":16,
+			"height":16
+		},
+		"arrow_blue" : {
+			"tileset":"projectiles",
+			"id":1,
+			"width":16,
+			"height":16
 		},
 		"ladder" : {
 			"tileset":"objects",

@@ -60,6 +60,7 @@ class Play extends states.State {
 		registerRenderSystem(new system.ParticleRenderer(entities));
 		registerRenderSystem(new system.DebugView(entities));
 		registerRenderSystem(new system.Healthbars(entities));
+		registerRenderSystem(new system.CorruptSoulRenderer(entities));
 		
 		var collisionSys = new system.Collisions(entities);
 		registerRenderSystem(new system.CollisionDebugView(entities,collisionSys.grid,true));
@@ -180,6 +181,7 @@ class Play extends states.State {
 		}
 
 		EntityFactory.createLadder(entities,generator.exitPoint.x*16,generator.exitPoint.y*16,descend);
+		EntityFactory.createCorruptSoul(entities,generator.spawnPoint.x*16,generator.spawnPoint.y*16);
 
 		p = EntityFactory.createPlayer(entities,{x:generator.spawnPoint.x, y:generator.spawnPoint.y});
 		p.get(component.Inventory).putIntoInventory(component.Inventory.Item.SlimeGun);

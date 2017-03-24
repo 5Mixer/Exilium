@@ -57,7 +57,6 @@ class EntityFactory {
 		slime.get(component.AnimatedSprite).speed = 4;
 		slime.set(new component.Physics());
 		slime.set(new component.AI(component.AI.AIMode.Slime));
-		slime.set(new component.DieOnCollision([component.Collisions.CollisionGroup.Bullet]));
 		slime.set(new component.Collisions([component.Collisions.CollisionGroup.Enemy]));
 		var b:component.Collisions.Rect = new component.Collisions.Rect(0,0,8,8);
 		slime.get(component.Collisions).registerCollisionRegion(b);
@@ -79,8 +78,6 @@ class EntityFactory {
 		if (Math.random() > .75) contents.push(component.Inventory.Item.GrapplingHook);
 		treasure.set(new component.ReleaseOnCollision(contents,[component.Collisions.CollisionGroup.Friendly]));
 		
-		
-
 		return treasure;
 	}
 	public static function createShooterTrap(entities:eskimo.EntityManager,x:Int,y:Int){
@@ -97,15 +94,6 @@ class EntityFactory {
 
 		shooter.set(new component.TimedShoot(10));
 		
-		var contents = [];
-		contents.pushx(component.Inventory.Item.Gold,Math.floor(Math.random()*15));
-		contents.pushx(component.Inventory.Item.HealthPotion,Math.floor(Math.random()*2));
-		if (Math.random() > .5) contents.push(component.Inventory.Item.LaserGun);
-		if (Math.random() > .75) contents.push(component.Inventory.Item.GrapplingHook);
-		shooter.set(new component.ReleaseOnCollision(contents,[component.Collisions.CollisionGroup.Friendly]));
-		
-		
-
 		return shooter;
 	}
 	public static function createGoblin (entities:eskimo.EntityManager,x:Int, y:Int){
@@ -117,11 +105,37 @@ class EntityFactory {
 		goblin.get(component.AnimatedSprite).speed = 13;
 		goblin.set(new component.Physics());
 		goblin.set(new component.AI(component.AI.AIMode.Goblin));
-		goblin.set(new component.DieOnCollision([component.Collisions.CollisionGroup.Bullet]));
 		goblin.set(new component.Collisions([component.Collisions.CollisionGroup.Enemy]));
 		var b:component.Collisions.Rect = new component.Collisions.Rect(2,1,6,9);
 		goblin.get(component.Collisions).registerCollisionRegion(b);
 		return goblin;
+	}
+	public static function createCorruptSoul (entities:eskimo.EntityManager,x:Int, y:Int){
+		var corruptSoul = entities.create();
+		corruptSoul.set(new component.Name("Corrupt Soul"));
+		corruptSoul.set(new component.Transformation(new kha.math.Vector2(x,y)));
+		//corruptSoul.set(new component.Health(75));
+		corruptSoul.set(new component.Physics());
+		corruptSoul.set(new component.AI(component.AI.AIMode.CorruptSoul));
+		corruptSoul.set(new component.Collisions([component.Collisions.CollisionGroup.Enemy],[component.Collisions.CollisionGroup.Enemy],false));
+		var b:component.Collisions.Rect = new component.Collisions.Rect(-3,-3,6,6);
+		corruptSoul.get(component.Collisions).registerCollisionRegion(b);
+		corruptSoul.set(new component.CorruptSoul());
+		for (i in 0...20){
+			var size = 4+Math.random()*5;
+			var corruptSoulChild = entities.create();
+			corruptSoulChild.set(new component.Transformation(new kha.math.Vector2(x,y)));
+			corruptSoulChild.set(new component.Health(10));
+			corruptSoulChild.set(new component.Physics());
+			corruptSoulChild.set(new component.CorruptSoulChild());
+			corruptSoulChild.get(component.Physics).friction = .6;
+			corruptSoulChild.set(new component.Collisions([component.Collisions.CollisionGroup.Enemy],[component.Collisions.CollisionGroup.Enemy],false));
+			var b:component.Collisions.Rect = new component.Collisions.Rect(Math.ceil(-size/2),Math.ceil(-size/2),Math.ceil(size),Math.ceil(size));
+			corruptSoulChild.get(component.Collisions).registerCollisionRegion(b);
+			
+			corruptSoul.get(component.CorruptSoul).children.push(corruptSoulChild);
+		}
+		return corruptSoul;
 	}
 	public static function createPotion(entities:eskimo.EntityManager,x:Float, y:Float){
 		var potion = entities.create();

@@ -147,13 +147,27 @@ class Collisions extends System {
 		}
 	}
 
+	function validCollision(shape:component.Collisions.Rect,otherShape:component.Collisions.Rect){
+		//If both shapes are ignoring nothing, they should collide.
+		if (otherShape.ignoreGroups.length == 0 && shape.ignoreGroups.length == 0) return true;
+		//If the shape has a group that is being ignored by otherShape, don't collide.
+		for (group in shape.group){
+			if (otherShape.ignoreGroups.indexOf(group) != -1){
+				return false;
+			}
+		}
+		return true;
+
+	}
+
 	public function DamageHandler(shape:component.Collisions.Rect,otherShape:component.Collisions.Rect){
 		var shapeEntity = shape.ofEntity;
 		var otherShapeEntity = otherShape.ofEntity;
 		if (shapeEntity.has(component.Health)){
+			
 			if (otherShapeEntity.has(component.Damager)){
 				var damager = otherShapeEntity.get(component.Damager);
-				if (damager.active && frame % 1 == 0){
+				if (damager.active && frame % 1 == 0 && (validCollision(shape,otherShape))){
 					shapeEntity.get(component.Health).addToHealth(-Math.floor(damager.damage));
 
 					for (i in 0...3){
@@ -162,12 +176,12 @@ class Collisions extends System {
 						
 						particle.set(new component.Transformation(shapeEntity.get(component.Transformation).pos.add(new kha.math.Vector2(4,0))));
 						var phys = new component.Physics();
-						var speed = 2+Math.random()*4;
+						var speed = Math.random()*6;
 						phys.friction = 0.7;
 						var particleAngle = Math.random()*360;
 						phys.velocity = new kha.math.Vector2(Math.cos(particleAngle * (Math.PI / 180)) * speed,Math.sin(particleAngle * (Math.PI / 180)) * speed);		
 						particle.set(phys);
-						particle.set(new component.TimedLife(1));
+						particle.set(new component.TimedLife(.5+Math.random()));
 					}
 				}
 			}

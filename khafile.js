@@ -6,6 +6,7 @@ project.addLibrary("differ");
 project.addLibrary("compiletime");
 project.addLibrary("zui");
 project.addLibrary("hxNoise");
+project.addLibrary("hxColorToolkit");
 // project.addLibrary('hxtelemetry');
 // project.addCDefine('HXCPP_TELEMETRY');
 // project.addCDefine('HXCPP_STACK_TRACE');

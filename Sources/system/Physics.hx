@@ -71,7 +71,9 @@ class Physics extends System {
 							if (c != null && c.separationX != 0){
 								collision = true;
 								collidingShape = otherShape;
-								transformation.pos.x += c.separationX;
+								if (otherShape.ofEntity.get(component.Collisions).stopMovement){
+									transformation.pos.x += c.separationX;
+								}
 								if (physics.reflect){
 									reflectx = true;
 								}
@@ -98,7 +100,9 @@ class Physics extends System {
 							if (c != null && c.separationY != 0){
 								collision = true;
 								collidingShape = otherShape;
-								transformation.pos.y += c.separationY;
+								if (otherShape.ofEntity.get(component.Collisions).stopMovement){
+									transformation.pos.y += c.separationY;
+								}
 								if (physics.reflect){
 									reflecty = true;
 								}

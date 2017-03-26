@@ -91,6 +91,12 @@
 			"width":16,
 			"height":16
 		},
+		"corrupt_projectile" : {
+			"tileset":"projectiles",
+			"id":2,
+			"width":16,
+			"height":16
+		},
 		"ladder" : {
 			"tileset":"objects",
 			"id":0,

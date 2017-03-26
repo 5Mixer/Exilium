@@ -44,12 +44,12 @@ class Menu extends states.State {
 		var boxx = x-padding;
 		var boxy = y-padding;
 		var boxw = g.font.width(g.fontSize,text)+(2*padding);
-		var boxh = g.font.height(g.fontSize)+(2*padding);
+		var boxh = g.font.height(g.fontSize)+(2*padding)-(3.5*8);
 		
 		g.color = kha.Color.fromFloats(.2,.2,.2,.6);
-		g.fillRect(boxx,boxy,boxw,boxh);
+		g.fillRect(boxx,boxy,boxw+8,boxh);
 		g.color = kha.Color.White;
-		g.drawString(text,x+padding*4,y-1*4);
+		g.drawString(text,x+padding*4,y-(3*8));
 		return (input.mouseReleased && input.mousePos.x > x && input.mousePos.y > y && input.mousePos.x < boxx+boxw && input.mousePos.y < boxy+boxh);
 		
 	}

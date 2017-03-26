@@ -25,6 +25,7 @@ class TilemapRenderer extends System {
 			var windoww = Math.ceil(kha.System.windowWidth()/(16*4))+1;
 			var windowh = Math.ceil(kha.System.windowHeight()/(16*4))+1;
 
+			//Loop through every visible tile.
 			for (y in camtiley ... cast Math.min(camtiley+windowh,map.height)){
 				for (x in camtilex ... cast Math.min(camtilex+windoww,map.width)){
 
@@ -43,20 +44,22 @@ class TilemapRenderer extends System {
 						var light = lit.get(component.Light);
 						var lightTransform = lit.get(component.Transformation);
 						
+						var lightPositionx:Int = Math.floor(lightTransform.pos.x/tilesize);
+						var lightPositiony:Int = Math.floor(lightTransform.pos.y/tilesize);
+						
 						var smootherLights = [];
 						for (sx in -1...2){
 							for (sy in -1...2){
-								if (map.get(x-sx,y-sy) < 0) continue;
-								// 
-								if (map.tileInfo.get(map.get(x-sx,y-sy)) == null) {trace("Why?"); continue; }
-								if (map.tileInfo.get(map.get(x-sx,y-sy)).collide) continue;
-								smootherLights.push({x:sx, y:sy});
+								if (map.get(lightPositionx+sx,lightPositiony+sy) < 0) continue;
+								if (map.tileInfo.get(map.get(lightPositionx+sx,lightPositiony+sy)) == null) {continue; }
+								if (map.tileInfo.get(map.get(lightPositionx+sx,lightPositiony+sy)).collide) continue;
+								smootherLights.push({x:sx,y:sy});
 							}
 						}
 						//Can a path to the light be drawn from this tile without hitting an occluder?
 						for (smootherLight in smootherLights){
 							
-							if (map.tileInfo.get(map.get(x,y)).collide || !map.raycast(g,Math.floor((lightTransform.pos.x)/tilesize +smootherLight.x),Math.floor((lightTransform.pos.y)/tilesize +smootherLight.y),x,y)){
+							if (map.tileInfo.get(map.get(x,y)).collide || !map.raycast(g,lightPositionx+smootherLight.x,lightPositiony +smootherLight.y,x,y)){
 								var lx = (lightTransform.pos.x-4)/tilesize;
 								var ly = (lightTransform.pos.y-4)/tilesize;
 								var l =	Math.sqrt(((x - lx + smootherLight.x) * (x - lx + smootherLight.x)) + ((y - ly + smootherLight.y) * (y - ly + smootherLight.y))); //Distance to light.

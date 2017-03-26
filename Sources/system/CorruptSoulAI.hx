@@ -123,7 +123,7 @@ class CorruptSoulAI extends System {
 		bullet.set(physics);
 
 		//Sprite
-		bullet.set(new component.Sprite(states.Play.spriteData.entity.arrow_blue));
+		bullet.set(new component.Sprite(states.Play.spriteData.entity.corrupt_projectile));
 		
 		//Death
 		bullet.set(new component.TimedLife(3));
@@ -131,7 +131,7 @@ class CorruptSoulAI extends System {
 		
 		//Damage and collisions
 		bullet.set(new component.Damager(10));
-		bullet.set(new component.Collisions([component.Collisions.CollisionGroup.Bullet,component.Collisions.CollisionGroup.Enemy],[component.Collisions.CollisionGroup.Bullet,component.Collisions.CollisionGroup.Enemy],true));
+		bullet.set(new component.Collisions([component.Collisions.CollisionGroup.Bullet,component.Collisions.CollisionGroup.Enemy],[component.Collisions.CollisionGroup.Bullet,component.Collisions.CollisionGroup.Enemy,component.Collisions.CollisionGroup.Item,component.Collisions.CollisionGroup.Particle],true));
 		bullet.get(component.Collisions).registerCollisionRegion(new component.Collisions.Rect(3,6,10,10));
 
 		//Little particle

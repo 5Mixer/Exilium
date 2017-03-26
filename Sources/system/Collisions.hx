@@ -181,7 +181,7 @@ class Collisions extends System {
 						var particleAngle = Math.random()*360;
 						phys.velocity = new kha.math.Vector2(Math.cos(particleAngle * (Math.PI / 180)) * speed,Math.sin(particleAngle * (Math.PI / 180)) * speed);		
 						particle.set(phys);
-						particle.set(new component.TimedLife(.5+Math.random()));
+						particle.set(new component.TimedLife(2+Math.random()*4));
 					}
 				}
 			}

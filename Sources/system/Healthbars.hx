@@ -29,7 +29,7 @@ class Healthbars extends System {
 		super.onUpdate(delta);
 		for (entity in view.entities){
 			var health:component.Health = entity.get(component.Health);
-			if (health.current < 0){
+			if (health.current <= 0){
 				if (entity.has(component.Events)){
 					entity.get(component.Events).callEvent(component.Events.Event.Death,null);
 				}

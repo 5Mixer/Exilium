@@ -116,19 +116,20 @@ class EntityFactory {
 		corruptSoul.set(new component.Transformation(new kha.math.Vector2(x,y)));
 		//corruptSoul.set(new component.Health(75));
 		corruptSoul.set(new component.Physics());
-		corruptSoul.set(new component.AI(component.AI.AIMode.CorruptSoul));
-		corruptSoul.set(new component.Collisions([component.Collisions.CollisionGroup.Enemy],[component.Collisions.CollisionGroup.Enemy],false));
+		corruptSoul.set(new component.CorruptSoulAI());
+		corruptSoul.set(new component.ActiveBoss("Corrupt Soul"));
+		corruptSoul.set(new component.Collisions([],[component.Collisions.CollisionGroup.Enemy,component.Collisions.CollisionGroup.Bullet,component.Collisions.CollisionGroup.Item],false));
 		var b:component.Collisions.Rect = new component.Collisions.Rect(-3,-3,6,6);
 		corruptSoul.get(component.Collisions).registerCollisionRegion(b);
 		corruptSoul.set(new component.CorruptSoul());
-		for (i in 0...20){
+		for (i in 0...25){
 			var size = 4+Math.random()*5;
 			var corruptSoulChild = entities.create();
 			corruptSoulChild.set(new component.Transformation(new kha.math.Vector2(x,y)));
 			corruptSoulChild.set(new component.Health(10));
 			corruptSoulChild.set(new component.Physics());
 			corruptSoulChild.set(new component.CorruptSoulChild());
-			corruptSoulChild.get(component.Physics).friction = .6;
+			corruptSoulChild.get(component.Physics).friction = .5;
 			corruptSoulChild.set(new component.Collisions([component.Collisions.CollisionGroup.Enemy],[component.Collisions.CollisionGroup.Enemy],false));
 			var b:component.Collisions.Rect = new component.Collisions.Rect(Math.ceil(-size/2),Math.ceil(-size/2),Math.ceil(size),Math.ceil(size));
 			corruptSoulChild.get(component.Collisions).registerCollisionRegion(b);

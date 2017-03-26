@@ -60,6 +60,7 @@ class Play extends states.State {
 		registerRenderSystem(new system.ParticleRenderer(entities));
 		registerRenderSystem(new system.DebugView(entities));
 		registerRenderSystem(new system.Healthbars(entities));
+		registerRenderSystem(new system.ActiveBoss(entities));
 		registerRenderSystem(new system.CorruptSoulRenderer(entities));
 		
 		var collisionSys = new system.Collisions(entities);
@@ -73,6 +74,7 @@ class Play extends states.State {
 		systems.add(new system.TimedLife(entities));
 		systems.add(new system.Gun(input,camera,entities));
 		systems.add(new system.AI(entities,null));
+		systems.add(new system.CorruptSoulAI(entities,null));
 		systems.add(new system.Magnets(entities,p));
 		systems.add(new system.TimedShoot(entities));
 		systems.add(new system.GrappleHooker(input,camera,entities,collisionSys));
@@ -80,6 +82,7 @@ class Play extends states.State {
 		createMap();
 
 		debugInterface = new ui.DebugInterface();
+		//debugInterface.visible = false;
 		
 		input.listenToKeyRelease('r', descend);
 		input.listenToKeyRelease('q',function (){
@@ -113,13 +116,13 @@ class Play extends states.State {
 		map.get(component.Collisions).fixed = true;
 		(cast systems.get(system.AI)).map = map.get(component.Tilemap);
 
-
-		var generator:util.WorldGenerator = new util.DungeonWorldGenerator(60,60);
+		var worldSize = 60;
+		var generator:util.WorldGenerator = new util.DungeonWorldGenerator(worldSize,worldSize);
 		map.get(component.Tilemap).tiles = generator.tiles;
-		map.get(component.Tilemap).width = 60;
-		map.get(component.Tilemap).height = 60;
+		map.get(component.Tilemap).width = worldSize;
+		map.get(component.Tilemap).height = worldSize;
 		
-		minimap = kha.Image.createRenderTarget(60,60);
+		minimap = kha.Image.createRenderTarget(worldSize,worldSize);
 		
 		minimapOpacity = 1.0;
 		minimap.g2.begin();
@@ -134,7 +137,6 @@ class Play extends states.State {
 				var width = 1;
 				var height = 1;
 				/*while (map.get(component.Tilemap).tileInfo.get(generator.tiles[t+width]).collide && Math.floor((t+width)/map.get(component.Tilemap).width) == y){
-				
 					width += 1;
 				}*/
 				
@@ -176,8 +178,6 @@ class Play extends states.State {
 				case util.WorldGenerator.EntityType.Spike: EntityFactory.createSpike(entities,e.x*16,e.y*16);
 				case util.WorldGenerator.EntityType.Shooter: EntityFactory.createShooterTrap(entities,e.x*16,e.y*16);
 			}
-			
-			//EntityFactory.createGoblin(entities,e.x*16,e.y*16);
 		}
 
 		EntityFactory.createLadder(entities,generator.exitPoint.x*16,generator.exitPoint.y*16,descend);
@@ -186,7 +186,7 @@ class Play extends states.State {
 		p = EntityFactory.createPlayer(entities,{x:generator.spawnPoint.x, y:generator.spawnPoint.y});
 		p.get(component.Inventory).putIntoInventory(component.Inventory.Item.SlimeGun);
 		p.get(component.Events).listenToEvent(component.Events.Event.Death,function (args){
-			//states.push(new states.Dead());
+			Project.states.push(new states.Dead());
 		});
 		if (lastSave != null && lastSave.player != null){
 			p.get(component.Health).current = lastSave.player.health;
@@ -346,6 +346,7 @@ class Play extends states.State {
 		g.popTransformation();
 		
 		g.end();
+
 		debugInterface.render(g);
 
 		debugInterface.updateGraph.pushValue(1/renderDelta/debugInterface.updateGraph.size.y);

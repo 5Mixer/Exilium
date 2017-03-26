@@ -21,6 +21,9 @@ Promise.all([Project.createProject('build/windows-build', __dirname), Project.cr
 	if (fs.existsSync(path.join('Libraries/hxNoise', 'korefile.js'))) {
 		libs.push(Project.createProject('Libraries/hxNoise', __dirname));
 	}
+	if (fs.existsSync(path.join('Libraries/hxColorToolkit', 'korefile.js'))) {
+		libs.push(Project.createProject('Libraries/hxColorToolkit', __dirname));
+	}
 	Promise.all(libs).then((libprojects) => {
 		for (let p of libprojects) project.addSubProject(p);
 		resolve(project);

@@ -11,7 +11,7 @@ class Project {
 	var realLastTime:Float;
 	var lastRenderTime:Float;
 
-	public var states:Array<states.State> = [];
+	public static var states:Array<states.State> = [];
 
 	public function new() {
 		kha.System.notifyOnRender(render);
@@ -22,7 +22,7 @@ class Project {
 		realLastTime = Scheduler.realTime();
 		lastRenderTime = Scheduler.time();
 		
-		states.push(new states.Play());
+		states.push(new states.Menu());
 	}
 
 	function update() {
@@ -30,8 +30,7 @@ class Project {
 		var delta = Scheduler.time() - lastTime;
 		var realDelta = Scheduler.realTime() - realLastTime;
 
-		for (state in states)
-			state.update(delta);
+		states[states.length-1].update(delta);
 		
 		lastTime = Scheduler.time();
 		realLastTime = Scheduler.realTime();
@@ -39,8 +38,7 @@ class Project {
 	function render(framebuffer: Framebuffer): Void {
 		frame++;
 
-		for (state in states)
-			state.render(framebuffer);		
+		states[states.length-1].render(framebuffer);		
 
 	}
 }

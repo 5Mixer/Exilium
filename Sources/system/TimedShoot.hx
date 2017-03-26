@@ -79,7 +79,7 @@ class TimedShoot extends System {
 		//Damage and collisions
 		bullet.set(new component.Damager(10));
 		bullet.set(new component.Collisions([component.Collisions.CollisionGroup.Bullet,component.Collisions.CollisionGroup.Enemy],[component.Collisions.CollisionGroup.Bullet,component.Collisions.CollisionGroup.Enemy],true));
-		bullet.get(component.Collisions).registerCollisionRegion(new component.Collisions.Rect(3,6,11,5));
+		bullet.get(component.Collisions).registerCollisionRegion(new component.Collisions.Rect(3,6,10,10));
 
 		//Little particle
 		var particle = entities.create();

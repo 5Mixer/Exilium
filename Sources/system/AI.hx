@@ -29,9 +29,6 @@ class AI extends System {
 
 			if (AI.mode == component.AI.AIMode.Goblin)
 				goblineAIMode(entity,transformation,physics,AI);
-
-			if (AI.mode == component.AI.AIMode.CorruptSoul)
-				corruptSoulAIMode(entity,transformation,physics,AI);
 			
 		}
 	}

@@ -114,15 +114,21 @@ class Gun extends System {
 		p.friction = 0.999;
 		p.velocity = new kha.math.Vector2(Math.cos(angle * (Math.PI / 180)) * speed,Math.sin(angle * (Math.PI / 180)) * speed);
 		bullet.set(p);
-		bullet.set(new component.Sprite(cast spriteData));
+		var s = null;
+		if (Math.random()>.5){
+			s = states.Play.spriteData.entity.summoned_missile;
+		}else{
+			s = states.Play.spriteData.entity.summoned_missile_2;
+		}
+		bullet.set(new component.Sprite(s));
 		bullet.set(new component.Damager(1));
 
 		bullet.set(new component.TimedLife(3));
 		bullet.set(new component.DieOnCollision([component.Collisions.CollisionGroup.Enemy]));
-		
+
 		
 		bullet.set(new component.Collisions([component.Collisions.CollisionGroup.Bullet,component.Collisions.CollisionGroup.Friendly],[component.Collisions.CollisionGroup.Bullet,component.Collisions.CollisionGroup.Friendly,component.Collisions.CollisionGroup.Player,component.Collisions.CollisionGroup.Item,component.Collisions.CollisionGroup.Particle]));
-		bullet.get(component.Collisions).registerCollisionRegion(new component.Collisions.Rect(4,7,8,8));
+		bullet.get(component.Collisions).registerCollisionRegion(new component.Collisions.Rect(6,6,4,4));
 
 		var particle = entities.create();
 		particle.set(new component.VisualParticle(component.VisualParticle.Effect.Spark));

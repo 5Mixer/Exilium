@@ -85,6 +85,18 @@
 			"width":16,
 			"height":16
 		},
+		"summoned_missile" : {
+			"tileset":"projectiles",
+			"id":3,
+			"width":16,
+			"height":16
+		},
+		"summoned_missile_2" : {
+			"tileset":"projectiles",
+			"id":4,
+			"width":16,
+			"height":16
+		},
 		"arrow_blue" : {
 			"tileset":"projectiles",
 			"id":1,

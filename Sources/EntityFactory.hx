@@ -62,6 +62,20 @@ class EntityFactory {
 		slime.get(component.Collisions).registerCollisionRegion(b);
 		return slime;
 	}
+	public static function createMummy(entities:eskimo.EntityManager,x:Int,y:Int){
+		var mummy = entities.create();
+		mummy.set(new component.Name("Mummy"));
+		mummy.set(new component.Transformation(new kha.math.Vector2(x,y)));
+		mummy.set(new component.AnimatedSprite(states.Play.spriteData.entity.mummy));
+		mummy.set(new component.Health(20));
+		mummy.get(component.AnimatedSprite).speed = 5;
+		mummy.set(new component.Physics());
+		mummy.set(new component.MummyAI());
+		mummy.set(new component.Collisions([component.Collisions.CollisionGroup.Enemy]));
+		var b:component.Collisions.Rect = new component.Collisions.Rect(0,0,8,8);
+		mummy.get(component.Collisions).registerCollisionRegion(b);
+		return mummy;
+	}
 	public static function createTreasure(entities:eskimo.EntityManager,x:Int,y:Int){
 		var treasure = entities.create();
 		treasure.set(new component.Name("Treasure"));

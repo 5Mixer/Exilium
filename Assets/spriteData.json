@@ -49,6 +49,40 @@
 				"attack u" : [76,77,78,79]
 			}
 		},
+		"mummy" : {
+			"tileset":"mummy",
+			"animations" : {
+				"idle" : [0],
+
+				"d" : [0],
+				"dr" : [1],
+				"r" : [2],
+				"ur" : [3],
+				"u" : [4],
+				"ul" : [5],
+				"l" : [6],
+				"dl" :[7],
+
+				"walk_d" : [8,9],
+				"walk_dr" : [10,11],
+				"walk_r" : [12,13],
+				"walk_ur" : [14.15],
+				"walk_u" : [16,17],
+				"walk_ul" : [14,15],
+				"walk_l" : [18,19],
+				"walk_dl" :[14,15],
+
+				"die" : [43],
+				"attack u" : [24,25],
+				"attack ul" : [26,27],
+				"attack l" : [28,29],
+				"attack dl" : [30,31],
+				"attack d" : [32,33],
+				"attack dr" : [34,35],
+				"attack r" : [36,37],
+				"attack ur" : [38,39]
+			}
+		},
 		"goblin" : {
 			"tileset" : "goblin",
 			"animations" : {

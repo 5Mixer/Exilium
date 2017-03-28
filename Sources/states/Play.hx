@@ -75,6 +75,7 @@ class Play extends states.State {
 		systems.add(new system.Gun(input,camera,entities));
 		systems.add(new system.AI(entities,null));
 		systems.add(new system.CorruptSoulAI(entities,null));
+		systems.add(new system.MummyAI(entities,null));
 		systems.add(new system.Magnets(entities,p));
 		systems.add(new system.TimedShoot(entities));
 		systems.add(new system.GrappleHooker(input,camera,entities,collisionSys));
@@ -182,6 +183,7 @@ class Play extends states.State {
 
 		EntityFactory.createLadder(entities,generator.exitPoint.x*16,generator.exitPoint.y*16,descend);
 		EntityFactory.createCorruptSoul(entities,generator.exitPoint.x*16,generator.exitPoint.y*16);
+		EntityFactory.createMummy(entities,generator.spawnPoint.x*16+10,generator.spawnPoint.y*16);
 
 		p = EntityFactory.createPlayer(entities,{x:generator.spawnPoint.x, y:generator.spawnPoint.y});
 		p.get(component.Inventory).putIntoInventory(component.Inventory.Item.SlimeGun);

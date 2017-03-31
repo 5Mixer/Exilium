@@ -43,6 +43,8 @@ class EntityFactory {
 		p.get(component.Light).colour = kha.Color.fromBytes(255,200,200);
 		p.get(component.Light).strength = .8;
 
+		p.get(component.Inventory).putIntoInventory(component.Inventory.Item.CastSheild);
+
 		// if (lastSave != null && lastSave.player != null){
 		// 	p.get(component.Health).current = lastSave.player.health;
 		// }
@@ -136,6 +138,11 @@ class EntityFactory {
 		var b:component.Collisions.Rect = new component.Collisions.Rect(-3,-3,6,6);
 		corruptSoul.get(component.Collisions).registerCollisionRegion(b);
 		corruptSoul.set(new component.CorruptSoul());
+		corruptSoul.set(new component.Events());
+		corruptSoul.get(component.Events).listenToEvent(component.Events.Event.Death,function(e){
+			trace("You killed the corrupt soul!");
+			
+		});
 		for (i in 0...25){
 			var size = 4+Math.random()*5;
 			var corruptSoulChild = entities.create();

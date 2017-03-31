@@ -149,6 +149,12 @@
 			"width":8,
 			"height":8
 		},
+		"cast_shield" : {
+			"tileset":"objects",
+			"id":8,
+			"width":8,
+			"height":8
+		},
 		"spikes" : {
 			"tileset":"tileset",
 			"id":6,

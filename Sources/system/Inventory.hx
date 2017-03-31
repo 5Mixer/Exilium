@@ -13,6 +13,19 @@ class Inventory extends System {
 	public function mouseUp (){
 
 	}
+	public function onChangeItem(){
+		for (entity in inventoryHolders.entities){
+			var inventory = entity.get(component.Inventory);
+			var activeItem = inventory.getByIndex(inventory.activeIndex);
+
+			if (activeItem.item == component.Inventory.Item.CastSheild){
+				entity.set(new component.Shield());
+			}else{
+				entity.remove(component.Shield);
+			}
+		}
+
+	}
 	override public function onUpdate (delta:Float){
 		super.onUpdate(delta);
 

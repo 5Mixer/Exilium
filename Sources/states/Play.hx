@@ -42,9 +42,13 @@ class Play extends states.State {
 	var dungeons:Array<Dungeon> = [];
 	
 	var debugInterface:ui.DebugInterface;
-	
+	var mainMusicChannel:kha.audio1.AudioChannel;
+
 	override public function new (){
 		super();
+
+		mainMusicChannel = kha.audio1.Audio.play(kha.Assets.sounds.Synthwave_Beta_2,true);
+		mainMusicChannel.volume = .5;
 
 		input = new Input();
 		camera = new Camera();
@@ -62,6 +66,7 @@ class Play extends states.State {
 		registerRenderSystem(new system.Healthbars(entities));
 		registerRenderSystem(new system.ActiveBoss(entities));
 		registerRenderSystem(new system.CorruptSoulRenderer(entities));
+		registerRenderSystem(new system.ShieldRenderer(input,camera,entities));
 		
 		var collisionSys = new system.Collisions(entities);
 		registerRenderSystem(new system.CollisionDebugView(entities,collisionSys.grid,true));
@@ -97,6 +102,7 @@ class Play extends states.State {
 			p.get(component.Inventory).activeIndex += dir;
 			if (p.get(component.Inventory).activeIndex < 0) p.get(component.Inventory).activeIndex = p.get(component.Inventory).length-1;
 			if (p.get(component.Inventory).activeIndex > p.get(component.Inventory).length-1) p.get(component.Inventory).activeIndex = 0;
+			cast(systems.get(system.Inventory),system.Inventory).onChangeItem();
 		});
 
 		lastRenderTime = kha.Scheduler.time();
@@ -230,6 +236,9 @@ class Play extends states.State {
 	override public function render (framebuffer:kha.Framebuffer){
 		var renderDelta = kha.Scheduler.time() - lastRenderTime;
 		lastRenderTime = kha.Scheduler.time();
+
+		cast(systems.get(system.ShieldRenderer),system.ShieldRenderer).prepass();
+
 		var g = framebuffer.g2;
 		g.begin();
 		g.color = kha.Color.White;

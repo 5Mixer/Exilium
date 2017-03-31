@@ -7,12 +7,14 @@ enum Item {
 	Gem;
 	HealthPotion;
 	GrapplingHook;
+	CastSheild;
 }
 enum ItemType {
 	Gun;
 	Potion;
 	Sword;
 	Currency;
+	Other;
 }
 /*
 { name: "freaking destroyer", type: gun{bullet: giantBloodyGlowingBullet { angle : angle, speed: fucking fast} }}
@@ -40,7 +42,8 @@ class Inventory extends Component {
 		Item.HealthPotion => { name: "health potion", stackable: true, type: ItemType.Potion, sprite:states.Play.spriteData.entity.healthPotion },
 		Item.SlimeGun => { name: "slime gun", stackable: false, type: ItemType.Gun, sprite:states.Play.spriteData.entity.slimeGun },
 		Item.LaserGun => { name: "laser gun", stackable: false, type: ItemType.Gun, sprite:states.Play.spriteData.entity.laserGun },
-		Item.GrapplingHook => { name: "grappling gun", stackable: false, type: ItemType.Gun, sprite:states.Play.spriteData.entity.grapplingHook }
+		Item.GrapplingHook => { name: "grappling gun", stackable: false, type: ItemType.Gun, sprite:states.Play.spriteData.entity.grapplingHook },
+		Item.CastSheild => { name: "cast shield", stackable: false, type: ItemType.Other, sprite:states.Play.spriteData.entity.cast_shield }
 	];
 	override public function new (){
 		super();

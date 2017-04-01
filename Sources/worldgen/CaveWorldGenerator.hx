@@ -1,9 +1,9 @@
-package util;
+package worldgen;
 
-import util.WorldGenerator.Room;
-import util.WorldGenerator.EntityType;
-import util.WorldGenerator.Side;
-import util.WorldGenerator.WorldGenerator;
+import worldgen.WorldGenerator.Room;
+import worldgen.WorldGenerator.EntityType;
+import worldgen.WorldGenerator.Side;
+import worldgen.WorldGenerator.WorldGenerator;
 
 import hxnoise.Perlin;
 

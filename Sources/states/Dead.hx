@@ -10,6 +10,7 @@ class Dead extends states.State {
 		super();
 		header = deadMessages[Math.floor(Math.random()*deadMessages.length)];
 		input = new Input();
+		kha.input.Mouse.get().showSystemCursor();
 	}
 	override public function render (framebuffer:kha.Framebuffer){
 		

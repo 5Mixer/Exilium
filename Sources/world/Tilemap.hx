@@ -1,8 +1,9 @@
-package component;
+package world;
 
 import kha.Color;
+import worldgen.Tile;
 
-typedef Tile = {
+typedef TileType = {
 	var name:String;
 	var collide:Bool;
 	@:optional var oncollide:Void -> Void;
@@ -12,55 +13,32 @@ typedef Tile = {
 	var colour:kha.Color;
 }
 
-
-class Tilemap extends Component{
-	public var tiles = new Array<Int>();
-	public var tileInfo:Map<Int,Tile> = [
+class Tilemap {
+	public var tiles = new Array<Tile>();
+	public var tileInfo:Map<Int,TileType> = [
 		0 => { name: "empty", collide: false, id: -1, colour: Color.fromFloats(0,0,0,0) },
-		1 => { name: "floor", collide: false, id: 4, specularity: 2, colour:Color.fromBytes(158,93,94)},
+		1 => { name: "floor", collide: false, id: 0, specularity: 2, colour:Color.fromBytes(158,93,94)},
 		2 => { name: "dungeonwall", collide: true, id: 1, ambient: Color.fromFloats(.1,.1,.1), specularity: 1.3, colour:Color.fromBytes(214,166,122)},
-		3 => { name: "dungeonwall.h", collide: true, id: 2, ambient: Color.fromFloats(.1,.1,.1), specularity: 1.3, colour:Color.fromBytes(214,166,122)},
-		4 => { name: "dungeonwall.v", collide: true, id: 3, ambient: Color.fromFloats(.1,.1,.1), specularity: 1.3, colour:Color.fromBytes(214,166,122)},
-		5 => { name: "dungeonwall.side", collide: true, id: 0, ambient: Color.fromFloats(.1,.1,.1), specularity: 1.3, colour:Color.fromBytes(186,143,104)},
-		6 => { name: "gate", collide: false, id: 4, colour:Color.fromBytes(104,111,186)}
+		3 => { name: "dungeonwall.side", collide: true, id: 2, ambient: Color.fromFloats(.1,.1,.1), specularity: 1.3, colour:Color.fromBytes(186,143,104)},
+		4 => { name: "dungeonwall.h", collide: true, id: 3, ambient: Color.fromFloats(.1,.1,.1), specularity: 1.3, colour:Color.fromBytes(214,166,122)},
+		5 => { name: "dungeonwall.v", collide: true, id: 4, ambient: Color.fromFloats(.1,.1,.1), specularity: 1.3, colour:Color.fromBytes(214,166,122)},
+		6 => { name: "gate", collide: false, id: 0, colour:Color.fromBytes(104,111,186)}
 	];
 	public var width:Int;
 	public var height:Int;
 	public var treasure = new Array<{x:Int, y:Int}>();
 
-	override public function new () {
-		super();
+	public function new () {
+
 	}
+
 	inline public function get(x,y){
 		return tiles[y*width+x];
 	}
-	inline public function set(x:Int,y:Int,i:Int){
+	inline public function set(x:Int,y:Int,i:Tile){
 		tiles[y*width+x] = i;
 	}
 
-	public function loadFromTiled (){
-		var data = haxe.xml.Parser.parse(kha.Assets.blobs.level1_tmx.toString());
-		var map = data.elementsNamed("map").next();
-		width = Std.parseInt(map.get("width"));
-		height = Std.parseInt(map.get("height"));
-
-		for (layer in map.elementsNamed("layer")){
-			tiles = [];
-			var i = 0;
-			var layerTiles = layer.elementsNamed("data").next().elements();
-			for (tile in layerTiles){
-				var t = Std.parseInt(tile.get("gid"))-1;
-				tiles.push(t);
-
-				i++;
-			}
-		}
-
-		if (tiles.length != width*height){
-			throw "Odd level data - More tiles than width*height";
-		}
-
-	}
 	public function raycast (g:kha.graphics2.Graphics,x0:Int,y0:Int,x1:Int,y1:Int){
 		g.color = kha.Color.Cyan;
 
@@ -86,7 +64,7 @@ class Tilemap extends Component{
 		if( swapXY )
 			// Y / X
 			for ( x in x0 ... x1+1 ) {
-				var tInfo = tileInfo.get(get(y,x));
+				var tInfo = tileInfo.get(get(y,x).id);
 				if (tInfo != null && tInfo.collide) {
 					//g.drawLine((x0+.5)*8,(y0+.5)*8,(x1+.5)*8,(y1+.5)*8,.5);
 					//g.drawRect((x)*8+4,(y)*8+4,2,2);
@@ -101,7 +79,7 @@ class Tilemap extends Component{
 		else
 			// X / Y
 			for ( x in x0 ... x1+1 ) {
-				var tInfo = tileInfo.get(get(x,y));
+				var tInfo = tileInfo.get(get(x,y).id);
 				if (tInfo != null && tInfo.collide) {
 					
 					//g.drawLine((x0+.5)*8,(y0+.5)*8,(x1+.5)*8,(y1+.5)*8,.5);

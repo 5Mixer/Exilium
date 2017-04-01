@@ -43,6 +43,10 @@ class Play extends states.State {
 	
 	var debugInterface:ui.DebugInterface;
 	var mainMusicChannel:kha.audio1.AudioChannel;
+	
+	var tilemapRender:rendering.TilemapRenderer;
+	var map:world.Tilemap;
+	var mapCollisions:eskimo.Entity;
 
 	override public function new (){
 		super();
@@ -58,7 +62,7 @@ class Play extends states.State {
 		entities = new eskimo.EntityManager(components);
 		systems = new eskimo.systems.SystemManager(entities);		
 
-		registerRenderSystem(new system.TilemapRenderer(camera,entities));
+		tilemapRender = new rendering.TilemapRenderer(camera,entities);
 		registerRenderSystem(new system.Renderer(entities));
 		registerRenderSystem(new system.SpikeHandler(entities));
 		registerRenderSystem(new system.ParticleRenderer(entities));
@@ -85,9 +89,10 @@ class Play extends states.State {
 		systems.add(new system.TimedShoot(entities));
 		systems.add(new system.GrappleHooker(input,camera,entities,collisionSys));
 		
-		createMap();
+		map = createMap();
 
-		debugInterface = new ui.DebugInterface();
+		debugInterface = new ui.DebugInterface(p);
+		
 		//debugInterface.visible = false;
 		
 		input.listenToKeyRelease('r', descend);
@@ -116,18 +121,18 @@ class Play extends states.State {
 		entities.clear();
 		
 		(cast systems.get(system.Collisions)).processFixedEntities = true;
-		var map = entities.create();
-		map.set(new component.Transformation(new kha.math.Vector2())); 
-		map.set(new component.Tilemap());
-		map.set(new component.Collisions([component.Collisions.CollisionGroup.Level],[]));
-		map.get(component.Collisions).fixed = true;
-		(cast systems.get(system.AI)).map = map.get(component.Tilemap);
+		map = new world.Tilemap();
+		mapCollisions = entities.create();
+		mapCollisions.set(new component.Transformation(new kha.math.Vector2()));
+		mapCollisions.set(new component.Collisions([component.Collisions.CollisionGroup.Level],[]));
+		mapCollisions.get(component.Collisions).fixed = true;
+		(cast systems.get(system.AI)).map = map;
 
 		var worldSize = 60;
-		var generator:util.WorldGenerator = new util.DungeonWorldGenerator(worldSize,worldSize);
-		map.get(component.Tilemap).tiles = generator.tiles;
-		map.get(component.Tilemap).width = worldSize;
-		map.get(component.Tilemap).height = worldSize;
+		var generator:worldgen.WorldGenerator = new worldgen.DungeonWorldGenerator(worldSize,worldSize);
+		map.tiles = generator.tiles;
+		map.width = worldSize;
+		map.height = worldSize;
 		
 		minimap = kha.Image.createRenderTarget(worldSize,worldSize);
 		
@@ -138,9 +143,10 @@ class Play extends states.State {
 		var collisionRects = [];
 		while (t < generator.tiles.length-1){
 			var tile = generator.tiles[t];
-			if (map.get(component.Tilemap).tileInfo.get(tile).collide){
-				var x = t%map.get(component.Tilemap).width;
-				var y = Math.floor(t/map.get(component.Tilemap).width);
+
+			if (map.tileInfo.get(tile.id).collide){
+				var x = t%map.width;
+				var y = Math.floor(t/map.width);
 				var width = 1;
 				var height = 1;
 				/*while (map.get(component.Tilemap).tileInfo.get(generator.tiles[t+width]).collide && Math.floor((t+width)/map.get(component.Tilemap).width) == y){
@@ -151,8 +157,8 @@ class Play extends states.State {
 
 				t += width;
 
-				minimap.g2.color = map.get(component.Tilemap).tileInfo.get(tile).colour;
-				minimap.g2.fillRect(t%map.get(component.Tilemap).width,Math.floor(t/map.get(component.Tilemap).width),1,1);
+				minimap.g2.color = map.tileInfo.get(tile.id).colour;
+				minimap.g2.fillRect(t%map.width,Math.floor(t/map.width),1,1);
 				
 			}else{
 				t+=1;
@@ -166,7 +172,7 @@ class Play extends states.State {
 				collisionRects[rect.t+width].resolved=true;
 				rect.resolved = true;
 			}*/
-			map.get(component.Collisions).registerCollisionRegion(new component.Collisions.Rect(
+			mapCollisions.get(component.Collisions).registerCollisionRegion(new component.Collisions.Rect(
 					rect.x*16,rect.y*16,
 					width*16,rect.height*16));
 		}
@@ -180,10 +186,10 @@ class Play extends states.State {
 		
 		for (e in generator.entities){
 			switch e.type {
-				case util.WorldGenerator.EntityType.Treasure: EntityFactory.createTreasure(entities,e.x*16,e.y*16);
-				case util.WorldGenerator.EntityType.Enemy: EntityFactory.createSlime(entities,e.x*16,e.y*16);
-				case util.WorldGenerator.EntityType.Spike: EntityFactory.createSpike(entities,e.x*16,e.y*16);
-				case util.WorldGenerator.EntityType.Shooter: EntityFactory.createShooterTrap(entities,e.x*16,e.y*16);
+				case worldgen.WorldGenerator.EntityType.Treasure: EntityFactory.createTreasure(entities,e.x*16,e.y*16);
+				case worldgen.WorldGenerator.EntityType.Enemy: EntityFactory.createSlime(entities,e.x*16,e.y*16);
+				case worldgen.WorldGenerator.EntityType.Spike: EntityFactory.createSpike(entities,e.x*16,e.y*16);
+				case worldgen.WorldGenerator.EntityType.Shooter: EntityFactory.createShooterTrap(entities,e.x*16,e.y*16);
 			}
 		}
 
@@ -245,6 +251,7 @@ class Play extends states.State {
 		
 		camera.transform(g);
 
+		tilemapRender.render(g,map);
 		for (system in renderSystems)
 			system.render(g);
 
@@ -341,6 +348,15 @@ class Play extends states.State {
 			}
 		}
 
+
+		var playerPosition = p.get(component.Transformation).pos;
+		var playerZone = map.get(Math.round(playerPosition.x/16),Math.round(playerPosition.y/16));
+		var x = 0;
+		g.color = kha.Color.White;
+		g.font = kha.Assets.fonts.trenco;
+		g.fontSize = 38;
+		g.drawString("Zone: "+playerZone.zone,3*4,(kha.System.windowHeight()/4)-20);
+
 		g.transformation = kha.math.FastMatrix3.identity();
 		g.font = kha.Assets.fonts.OpenSans;
 		g.color = kha.Color.White;
@@ -402,10 +418,18 @@ class Play extends states.State {
 		if (overlay > 0.0) overlay -= delta;
 		if (overlay < 0.0) overlay = 0.0;
 
+		var playerPosition = p.get(component.Transformation).pos;
+		var playerZone = map.get(Math.round(playerPosition.x/16),Math.round(playerPosition.y/16));
+		debugInterface.windows = [{
+			title:"world",
+			contents: [
+				ui.DebugInterface.Module.Label("Zone: "+playerZone.zone)
+			]
+		}];
+		trace(playerZone.zone);
 
 		cast(systems.get(system.CollisionDebugView),system.CollisionDebugView).showActiveEntities = (debugInterface.activeCollisionRegionsShown);
 		cast(systems.get(system.CollisionDebugView),system.CollisionDebugView).showStaticEntities = (debugInterface.staticCollisionRegionsShown);
-
 		
 		input.endUpdate();
 	}

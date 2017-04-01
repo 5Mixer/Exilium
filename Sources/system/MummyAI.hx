@@ -4,9 +4,9 @@ class MummyAI extends System {
 	var view:eskimo.views.View;
 	var frame = 0.0;
 	var entities:eskimo.EntityManager;
-	public var map:component.Tilemap;
+	public var map:world.Tilemap;
 	var targets:eskimo.views.View;
-	public function new (entities:eskimo.EntityManager,tilemap:component.Tilemap){
+	public function new (entities:eskimo.EntityManager,tilemap:world.Tilemap){
 		this.entities = entities;
 		map = tilemap;
 		view = new eskimo.views.View(new eskimo.filters.Filter([component.MummyAI,component.Physics,component.Transformation]),entities);

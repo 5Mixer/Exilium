@@ -16,17 +16,6 @@ enum ItemType {
 	Currency;
 	Other;
 }
-/*
-{ name: "freaking destroyer", type: gun{bullet: giantBloodyGlowingBullet { angle : angle, speed: fucking fast} }}
-{ name: "steroids", type: potion{ health: +5, speed: +5, poison: +3}}
-{ name: "cluster bombs", type: bomb{ fuse: 5s, radius: 4, subbombs: {fuse: 1s, radius 1}}}
-{ name: "long sword", type: sword{reach: 5, sweep: 45-90} }
-{ name: "coin", type: currency, value: 1 }
-{  }
-
-name
-type
-*/
 
 typedef Stack = {
 	var item: Item;

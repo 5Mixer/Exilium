@@ -1,10 +1,11 @@
-let project = new Project('New Project');
+let project = new Project('Exilium');
 project.addAssets('Assets/**');
 project.addSources('Sources');
 project.addLibrary("eskimo");
 project.addLibrary("differ");
 project.addLibrary("compiletime");
 project.addLibrary("zui");
+project.addLibrary("thx.promise");
 project.addLibrary("hxNoise");
 project.addLibrary("hxColorToolkit");
 // project.addLibrary('hxtelemetry');

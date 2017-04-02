@@ -418,15 +418,16 @@ class Play extends states.State {
 		if (overlay > 0.0) overlay -= delta;
 		if (overlay < 0.0) overlay = 0.0;
 
-		var playerPosition = p.get(component.Transformation).pos;
-		var playerZone = map.get(Math.round(playerPosition.x/16),Math.round(playerPosition.y/16));
-		debugInterface.windows = [{
-			title:"world",
-			contents: [
-				ui.DebugInterface.Module.Label("Zone: "+playerZone.zone)
-			]
-		}];
-		trace(playerZone.zone);
+		if (p.has(component.Transformation)){
+			var playerPosition = p.get(component.Transformation).pos;
+			var playerZone = map.get(Math.round(playerPosition.x/16),Math.round(playerPosition.y/16)).zone;
+			debugInterface.windows = [{
+				title:"world",
+				contents: [
+					ui.DebugInterface.Module.Label("Zone: "+playerZone)
+				]
+			}];
+		}
 
 		cast(systems.get(system.CollisionDebugView),system.CollisionDebugView).showActiveEntities = (debugInterface.activeCollisionRegionsShown);
 		cast(systems.get(system.CollisionDebugView),system.CollisionDebugView).showStaticEntities = (debugInterface.staticCollisionRegionsShown);

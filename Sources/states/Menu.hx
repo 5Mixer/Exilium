@@ -2,8 +2,7 @@ package states;
 
 class Menu extends states.State {
 	var input:Input;
-	var transition = 0;
-	var transitioning = false;
+	var frame = 0.;
 	override public function new (){
 		super();
 		input = new Input();
@@ -12,28 +11,58 @@ class Menu extends states.State {
 		
 	}
 	override public function render (framebuffer:kha.Framebuffer){
+		frame+=.25;
 		input.startUpdate();
 		var g = framebuffer.g2;
 		g.begin(true,kha.Color.fromFloats(.1,.1,.1,.6));
-		g.color = kha.Color.White;
-		g.font = kha.Assets.fonts.trenco;
-		g.fontSize = 38*4;
-		var x = 20;//(framebuffer.width/2) - (g.font.width(g.fontSize,"Exilium")/2);
-		g.drawString("Exilium",x,20);
-		g.fontSize = 38*2;
-		if (!transitioning && button(g,"New game.",x,Math.round(20+(g.font.height(38*4)+5)))){
-			transitioning = true;
-		}
-		g.color = kha.Color.fromFloats(0,0,0,transition/30);
-		g.fillRect(0,0,framebuffer.width,framebuffer.height);
-		if (transitioning){
-			transition++;
-			if (transition >= 29){
-				transitioning = false;
-				Project.states.push(new states.Play());
 
+		g.pushTransformation(g.transformation);
+		g.transformation = kha.math.FastMatrix3.identity();
+		g.transformation._00 = 4;
+		g.transformation._11 = 4;
+		//pattern
+		var patternSize = 64; //todo: use image size
+		var offset = frame%64;
+		for (x in 0...Math.ceil(kha.System.windowWidth()/patternSize)+1){
+			for (y in 0...Math.ceil(kha.System.windowHeight()/patternSize)+1){
+				g.drawImage(kha.Assets.images.pattern,((x-1)*64)+offset,((y-1)*64)+offset);
 			}
 		}
+		g.popTransformation();
+		g.font = kha.Assets.fonts.trenco;
+		g.fontSize = 38*4;
+
+		g.color = kha.Color.fromBytes(30,30,30);
+		g.fillRect(0,0,g.font.width(g.fontSize,"Exilium")+32,kha.System.windowHeight());
+
+		g.color = kha.Color.White;
+		
+		g.drawString("Exilium",20,20);
+		g.fontSize = 38*2;
+		var y = Math.round(20+(g.font.height(38*4)+5));
+		if (button(g,"New game.",20,y)){
+			trace("CLICKED BUTTON");
+			var promise = thx.promise.Promise.create(function(resolve : states.Play -> Void, reject : thx.Error -> Void) {
+				
+				var p = new states.Play();
+				resolve(p);
+				
+				//reject(new thx.Error("failure"));
+			
+			});
+			
+			promise.success(function(result:states.Play){
+				// trace(result);
+				Project.states.push(result);
+			});
+
+		}
+
+		y=kha.System.windowHeight();
+		g.fontSize = 38*1;
+		g.drawString("game by @5mixer...",20,y-100);
+		g.drawString("art by patch...",20,y-70);
+		g.drawString("music by gas.",20,y-40);
 
 		g.end();
 		input.endUpdate();

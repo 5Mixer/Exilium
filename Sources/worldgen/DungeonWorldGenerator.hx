@@ -16,6 +16,7 @@ typedef Room = {
 	var doorways:Array<{x:Int, y:Int}>;
 	@:optional var distanceToEntrance:Int;
 	var zone:Zone;
+	@:optional var structure:Array<Tile>;
 }
 
 class DungeonWorldGenerator extends WorldGenerator {
@@ -51,11 +52,6 @@ class DungeonWorldGenerator extends WorldGenerator {
 		bakerooms();
 		createWallDepth();
 	}
-	var fails = 0;
-	function fail(){
-		fails++;
-		return fails < 20;
-	}
 	function placeExit(){
 		//Sort rooms so furtherest rooms are at end of Array
 		rooms.sort(function(a,b){
@@ -87,10 +83,8 @@ class DungeonWorldGenerator extends WorldGenerator {
 	}
 	var roomCount = 0;
 	function growFromRoom (room:Room){
-		var thisZone = room.zone;
-		if (Math.random()>.6){
-			thisZone = Zone.createByIndex(Math.floor(Math.random()*Zone.createAll().length));
-		}
+		var thisZone = Math.random() > .6 ? room.zone : Zone.createByIndex(Math.floor(Math.random()*Zone.createAll().length));
+		
 		if (roomCount++ > 100) return;
 		var side = Side.createByIndex(Math.floor(random.generate()*4));
 		while (side == room.attachedFromSide){
@@ -105,43 +99,67 @@ class DungeonWorldGenerator extends WorldGenerator {
 		
 		var dte = room.distanceToEntrance+1;
 
-		if (random.generate() > .25) {
-			var newRoom = {id:rooms.length, attachedFromSide: Side.Left, distanceToEntrance:dte, doorways:[{x:room.x+room.width-1,y:doory}], x: room.x+room.width-1, y: room.y, width:width, height:height,zone:thisZone};
-			if (roomPlacementValid(newRoom)){
-				rooms.push(newRoom);
-				growFromRoom(newRoom);
-			}else if (fail()){
-				growFromRoom(room);
-			}
-		}
-		if (random.generate() > .25) {
-			var newRoom = {id:rooms.length, attachedFromSide: Side.Top, distanceToEntrance:dte, doorways:[{x:doorx,y:room.y+room.height-1}], x: room.x, y: room.y+room.height-1, width:width, height:height,zone:thisZone};
-			if (roomPlacementValid(newRoom)){
-				rooms.push(newRoom);
-				growFromRoom(newRoom);
-			}else if (fail()){
-				growFromRoom(room);
-			}
-		}
-		if (random.generate() > .25) {
-			var newRoom = {id:rooms.length, attachedFromSide: Side.Right, distanceToEntrance:dte, doorways:[{x:room.x,y:doory}], x: room.x-width+1, y: room.y, width:width, height:height,zone:thisZone};
-			if (roomPlacementValid(newRoom)){
-				rooms.push(newRoom);
-				growFromRoom(newRoom);
-			}else if (fail()){
-				growFromRoom(room);
-			}
-		}
-		if (random.generate() > .25) {
-			var newRoom = {id:rooms.length, attachedFromSide: Side.Bottom, distanceToEntrance:dte, doorways:[{x:doorx,y:room.y}], x: room.x, y: room.y-height+1, width:width, height:height,zone:thisZone};
-			if (roomPlacementValid(newRoom)){
-				rooms.push(newRoom);
-				growFromRoom(newRoom);
-			}else if (fail()){
-				growFromRoom(room);
-			}
-			
+		if (false){
+			//place room by structure
+			/*var data = haxe.xml.Parser.parse(kha.Assets.blobs.passageway_tmx.toString());
+			var structure = data.elementsNamed("map").next();
+			var swidth = Std.parseInt(structure.get("width"));
+			var sheight = Std.parseInt(structure.get("height"));
+			var tiles:Array<Tile> = [];
 
+			for (layer in structure.elementsNamed("layer")){
+				var layerTiles = layer.elementsNamed("data").next().elements();
+				for (tile in layerTiles){
+					var t = Std.parseInt(tile.get("gid"));
+					tiles.push({id:t,zone:null});
+					
+				}
+			}
+			var newRoom = {id:rooms.length, attachedFromSide: Side.Top, distanceToEntrance:dte, doorways:[{x:doorx,y:room.y+room.height-1}], x: room.x, y: room.y+room.height-1, width:swidth, height:sheight,zone:thisZone,structure:tiles};
+			if (roomPlacementValid(newRoom)){
+				rooms.push(newRoom);
+				growFromRoom(newRoom);
+			}else{
+				growFromRoom(room);
+			}
+			*/
+		}else{
+			if (random.generate() > .25) {
+				var newRoom = {id:rooms.length, attachedFromSide: Side.Left, distanceToEntrance:dte, doorways:[{x:room.x+room.width-1,y:doory}], x: room.x+room.width-1, y: room.y, width:width, height:height,zone:thisZone};
+				if (roomPlacementValid(newRoom)){
+					rooms.push(newRoom);
+					growFromRoom(newRoom);
+				}else{
+					growFromRoom(room);
+				}
+			}
+			if (random.generate() > .25) {
+				var newRoom = {id:rooms.length, attachedFromSide: Side.Top, distanceToEntrance:dte, doorways:[{x:doorx,y:room.y+room.height-1}], x: room.x, y: room.y+room.height-1, width:width, height:height,zone:thisZone};
+				if (roomPlacementValid(newRoom)){
+					rooms.push(newRoom);
+					growFromRoom(newRoom);
+				}else{
+					growFromRoom(room);
+				}
+			}
+			if (random.generate() > .25) {
+				var newRoom = {id:rooms.length, attachedFromSide: Side.Right, distanceToEntrance:dte, doorways:[{x:room.x,y:doory}], x: room.x-width+1, y: room.y, width:width, height:height,zone:thisZone};
+				if (roomPlacementValid(newRoom)){
+					rooms.push(newRoom);
+					growFromRoom(newRoom);
+				}else{
+					growFromRoom(room);
+				}
+			}
+			if (random.generate() > .25) {
+				var newRoom = {id:rooms.length, attachedFromSide: Side.Bottom, distanceToEntrance:dte, doorways:[{x:doorx,y:room.y}], x: room.x, y: room.y-height+1, width:width, height:height,zone:thisZone};
+				if (roomPlacementValid(newRoom)){
+					rooms.push(newRoom);
+					growFromRoom(newRoom);
+				}else{
+					growFromRoom(room);
+				}
+			}
 		}
 	}
 	function fillRooms (){
@@ -162,55 +180,49 @@ class DungeonWorldGenerator extends WorldGenerator {
 	
 	inline function bakerooms () {
 		for (room in rooms){
-			for (x in 0...room.width){
-				for (y in 0...room.height){
-					if (get (room.x+x,room.y+y).id != tileInfo.empty) continue;
-					set(room.x+x,room.y+y,{id: tileInfo.floor, zone:room.zone});
+			if (room.structure == null){
+				for (x in 0...room.width){
+					for (y in 0...room.height){
+						
+						if (get (room.x+x,room.y+y).id != tileInfo.empty) continue;
+						
+						set(room.x+x,room.y+y,{id: tileInfo.floor, zone:room.zone});
 
-					if (x==0)
-						set(room.x+x,room.y+y,{id: tileInfo.dungeonwallv, zone:room.zone});
+						if (x==0)
+							set(room.x+x,room.y+y,{id: tileInfo.dungeonwallv, zone:room.zone});
 
-					if ((x==room.width-1))
-						set(room.x+x,room.y+y,{id: tileInfo.dungeonwallv, zone:room.zone});
+						if ((x==room.width-1))
+							set(room.x+x,room.y+y,{id: tileInfo.dungeonwallv, zone:room.zone});
 
-					if ((y==0))
-						set(room.x+x,room.y+y,{id: tileInfo.dungeonwallh, zone:room.zone});
+						if ((y==0))
+							set(room.x+x,room.y+y,{id: tileInfo.dungeonwallh, zone:room.zone});
 
-					if (y==room.height-1)
-						set(room.x+x,room.y+y,{id:tileInfo.dungeonwallh,zone:room.zone});
+						if (y==room.height-1)
+							set(room.x+x,room.y+y,{id:tileInfo.dungeonwallh,zone:room.zone});
 
-					//Corner tiles.
-					if ((x==0 || x==room.width-1) && (y==0  || y==room.height-1))
-						set(room.x+x,room.y+y,{id:tileInfo.dungeonwall,zone:room.zone});
+						//Corner tiles.
+						if ((x==0 || x==room.width-1) && (y==0  || y==room.height-1))
+							set(room.x+x,room.y+y,{id:tileInfo.dungeonwall,zone:room.zone});
+					}
 				}
-			}
-
-			/*var data = haxe.xml.Parser.parse(kha.Assets.blobs.passageway_tmx.toString());
-			var structure = data.elementsNamed("map").next();
-			var swidth = Std.parseInt(structure.get("width"));
-			var sheight = Std.parseInt(structure.get("height"));
-
-			for (layer in structure.elementsNamed("layer")){
+			}else{
 				var i = 0;
-				var layerTiles = layer.elementsNamed("data").next().elements();
-				if (room.x+swidth > this.width-1 || room.y+sheight > this.height-1)
-					continue;
+				var structure = room.structure;
 
-				for (tile in layerTiles){
-					var x = room.x+(i%swidth);
-					var y = room.y+Math.floor(i/swidth);
+				for (tile in structure){
+					var x = room.x+(i%room.width);
+					var y = room.y+Math.floor(i/room.width);
 					
-					var t = Std.parseInt(tile.get("gid"));
-					if (t != null)
-						set(x,y,{id:t,zone:null});
+					if (tile != null)
+						set(x,y,tile);
 					
 					i++;
-				}
-			}*/
+				}	
+			}
 		}
 		for (room in rooms){
 			for (door in room.doorways){
-				set(door.x,door.y,{id:tileInfo.gate,zone:null});
+				set(door.x,door.y,{id:tileInfo.gate,zone:room.zone});
 			}
 		}
 		

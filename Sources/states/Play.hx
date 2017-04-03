@@ -348,15 +348,6 @@ class Play extends states.State {
 			}
 		}
 
-
-		var playerPosition = p.get(component.Transformation).pos;
-		var playerZone = map.get(Math.round(playerPosition.x/16),Math.round(playerPosition.y/16));
-		var x = 0;
-		g.color = kha.Color.White;
-		g.font = kha.Assets.fonts.trenco;
-		g.fontSize = 38;
-		g.drawString("Zone: "+playerZone.zone,3*4,(kha.System.windowHeight()/4)-20);
-
 		g.transformation = kha.math.FastMatrix3.identity();
 		g.font = kha.Assets.fonts.OpenSans;
 		g.color = kha.Color.White;

@@ -1,0 +1,3 @@
+3/04/17
+ - Made boss bar only show up for corrupt soul when close
+ - Tried out some shoot sound effects

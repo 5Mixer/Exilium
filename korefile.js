@@ -1,6 +1,6 @@
 let fs = require('fs');
 let path = require('path');
-let project = new Project('New Project', __dirname);
+let project = new Project('Exilium', __dirname);
 project.targetOptions = {"html5":{},"flash":{},"android":{},"ios":{}};
 project.setDebugDir('build/windows');
 Promise.all([Project.createProject('build/windows-build', __dirname), Project.createProject('c:/Users/Owner/Desktop/Dungeon Game/Kha', __dirname), Project.createProject('c:/Users/Owner/Desktop/Dungeon Game/Kha/Kore', __dirname)]).then((projects) => {

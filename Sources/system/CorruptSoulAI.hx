@@ -24,7 +24,8 @@ class CorruptSoulAI extends System {
 			var physics = entity.get(component.Physics);
 			var soul = entity.get(component.CorruptSoul);
 			var boss = entity.get(component.ActiveBoss);
-
+			
+			AI.life += 1;
 			var totalMaxHealth:Int = 0;
 			var totalCurrentHealth:Int = 0;
 			for (c in soul.children){
@@ -34,10 +35,11 @@ class CorruptSoulAI extends System {
 				}
 				totalMaxHealth += 10; //Ensure this is the same value as a childs max health;
 			}
-			boss.current = totalCurrentHealth;
-			boss.max = totalMaxHealth;
 
-			AI.life += 1;
+			if (boss != null){
+				boss.current = totalCurrentHealth;
+				boss.max = totalMaxHealth;
+			}
 
 			var closestTarget = null;
 			var distanceToTarget = Math.POSITIVE_INFINITY;
@@ -50,6 +52,9 @@ class CorruptSoulAI extends System {
 
 			if (closestTarget == null)
 				continue;
+
+			boss.active = (distanceToTarget < 200);
+			
 	
 			if (AI.rage == false){
 				if (totalCurrentHealth/totalMaxHealth < .25){

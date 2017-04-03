@@ -4,6 +4,7 @@ import kha.math.FastMatrix3;
 
 class ActiveBoss extends System {
 	var view:eskimo.views.View;
+	public var active = true;
 	public function new (entities:eskimo.EntityManager){
 		view = new eskimo.views.View(new eskimo.filters.Filter([component.ActiveBoss]), entities);
 		super();
@@ -14,6 +15,9 @@ class ActiveBoss extends System {
 
 		for (entity in view.entities){
 			var boss = entity.get(component.ActiveBoss);
+
+			if (!boss.active)
+				continue;
 			
 			if (boss.current <= 0){
 				var valid = true;

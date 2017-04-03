@@ -6,6 +6,7 @@ class ActiveBoss extends Component {
 	public var name:String;
 	public var rage:Bool = false;
 	public var mode = "";
+	public var active = true;
 	public function new (name:String){
 		super();
 		this.name = name;

@@ -12,16 +12,33 @@ class Gun extends System {
 		this.input = input;
 		this.camera = camera;
 		this.entities = entities;
-		view = new eskimo.views.View(new eskimo.filters.Filter([component.Gun,component.Transformation]),entities);
+		view = new eskimo.views.View(new eskimo.filters.Filter([component.Inventory,component.Gun,component.Transformation]),entities);
 		super();
 	}
 
 	override public function onUpdate (delta:Float){
 		super.onUpdate(delta);
 		frame++;
+
+		
 		
 		if (input.mouseButtons.left){
 			for (entity in view.entities){
+				if (entity.get(component.Inventory) != null){
+					var pinv = entity.get(component.Inventory);
+					var selectedItem = pinv.getByIndex(pinv.activeIndex).item;
+					var itemData = pinv.itemData.get(selectedItem);
+					if (selectedItem == component.Inventory.Item.SlimeGun){
+						entity.get(component.Gun).gun = component.Gun.GunType.SlimeGun;
+						entity.get(component.Gun).fireRate = 7;
+					}else if (selectedItem == component.Inventory.Item.LaserGun) {
+						entity.get(component.Gun).gun = component.Gun.GunType.LaserGun;
+						entity.get(component.Gun).fireRate = 4;
+					}else{
+						entity.get(component.Gun).gun = null;
+
+					}
+				}
 				
 				var transformation:component.Transformation = entity.get(component.Transformation);
 				var gun:component.Gun = entity.get(component.Gun);

@@ -30,13 +30,10 @@ class Play extends states.State {
 	public var camera:Camera;
 
 	var minimap:kha.Image;
-	var minimapOpacity = 1.0;
 	
 	public static var spriteData = CompileTime.parseJsonFile('../assets/spriteData.json');
 	
 	var dungeonLevel = 1;
-
-	var overlay:Float = 0.0;
 
 	var lastSave:Save;
 	var dungeons:Array<Dungeon> = [];
@@ -46,6 +43,7 @@ class Play extends states.State {
 	
 	var tilemapRender:rendering.TilemapRenderer;
 	var map:world.Tilemap;
+	var mapShown = true;
 	var mapCollisions:eskimo.Entity;
 
 	override public function new (){
@@ -60,19 +58,21 @@ class Play extends states.State {
 
 		var components = new eskimo.ComponentManager();
 		entities = new eskimo.EntityManager(components);
-		systems = new eskimo.systems.SystemManager(entities);		
+		systems = new eskimo.systems.SystemManager(entities);
 
+		
+		var collisionSys = new system.Collisions(entities);
 		tilemapRender = new rendering.TilemapRenderer(camera,entities);
 		registerRenderSystem(new system.Renderer(entities));
 		registerRenderSystem(new system.SpikeHandler(entities));
 		registerRenderSystem(new system.ParticleRenderer(entities));
+		registerRenderSystem(new system.GrappleHooker(input,camera,entities,collisionSys));
 		registerRenderSystem(new system.DebugView(entities));
 		registerRenderSystem(new system.Healthbars(entities));
 		registerRenderSystem(new system.ActiveBoss(entities));
 		registerRenderSystem(new system.CorruptSoulRenderer(entities));
 		registerRenderSystem(new system.ShieldRenderer(input,camera,entities));
 		
-		var collisionSys = new system.Collisions(entities);
 		registerRenderSystem(new system.CollisionDebugView(entities,collisionSys.grid,true));
 		
 		systems.add(collisionSys);
@@ -87,7 +87,6 @@ class Play extends states.State {
 		systems.add(new system.MummyAI(entities,null));
 		systems.add(new system.Magnets(entities,p));
 		systems.add(new system.TimedShoot(entities));
-		systems.add(new system.GrappleHooker(input,camera,entities,collisionSys));
 		
 		map = createMap();
 
@@ -100,7 +99,7 @@ class Play extends states.State {
 			debugInterface.visible = !debugInterface.visible;
 		});
 		input.listenToKeyRelease('m', function (){
-			minimapOpacity = 1.0;
+			mapShown = !mapShown;
 		});
 		input.wheelListeners.push(function(dir){
 			if (p.get(component.Inventory) == null) return;
@@ -136,9 +135,8 @@ class Play extends states.State {
 		
 		minimap = kha.Image.createRenderTarget(worldSize,worldSize);
 		
-		minimapOpacity = 1.0;
 		minimap.g2.begin();
-		minimap.g2.clear(kha.Color.fromBytes(0,0,0,200));
+		minimap.g2.clear(kha.Color.fromBytes(0,0,0,0));
 		var t = 0;
 		var collisionRects = [];
 		while (t < generator.tiles.length-1){
@@ -214,7 +212,6 @@ class Play extends states.State {
 		return map;
 	}
 	function descend (){
-		overlay = .7;
 		dungeonLevel++;
 		save();
 		createMap();
@@ -249,50 +246,11 @@ class Play extends states.State {
 		g.begin();
 		g.color = kha.Color.White;
 		
+		//Let individual systems render.
 		camera.transform(g);
-
 		tilemapRender.render(g,map);
 		for (system in renderSystems)
 			system.render(g);
-
-		var transformation = p.get(component.Transformation);
-		var collisions = p.get(component.Collisions);
-		var pinv = p.get(component.Inventory);
-		if (transformation != null){
-			if (pinv.getByIndex(pinv.activeIndex).item == component.Inventory.Item.GrapplingHook){
-				var collisionSystem:system.Collisions = cast systems.get(system.Collisions);
-				var dir = transformation.pos.sub(camera.screenToWorld(input.mousePos.sub(new kha.math.Vector2(24,24))));
-				var a = Math.atan2(-dir.y,-dir.x)*(180/Math.PI);
-				var endx = Math.cos(a*(Math.PI/180))*200;
-				var endy = Math.sin(a*(Math.PI/180))*200;
-				var px = transformation.pos.x + collisions.midpoint.x;
-				var py = transformation.pos.y + collisions.midpoint.y;
-				var l = collisionSystem.fireRay(new differ.shapes.Ray(new differ.math.Vector(px,py),new differ.math.Vector(px+endx,py+endy)),[component.Collisions.CollisionGroup.Player]);
-				g.drawLine(px,py,px+endx*l,py+endy*l);
-				var rayDist = l * Math.sqrt(Math.pow(endx,2)+Math.pow(endy,2));
-				
-				var hookLength = 8;
-				var hooks = Math.floor(rayDist/hookLength);
-				
-				//Refer to kha2d for rotating sprite help
-				g.pushTransformation(g.transformation.multmat(kha.math.FastMatrix3.translation(px, py)).multmat(kha.math.FastMatrix3.rotation(a*(Math.PI/180))).multmat(kha.math.FastMatrix3.translation(-px - collisions.midpoint.x, -py - collisions.midpoint.y+1)));
-				for (i in 0...hooks){
-					g.drawSubImage(kha.Assets.images.Objects,px+(i*hookLength),py,6*8,0,8,8);
-				}
-				var clawx:Float = px+(hooks*hookLength);
-				//Extra half a chain
-				if (rayDist%hookLength > .5*hookLength){
-					clawx += hookLength/2;
-					g.drawSubImage(kha.Assets.images.Objects,px+((hooks)*hookLength),py,6*8,0,4,8);
-
-				}
-				//Final claw
-				g.drawSubImage(kha.Assets.images.Objects,clawx,py,7*8,0,8,8);
-				g.popTransformation();
-
-			}
-		}
-		
 		camera.restore(g);
 		
 		//Draw mouse cursor.
@@ -307,16 +265,15 @@ class Play extends states.State {
 		}
 
 		//Clear any transformation for the UI.
-		g.pushTransformation(kha.math.FastMatrix3.identity());
-		g.transformation._00 = 5;
-		g.transformation._11 = 5;
-		g.transformation._20 = kha.System.windowWidth()/2 - minimap.width*5/2;
-		g.transformation._21 = kha.System.windowHeight()/2 - minimap.height*5/2;
-		g.color = kha.Color.fromFloats(1,1,1,minimapOpacity);
-		g.drawImage(minimap,0,0);
+		if (mapShown){
+			g.pushTransformation(kha.math.FastMatrix3.identity());
+			g.transformation._00 = 4;
+			g.transformation._11 = 4;
+			g.drawImage(minimap,kha.System.windowWidth()/4 - map.width,0);
 
+		}
 		g.transformation = kha.math.FastMatrix3.identity();
-		
+
 		var x = 0;
 		g.color = kha.Color.White;
 		g.font = kha.Assets.fonts.trenco;
@@ -354,49 +311,18 @@ class Play extends states.State {
 		g.fontSize = 20;
 		g.drawString("Floor "+dungeonLevel,10,kha.System.windowHeight()-30);
 
-		g.transformation = kha.math.FastMatrix3.identity();
-
-		g.color = kha.Color.fromFloats(0,0,0,overlay);
-		g.fillRect(0,0,kha.System.windowWidth(),kha.System.windowHeight());
-
-		g.color = kha.Color.White;
-
 		g.popTransformation();
 		
 		g.end();
 
+		g.color = kha.Color.White;
 		debugInterface.render(g);
-
 		debugInterface.updateGraph.pushValue(1/renderDelta/debugInterface.updateGraph.size.y);
-
-		g.transformation = kha.math.FastMatrix3.identity();
-
 		
 	}
 	override public function update(delta:Float){
 		input.startUpdate();
-		if (p.get(component.Inventory) != null){
-			var pinv = p.get(component.Inventory);
-			var selectedItem = pinv.getByIndex(pinv.activeIndex).item;
-			var itemData = pinv.itemData.get(selectedItem);
-			if (selectedItem == component.Inventory.Item.SlimeGun){
-				p.get(component.Gun).gun = component.Gun.GunType.SlimeGun;
-				p.get(component.Gun).fireRate = 7;
-			}else if (selectedItem == component.Inventory.Item.LaserGun) {
-				p.get(component.Gun).gun = component.Gun.GunType.LaserGun;
-				p.get(component.Gun).fireRate = 4;
-			}else{
-				p.get(component.Gun).gun = null;
-
-			}
-		}
-		
-		if (minimapOpacity > 0)
-			if (minimapOpacity - delta < 0)
-				minimapOpacity = 0;
-			else
-				minimapOpacity -= delta;
-
+				
 		systems.update(delta);
 		cast(systems.get(system.Physics),system.Physics).grid = cast(systems.get(system.Collisions),system.Collisions).grid;
 		cast(systems.get(system.Magnets),system.Magnets).p = p;
@@ -406,9 +332,6 @@ class Play extends states.State {
 		
 		debugInterface.fpsGraph.pushValue(1/delta/debugInterface.fpsGraph.size.y);
 		
-		if (overlay > 0.0) overlay -= delta;
-		if (overlay < 0.0) overlay = 0.0;
-
 		if (p.has(component.Transformation)){
 			var playerPosition = p.get(component.Transformation).pos;
 			var playerZone = map.get(Math.round(playerPosition.x/16),Math.round(playerPosition.y/16)).zone;

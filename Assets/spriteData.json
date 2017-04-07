@@ -107,6 +107,14 @@
 				"emptied" : [6]
 			}
 		},
+		"lava" : {
+			"tileset":"tileset",
+			"width": 16,
+			"height": 16,
+			"animations" : {
+				"flow" : [10,11,12,13,14,15,16,17]
+			}
+		},
 		"shooter" : {
 			"tileset":"tileset",
 			"width": 16,
@@ -144,14 +152,26 @@
 			"height":16
 		},
 		"ladder" : {
-			"tileset":"objects",
-			"id":0,
-			"width":8,
-			"height":8
+			"tileset":"tileset",
+			"id":19,
+			"width":16,
+			"height":16
+		},
+		"door" : {
+			"tileset":"tileset",
+			"id":20,
+			"width":16,
+			"height":16
 		},
 		"cast_shield" : {
 			"tileset":"objects",
 			"id":8,
+			"width":8,
+			"height":8
+		},
+		"key" : {
+			"tileset":"objects",
+			"id":9,
 			"width":8,
 			"height":8
 		},

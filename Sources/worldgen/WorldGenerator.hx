@@ -5,8 +5,11 @@ enum EntityType {
 	Enemy;
 	Spike;
 	Shooter;
+	Lava;
+	CorruptSoulBoss;
+	Item(type:component.Inventory.Item);
+	Door;
 }
-
 
 enum Side {
 	Left;

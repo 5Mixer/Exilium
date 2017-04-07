@@ -43,6 +43,7 @@ class TilemapRenderer  {
 					var smootherLights = [];
 					for (sx in -1...2){
 						for (sy in -1...2){
+							if (map.get(lightPositionx+sx,lightPositiony+sy) == null) continue;
 							if (map.get(lightPositionx+sx,lightPositiony+sy).id < 0) continue;
 							if (map.tileInfo.get(map.get(lightPositionx+sx,lightPositiony+sy).id) == null) {continue; }
 							if (map.tileInfo.get(map.get(lightPositionx+sx,lightPositiony+sy).id).collide) continue;
@@ -64,7 +65,7 @@ class TilemapRenderer  {
 					
 				}
 				//Now add these colours togethor and store in one variable.
-				var c = {r: 0.2, g: 0.2, b:0.2, a: 1.0};
+				var c = {r: 0.1, g: 0.1, b:0.1, a: 1.0};
 				if (tileData.ambient != null){
 					c.r = tileData.ambient.R;
 					c.g = tileData.ambient.G;
@@ -81,18 +82,7 @@ class TilemapRenderer  {
 				
 				
 				var id = tileData.id;
-				if (tile.zone == worldgen.Zone.Friendly){
-					id += 5;
-				}
-				if (tile.zone == worldgen.Zone.Jungle){
-					id += 10;
-				}
-				if (tile.zone == worldgen.Zone.Sandy){
-					id += 15;
-				}
-				if (tile.zone == worldgen.Zone.Slime){
-					id += 20;
-				}
+				id += tile.zone.getIndex() * 5;
 				var sourcePos = { x: (id%Math.floor(kha.Assets.images.Dungeonsets.width/tilesize))*tilesize, y:Math.floor(id/Math.floor(kha.Assets.images.Dungeonsets.width/tilesize))*tilesize };
 				
 				g.drawScaledSubImage(kha.Assets.images.Dungeonsets,sourcePos.x,sourcePos.y,tilesize,tilesize,x*tilesize,y*tilesize,tilesize,tilesize);

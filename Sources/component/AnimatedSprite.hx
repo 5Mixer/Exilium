@@ -12,7 +12,6 @@ class AnimatedSprite extends Component {
 	public var whenFinishedStart:String;
 	public function new (?spriteData:Dynamic){
 		this.spriteData = spriteData;
-		spriteMap = kha.Assets.images.Entities;
 
 		if (this.spriteData.speed != null){
 			this.speed = this.spriteData.speed;

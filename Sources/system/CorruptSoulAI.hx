@@ -9,8 +9,8 @@ class CorruptSoulAI extends System {
 	public function new (entities:eskimo.EntityManager,tilemap:world.Tilemap){
 		this.entities = entities;
 		map = tilemap;
-		view = new eskimo.views.View(new eskimo.filters.Filter([component.CorruptSoulAI,component.Physics,component.Transformation]),entities);
-		targets = new eskimo.views.View(new eskimo.filters.Filter([component.AITarget]),entities);
+		view = new eskimo.views.View(new eskimo.filters.Filter([component.ai.CorruptSoulAI,component.Physics,component.Transformation]),entities);
+		targets = new eskimo.views.View(new eskimo.filters.Filter([component.ai.AITarget]),entities);
 		super();
 	}
 
@@ -20,14 +20,14 @@ class CorruptSoulAI extends System {
 	
 		for (entity in view.entities){
 			var transformation = entity.get(component.Transformation);
-			var AI = entity.get(component.CorruptSoulAI);
+			var AI = entity.get(component.ai.CorruptSoulAI);
 			var physics = entity.get(component.Physics);
 			var soul = entity.get(component.CorruptSoul);
 			var boss = entity.get(component.ActiveBoss);
 			
 			AI.life += 1;
-			var totalMaxHealth:Int = 0;
-			var totalCurrentHealth:Int = 0;
+			var totalMaxHealth:Float = 0;
+			var totalCurrentHealth:Float = 0;
 			for (c in soul.children){
 				var health = c.get(component.Health);
 				if (health != null){
@@ -37,8 +37,8 @@ class CorruptSoulAI extends System {
 			}
 
 			if (boss != null){
-				boss.current = totalCurrentHealth;
-				boss.max = totalMaxHealth;
+				boss.current = Math.floor(totalCurrentHealth);
+				boss.max = Math.floor(totalMaxHealth);
 			}
 
 			var closestTarget = null;

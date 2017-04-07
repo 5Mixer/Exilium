@@ -9,8 +9,8 @@ class MummyAI extends System {
 	public function new (entities:eskimo.EntityManager,tilemap:world.Tilemap){
 		this.entities = entities;
 		map = tilemap;
-		view = new eskimo.views.View(new eskimo.filters.Filter([component.MummyAI,component.Physics,component.Transformation]),entities);
-		targets = new eskimo.views.View(new eskimo.filters.Filter([component.AITarget]),entities);
+		view = new eskimo.views.View(new eskimo.filters.Filter([component.ai.MummyAI,component.Physics,component.Transformation]),entities);
+		targets = new eskimo.views.View(new eskimo.filters.Filter([component.ai.AITarget]),entities);
 		super();
 	}
 
@@ -21,7 +21,7 @@ class MummyAI extends System {
 		for (entity in view.entities){
 			var transformation = entity.get(component.Transformation);
 			var physics = entity.get(component.Physics);
-			var AI = entity.get(component.MummyAI);
+			var AI = entity.get(component.ai.MummyAI);
 			AI.life += 1;
 
 			var closestTarget = null;

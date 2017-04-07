@@ -113,7 +113,7 @@ class Collisions extends System {
 		if (shapeEntity.has(component.CustomCollisionHandler)){
 			for (group in shapeEntity.get(component.CustomCollisionHandler).collisionGroups){
 				if (otherShape.group.indexOf(group) != -1){
-					shapeEntity.get(component.CustomCollisionHandler).handler();
+					shapeEntity.get(component.CustomCollisionHandler).handler(otherShapeEntity);
 					break;
 				}
 			}
@@ -128,7 +128,7 @@ class Collisions extends System {
 			for (releaseGroup in roc.collisionGroups){
 				if (otherShape.group.indexOf(releaseGroup) != -1){
 					for (item in roc.release){
-						var droppedItem = EntityFactory.makeItem(entities,item,{pos:{x:shapeEntity.get(component.Transformation).pos.x,y:shapeEntity.get(component.Transformation).pos.y}});
+						var droppedItem = EntityFactory.createItem(entities,item,shapeEntity.get(component.Transformation).pos.x,shapeEntity.get(component.Transformation).pos.y);
 						droppedItem.set(new component.Physics().setVelocity(new kha.math.Vector2(-6+Math.random()*12,-6+Math.random()*12)));
 					}
 					shapeEntity.set(new component.Light());
@@ -168,20 +168,22 @@ class Collisions extends System {
 			if (otherShapeEntity.has(component.Damager)){
 				var damager = otherShapeEntity.get(component.Damager);
 				if (damager.active && frame % 1 == 0 && (validCollision(shape,otherShape))){
-					shapeEntity.get(component.Health).addToHealth(-Math.floor(damager.damage));
+					shapeEntity.get(component.Health).addToHealth(-damager.damage);
 
-					for (i in 0...3){
-						var particle = entities.create();
-						particle.set(new component.VisualParticle(component.VisualParticle.Effect.Blood));
-						
-						particle.set(new component.Transformation(shapeEntity.get(component.Transformation).pos.add(new kha.math.Vector2(4,0))));
-						var phys = new component.Physics();
-						var speed = Math.random()*6;
-						phys.friction = 0.7;
-						var particleAngle = Math.random()*360;
-						phys.velocity = new kha.math.Vector2(Math.cos(particleAngle * (Math.PI / 180)) * speed,Math.sin(particleAngle * (Math.PI / 180)) * speed);		
-						particle.set(phys);
-						particle.set(new component.TimedLife(2+Math.random()*4));
+					if (damager.causesBlood){
+						for (i in 0...3){
+							var particle = entities.create();
+							particle.set(new component.VisualParticle(component.VisualParticle.Effect.Blood));
+							
+							particle.set(new component.Transformation(shapeEntity.get(component.Transformation).pos.add(new kha.math.Vector2(4,0))));
+							var phys = new component.Physics();
+							var speed = Math.random()*6;
+							phys.friction = 0.7;
+							var particleAngle = Math.random()*360;
+							phys.velocity = new kha.math.Vector2(Math.cos(particleAngle * (Math.PI / 180)) * speed,Math.sin(particleAngle * (Math.PI / 180)) * speed);		
+							particle.set(phys);
+							particle.set(new component.TimedLife(5+Math.random()*5));
+						}
 					}
 				}
 			}

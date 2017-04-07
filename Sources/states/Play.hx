@@ -45,12 +45,13 @@ class Play extends states.State {
 	var map:world.Tilemap;
 	var mapShown = true;
 	var mapCollisions:eskimo.Entity;
+	var generator:worldgen.WorldGenerator;
 
 	override public function new (){
 		super();
 
-		mainMusicChannel = kha.audio1.Audio.play(kha.Assets.sounds.Synthwave_Beta_2,true);
-		mainMusicChannel.volume = .5;
+		//mainMusicChannel = kha.audio1.Audio.play(kha.Assets.sounds.Synthwave_Beta_2,true);
+		//mainMusicChannel.volume = .5;
 
 		input = new Input();
 		camera = new Camera();
@@ -60,7 +61,6 @@ class Play extends states.State {
 		entities = new eskimo.EntityManager(components);
 		systems = new eskimo.systems.SystemManager(entities);
 
-		
 		var collisionSys = new system.Collisions(entities);
 		tilemapRender = new rendering.TilemapRenderer(camera,entities);
 		registerRenderSystem(new system.Renderer(entities));
@@ -90,8 +90,7 @@ class Play extends states.State {
 		
 		map = createMap();
 
-		debugInterface = new ui.DebugInterface(p);
-		
+		debugInterface = new ui.DebugInterface(p);		
 		//debugInterface.visible = false;
 		
 		input.listenToKeyRelease('r', descend);
@@ -128,10 +127,15 @@ class Play extends states.State {
 		(cast systems.get(system.AI)).map = map;
 
 		var worldSize = 60;
-		var generator:worldgen.WorldGenerator = new worldgen.DungeonWorldGenerator(worldSize,worldSize);
+		if (dungeonLevel == 1) {
+			generator = new worldgen.TiledStructure(worldSize,worldSize);
+		}else if (dungeonLevel > 1){
+			generator = new worldgen.DungeonWorldGenerator(worldSize,worldSize);
+
+		}
 		map.tiles = generator.tiles;
-		map.width = worldSize;
-		map.height = worldSize;
+		map.width = generator.width;
+		map.height = generator.height;
 		
 		minimap = kha.Image.createRenderTarget(worldSize,worldSize);
 		
@@ -188,12 +192,17 @@ class Play extends states.State {
 				case worldgen.WorldGenerator.EntityType.Enemy: EntityFactory.createSlime(entities,e.x*16,e.y*16);
 				case worldgen.WorldGenerator.EntityType.Spike: EntityFactory.createSpike(entities,e.x*16,e.y*16);
 				case worldgen.WorldGenerator.EntityType.Shooter: EntityFactory.createShooterTrap(entities,e.x*16,e.y*16);
+				case worldgen.WorldGenerator.EntityType.Lava: EntityFactory.createLava(entities,e.x*16,e.y*16);
+				case worldgen.WorldGenerator.EntityType.CorruptSoulBoss: EntityFactory.createCorruptSoul(entities,e.x*16,e.y*16);
+				case worldgen.WorldGenerator.EntityType.Item(item): EntityFactory.createItem(entities,item,e.x*16,e.y*16);
+				case worldgen.WorldGenerator.EntityType.Door: EntityFactory.createLockedDoor(entities,e.x*16,e.y*16);
 			}
 		}
 
-		EntityFactory.createLadder(entities,generator.exitPoint.x*16,generator.exitPoint.y*16,descend);
-		EntityFactory.createCorruptSoul(entities,generator.exitPoint.x*16,generator.exitPoint.y*16);
-		EntityFactory.createMummy(entities,generator.spawnPoint.x*16+10,generator.spawnPoint.y*16);
+		EntityFactory.createLadder(entities,generator.exitPoint.x*16,generator.exitPoint.y*16,function (collider){
+			descend();
+		});
+		//EntityFactory.createMummy(entities,generator.spawnPoint.x*16+10,generator.spawnPoint.y*16);
 
 		p = EntityFactory.createPlayer(entities,{x:generator.spawnPoint.x, y:generator.spawnPoint.y});
 		p.get(component.Inventory).putIntoInventory(component.Inventory.Item.SlimeGun);
@@ -239,6 +248,40 @@ class Play extends states.State {
 	override public function render (framebuffer:kha.Framebuffer){
 		var renderDelta = kha.Scheduler.time() - lastRenderTime;
 		lastRenderTime = kha.Scheduler.time();
+
+
+
+		minimap = kha.Image.createRenderTarget(60,60);
+		
+		minimap.g2.begin();
+		minimap.g2.clear(kha.Color.fromBytes(0,0,0,0));
+		var t = 0;
+		while (t < map.tiles.length-1){
+			var tile = map.tiles[t];
+			if (map.tileInfo.get(tile.id).collide){
+				var x = t%map.width;
+				var y = Math.floor(t/map.width);
+				t++;
+
+				minimap.g2.color = map.tileInfo.get(tile.id).colour;
+				minimap.g2.fillRect(t%map.width,Math.floor(t/map.width),1,1);
+				
+			}else{
+				t+=1;
+			}
+		}
+		minimap.g2.color = kha.Color.Red;
+		minimap.g2.fillRect(generator.spawnPoint.x,generator.spawnPoint.y,1,1);
+
+		minimap.g2.color = kha.Color.Green;
+		minimap.g2.fillRect(generator.exitPoint.x,generator.exitPoint.y,1,1);
+
+		var ppos = p.get(component.Transformation).pos;
+		minimap.g2.color = kha.Color.White;
+		minimap.g2.fillRect(Math.floor((ppos.x+16)/16),Math.floor((ppos.y+5)/16),1,1);
+		minimap.g2.end();
+
+
 
 		cast(systems.get(system.ShieldRenderer),system.ShieldRenderer).prepass();
 
@@ -332,16 +375,16 @@ class Play extends states.State {
 		
 		debugInterface.fpsGraph.pushValue(1/delta/debugInterface.fpsGraph.size.y);
 		
-		if (p.has(component.Transformation)){
-			var playerPosition = p.get(component.Transformation).pos;
-			var playerZone = map.get(Math.round(playerPosition.x/16),Math.round(playerPosition.y/16)).zone;
-			debugInterface.windows = [{
-				title:"world",
-				contents: [
-					ui.DebugInterface.Module.Label("Zone: "+playerZone)
-				]
-			}];
-		}
+		// if (p.has(component.Transformation)){
+		// 	var playerPosition = p.get(component.Transformation).pos;
+		// 	var playerZone = map.get(Math.round(playerPosition.x/16),Math.round(playerPosition.y/16)).zone;
+		// 	debugInterface.windows = [{
+		// 		title:"world",
+		// 		contents: [
+		// 			ui.DebugInterface.Module.Label("Zone: "+playerZone)
+		// 		]
+		// 	}];
+		// }
 
 		cast(systems.get(system.CollisionDebugView),system.CollisionDebugView).showActiveEntities = (debugInterface.activeCollisionRegionsShown);
 		cast(systems.get(system.CollisionDebugView),system.CollisionDebugView).showStaticEntities = (debugInterface.staticCollisionRegionsShown);

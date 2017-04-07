@@ -1,7 +1,15 @@
 3/04/17
+ - Started a changelog.w34
  - Made boss bar only show up for corrupt soul when close
  - Tried out some shoot sound effects
  - Moved 'active gun' code in gun system.
  - Moved grapple hook rendering code into grapple hook system.
  - Removed all 'overlay' variables and code, which was for fading black transition. Need better transition code.
  
+ 4/04/17
+ - Moved ai components into ai subdirectory.
+ - Fiddled with how the grappling hook 'locks on' to the hook.
+ - Health is a float
+
+6/04/17
+ - Made hand made first level that loads into the game.

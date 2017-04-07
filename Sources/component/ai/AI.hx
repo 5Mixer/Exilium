@@ -1,4 +1,4 @@
-package component;
+package component.ai;
 
 enum AIMode {
 	Slime;

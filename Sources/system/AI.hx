@@ -9,8 +9,8 @@ class AI extends System {
 	public function new (entities:eskimo.EntityManager,tilemap:world.Tilemap){
 		this.entities = entities;
 		map = tilemap;
-		view = new eskimo.views.View(new eskimo.filters.Filter([component.AI,component.Physics,component.Transformation]),entities);
-		targets = new eskimo.views.View(new eskimo.filters.Filter([component.AITarget]),entities);
+		view = new eskimo.views.View(new eskimo.filters.Filter([component.ai.AI,component.Physics,component.Transformation]),entities);
+		targets = new eskimo.views.View(new eskimo.filters.Filter([component.ai.AITarget]),entities);
 		super();
 	}
 
@@ -20,19 +20,19 @@ class AI extends System {
 	
 		for (entity in view.entities){
 			var transformation = entity.get(component.Transformation);
-			var AI = entity.get(component.AI);
+			var AI = entity.get(component.ai.AI);
 			var physics = entity.get(component.Physics);
 
 			
-			if (AI.mode == component.AI.AIMode.Slime)
+			if (AI.mode == component.ai.AI.AIMode.Slime)
 				slimeAIMode(entity,transformation,physics,AI);
 
-			if (AI.mode == component.AI.AIMode.Goblin)
+			if (AI.mode == component.ai.AI.AIMode.Goblin)
 				goblineAIMode(entity,transformation,physics,AI);
 			
 		}
 	}
-	public function goblineAIMode (entity:eskimo.Entity,transformation:component.Transformation,physics:component.Physics,AI:component.AI){
+	public function goblineAIMode (entity:eskimo.Entity,transformation:component.Transformation,physics:component.Physics,AI:component.ai.AI){
 		var closestTarget = null;
 		var distanceToTarget = Math.POSITIVE_INFINITY;
 		for (target in targets.entities){
@@ -79,7 +79,7 @@ class AI extends System {
 	}
 
 
-	public function slimeAIMode(entity:eskimo.Entity,transformation:component.Transformation,physics:component.Physics,AI:component.AI){
+	public function slimeAIMode(entity:eskimo.Entity,transformation:component.Transformation,physics:component.Physics,AI:component.ai.AI){
 		var closestTarget = null;
 		var distanceToTarget = Math.POSITIVE_INFINITY;
 		for (target in targets.entities){
@@ -155,7 +155,7 @@ class AI extends System {
 
 		entity.get(component.AnimatedSprite).playAnimation(animation);
 	}
-	public function corruptSoulAIMode(entity:eskimo.Entity,transformation:component.Transformation,physics:component.Physics,AI:component.AI){
+	public function corruptSoulAIMode(entity:eskimo.Entity,transformation:component.Transformation,physics:component.Physics,AI:component.ai.AI){
 		var closestTarget = null;
 		var distanceToTarget = Math.POSITIVE_INFINITY;
 		for (target in targets.entities){

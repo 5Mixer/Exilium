@@ -42,19 +42,20 @@ class Menu extends states.State {
 		var y = Math.round(20+(g.font.height(38*4)+5));
 		if (button(g,"New game.",20,y)){
 			trace("Starting up game.");
-			var promise = thx.promise.Promise.create(function(resolve : states.Play -> Void, reject : thx.Error -> Void) {
+			//var promise = thx.promise.Promise.create(function(resolve : states.Play -> Void, reject : thx.Error -> Void) {
 				
 				var p = new states.Play();
-				resolve(p);
+				Project.states.push(p);
+				//resolve(p);
 				
 				//reject(new thx.Error("failure"));
 			
-			});
+			//});
 			
-			promise.success(function(result:states.Play){
+			//promise.success(function(result:states.Play){
 				// trace(result);
-				Project.states.push(result);
-			});
+			//	Project.states.push(result);
+			//});
 
 		}
 

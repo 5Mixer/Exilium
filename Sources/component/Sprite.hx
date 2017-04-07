@@ -15,7 +15,6 @@ class Sprite extends Component {
 	public function new (spriteData:EntityData){
 		if (spriteData.id != null)
 			textureId = spriteData.id;
-		spriteMap = kha.Assets.images.Entities;
 
 		if (spriteData.tileset != null){
 			switch spriteData.tileset {
@@ -25,7 +24,12 @@ class Sprite extends Component {
 				case "objects": spriteMap = kha.Assets.images.Objects; tilesize = 8;
 				case "chest": spriteMap = kha.Assets.images.Chest; tilesize = 11;
 				case "tileset": {spriteMap = kha.Assets.images.Tileset; tilesize = 16;}
+				default : {
+					throw "unrecognised tileset?";
+				}
 			}
+		}else{
+			throw "tileset is null?";
 		}
 		super();
 	}

@@ -61,10 +61,13 @@ class DungeonWorldGenerator extends WorldGenerator {
 		});
 		var farRoom = rooms[rooms.length-1];
 		exitPoint = {x:farRoom.x+Math.floor(farRoom.width/2)+1,y:farRoom.y+Math.floor(farRoom.height/2)};
+		entities.push({type: worldgen.EntityType.CorruptSoulBoss,x:farRoom.x+Math.floor(farRoom.width/2)+1,y:farRoom.y+Math.floor(farRoom.height/2)});
 	}
 	function placeThingInRoom (room:Room){
 		if (room.id < 2) return; //Don't place in start room
 		var thing = {x:room.x+Math.floor(room.width/2),y:room.y+Math.floor(room.height/2)};
+
+		entities.push({type:EntityType.Lava, x: thing.x+3,y:thing.y});
 		
 		if (random.generate() > probabilityForTreasureInRoom)
 			entities.push({type:EntityType.Treasure,x:thing.x,y:thing.y});
@@ -83,7 +86,7 @@ class DungeonWorldGenerator extends WorldGenerator {
 	}
 	var roomCount = 0;
 	function growFromRoom (room:Room){
-		var thisZone = Math.random() > .6 ? room.zone : Zone.createByIndex(Math.floor(Math.random()*Zone.createAll().length));
+		var thisZone = Math.random() > .6 ? room.zone : Zone.createByIndex(Math.floor(Math.random()*4)+1);
 		
 		if (roomCount++ > 100) return;
 		var side = Side.createByIndex(Math.floor(random.generate()*4));

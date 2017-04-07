@@ -14,7 +14,7 @@ class GrappleHooker extends System {
 		this.camera = camera;
 		this.entities = entities;
 		this.collisionSystem = collisionSystem;
-		view = new eskimo.views.View(new eskimo.filters.Filter([component.Inventory,component.Transformation,component.Physics]),entities);
+		view = new eskimo.views.View(new eskimo.filters.Filter([component.GrappleHook,component.Inventory,component.Transformation,component.Physics]),entities);
 		super();
 	}
 
@@ -23,18 +23,18 @@ class GrappleHooker extends System {
 			var pinv = entity.get(component.Inventory);
 			var collisions = entity.get(component.Collisions);
 			var transformation = entity.get(component.Transformation);
+			var hook = entity.get(component.GrappleHook);
 			
 			if (transformation != null){
-				if (pinv.getByIndex(pinv.activeIndex).item == component.Inventory.Item.GrapplingHook){
-					var dir = transformation.pos.sub(camera.screenToWorld(input.mousePos.sub(new kha.math.Vector2(24,24))));
-					var a = Math.atan2(-dir.y,-dir.x)*(180/Math.PI);
-					var endx = Math.cos(a*(Math.PI/180))*200;
-					var endy = Math.sin(a*(Math.PI/180))*200;
+				if (pinv.getByIndex(pinv.activeIndex).item == component.Inventory.Item.GrapplingHook && hook.fired){
+					var endx = hook.destination.x;
+					var endy = hook.destination.y;
 					var px = transformation.pos.x + collisions.midpoint.x;
 					var py = transformation.pos.y + collisions.midpoint.y;
-					var l = collisionSystem.fireRay(new differ.shapes.Ray(new differ.math.Vector(px,py),new differ.math.Vector(px+endx,py+endy)),[component.Collisions.CollisionGroup.Player]);
-					g.drawLine(px,py,px+endx*l,py+endy*l);
-					var rayDist = l * Math.sqrt(Math.pow(endx,2)+Math.pow(endy,2));
+					var a = Math.atan2(endy-py,endx-px)*(180/Math.PI);
+					var l = collisionSystem.fireRay(new differ.shapes.Ray(new differ.math.Vector(px,py),new differ.math.Vector(endx,endy)),[component.Collisions.CollisionGroup.Player]);
+					g.drawLine(px,py,endx*l,endy*l);
+					var rayDist = l * Math.sqrt(Math.pow(px-endx,2)+Math.pow(py-endy,2));
 					
 					var hookLength = 8;
 					var hooks = Math.floor(rayDist/hookLength);
@@ -64,24 +64,51 @@ class GrappleHooker extends System {
 		super.onUpdate(delta);
 		frame++;
 		
-		if (input.mouseButtons.left){
-			for (entity in view.entities){
-								
-				var transformation:component.Transformation = entity.get(component.Transformation);
-				var inventory:component.Inventory = entity.get(component.Inventory);
-				var physics:component.Physics = entity.get(component.Physics);
+		for (entity in view.entities){
+			var transformation:component.Transformation = entity.get(component.Transformation);
+			var inventory:component.Inventory = entity.get(component.Inventory);
+			var physics:component.Physics = entity.get(component.Physics);
+			var hook:component.GrappleHook = entity.get(component.GrappleHook);
+			if (input.mouseButtons.left == false){
+				hook.fired = false;
+				hook.active = true;
+			}
+			if (inventory.getByIndex(inventory.activeIndex).item == component.Inventory.Item.GrapplingHook){
+				if (input.mouseButtons.left){
+					if (hook.fired){
+						var distToHook = Math.sqrt(Math.pow(transformation.pos.x-hook.destination.x,2)+Math.pow(transformation.pos.y-hook.destination.y,2));
+						if (distToHook > 15){
+							physics.velocity.x += (hook.destination.x - transformation.pos.x)/distToHook*8;
+							physics.velocity.y += (hook.destination.y - transformation.pos.y)/distToHook*8;
+						}
+						if (distToHook<15){
+							hook.active = false;
+						}
+					}else{						
+						hook.fired = true;
 
-				if (inventory.getByIndex(inventory.activeIndex).item == component.Inventory.Item.GrapplingHook){
-					var dir = transformation.pos.sub(camera.screenToWorld(input.mousePos.sub(new kha.math.Vector2(24,24))));
-					var a = Math.round(Math.atan2(-dir.y,-dir.x)*(180/Math.PI));
-					var endx = Math.cos(a*(Math.PI/180));
-					var endy = Math.sin(a*(Math.PI/180));
-					var px = transformation.pos.x + 4;
-					var py = transformation.pos.y + 4;
-					var l = collisionSystem.fireRay(new differ.shapes.Ray(new differ.math.Vector(px,py),new differ.math.Vector(px+endx,py+endy)),[component.Collisions.CollisionGroup.Player]);
-					physics.velocity.x += endx*l*5;
-					physics.velocity.y += endy*l*5;
+						var dir = transformation.pos.sub(camera.screenToWorld(input.mousePos.sub(new kha.math.Vector2(24,24))));
+						var a = Math.round(Math.atan2(-dir.y,-dir.x)*(180/Math.PI));
+						var endx = Math.cos(a*(Math.PI/180))*1000;
+						var endy = Math.sin(a*(Math.PI/180))*1000;
+						var px = transformation.pos.x + 4;
+						var py = transformation.pos.y + 4;
+						var l = collisionSystem.fireRay(new differ.shapes.Ray(new differ.math.Vector(px,py),new differ.math.Vector(px+endx,py+endy)),[component.Collisions.CollisionGroup.Player]);
+						
+						hook.destination = {
+							x: px+(endx*l),
+							y: py+(endy*l),
+						};
+					}
+				}else{
+					//no mouse no hook
+					hook.active = false;
+					hook.fired = false;
 				}
+			}else{
+				//Grapple hook isn't active in inventory
+				hook.active = false;
+				hook.fired = false;
 			}
 		}
 	}

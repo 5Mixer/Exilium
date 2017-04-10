@@ -73,6 +73,7 @@ class TiledStructure extends WorldGenerator {
 					case "item" : entities.push({type: worldgen.WorldGenerator.EntityType.Item(component.Inventory.Item.createByName(properties.get("item").toString())), x: Math.floor(Std.parseInt(object.get("x"))/16), y: Math.floor(Std.parseInt(object.get("y"))/16)});
 					case "door" : entities.push({type: worldgen.WorldGenerator.EntityType.Door, x: Math.floor(Std.parseInt(object.get("x"))/16), y: Math.floor(Std.parseInt(object.get("y"))/16)});
 					case "shooter" : entities.push({type: worldgen.WorldGenerator.EntityType.Shooter, x: Math.floor(Std.parseInt(object.get("x"))/16), y: Math.floor(Std.parseInt(object.get("y"))/16)});
+					case "torch" : entities.push({type: worldgen.WorldGenerator.EntityType.Torch, x: Math.floor(Std.parseInt(object.get("x"))/16), y: Math.floor(Std.parseInt(object.get("y"))/16)});
 				}
 			}
 		}

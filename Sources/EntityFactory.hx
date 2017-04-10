@@ -126,6 +126,17 @@ class EntityFactory {
 
 		return treasure;
 	}
+	public static function createTorch(entities:eskimo.EntityManager,x:Int,y:Int){
+		var torch = entities.create();
+		torch.set(new component.Name("Torch"));
+		torch.set(new component.Transformation(new kha.math.Vector2(x,y)));
+		torch.set(new component.Sprite(cast states.Play.spriteData.entity.torch));
+		torch.set(new component.Light());
+		torch.get(component.Light).colour = kha.Color.Red;
+		torch.get(component.Light).strength = .4;
+
+		return torch;
+	}
 	public static function createLockedDoor(entities:eskimo.EntityManager,x:Int,y:Int){
 		var door = entities.create();
 		door.set(new component.Name("Locked Door"));

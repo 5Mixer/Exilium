@@ -118,7 +118,7 @@ class Gun extends System {
 	public function shootLaserGun (parent:eskimo.Entity,angle){
 
 		
-		//kha.audio1.Audio.play(kha.Assets.sounds.RapidFire);
+		kha.audio1.Audio.play(kha.Assets.sounds.shoot1);
 		
 		var bullet = entities.create();
 
@@ -142,6 +142,7 @@ class Gun extends System {
 
 		bullet.set(new component.TimedLife(3));
 		bullet.set(new component.DieOnCollision([component.Collisions.CollisionGroup.Enemy]));
+		bullet.set(new component.ParticleTrail(1,component.VisualParticle.Effect.Spark));
 
 		
 		bullet.set(new component.Collisions([component.Collisions.CollisionGroup.Bullet,component.Collisions.CollisionGroup.Friendly],[component.Collisions.CollisionGroup.Bullet,component.Collisions.CollisionGroup.Friendly,component.Collisions.CollisionGroup.Player,component.Collisions.CollisionGroup.Item,component.Collisions.CollisionGroup.Particle]));

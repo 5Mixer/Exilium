@@ -23,15 +23,21 @@ class Renderer extends System {
 			var tilesize = sprite.tilesize;
 			var originX = Math.floor(tilesize/2);
 			var originY = Math.floor(tilesize/2);
+
+			// if (entity.has(component.Collisions)){
+			// 	var aabb = entity.get(component.Collisions).AABB;
+			// 	originX = Math.floor(aabb.width/2);
+			// 	originY = Math.floor(aabb.height/2);
+			// }
+
+
 			var x = transformation.pos.x;
 			var y = transformation.pos.y;
-			var angle = transformation.angle;
+			var angle = transformation.angle*(Math.PI/180);
 
-			g.pushTransformation(g.transformation.multmat(kha.math.FastMatrix3.translation(x + originX, y + originY)).multmat(kha.math.FastMatrix3.rotation(angle*(Math.PI / 180))).multmat(kha.math.FastMatrix3.translation(-x - originX, -y - originY)));
-					
+			if (angle != 0) g.pushTransformation(g.transformation.multmat(FastMatrix3.translation(x + originX, y + originY)).multmat(FastMatrix3.rotation(angle)).multmat(FastMatrix3.translation(-x - originX, -y - originY)));
 			g.drawScaledSubImage(sprite.spriteMap,Math.floor((sprite.textureId%Math.floor(sprite.spriteMap.width/tilesize))*tilesize),Math.floor(Math.floor(sprite.textureId/Math.floor(sprite.spriteMap.width/tilesize))*tilesize),tilesize,tilesize,x,y,tilesize,tilesize);
-			
-			g.popTransformation();
+			if (angle != 0) g.popTransformation();
 		}
 
 		for (entity in animatedView.entities){

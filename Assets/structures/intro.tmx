@@ -1729,5 +1729,7 @@
   <object name="slime" x="375.5" y="146"/>
   <object name="slime" x="349" y="118"/>
   <object name="slime" x="290.5" y="170.5"/>
+  <object name="torch" x="120.462" y="68.3587"/>
+  <object name="torch" x="281.337" y="137.734"/>
  </objectgroup>
 </map>

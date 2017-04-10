@@ -163,6 +163,12 @@
 			"width":16,
 			"height":16
 		},
+		"torch" : {
+			"tileset":"tileset",
+			"id":21,
+			"width":16,
+			"height":16
+		},
 		"cast_shield" : {
 			"tileset":"objects",
 			"id":8,

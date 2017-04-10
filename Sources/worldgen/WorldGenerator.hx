@@ -9,6 +9,7 @@ enum EntityType {
 	CorruptSoulBoss;
 	Item(type:component.Inventory.Item);
 	Door;
+	Torch;
 }
 
 enum Side {

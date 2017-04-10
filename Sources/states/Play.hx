@@ -80,7 +80,7 @@ class Play extends states.State {
 		systems.add(new system.Physics(entities,collisionSys.grid,collisionSys));
 		systems.add(new system.Inventory(input,entities));
 		systems.add(new system.TimedLife(entities));
-		systems.add(new system.TimedLife(entities));
+		systems.add(new system.ParticleTrails(entities));
 		systems.add(new system.Gun(input,camera,entities));
 		systems.add(new system.AI(entities,null));
 		systems.add(new system.CorruptSoulAI(entities,null));
@@ -196,6 +196,7 @@ class Play extends states.State {
 				case worldgen.WorldGenerator.EntityType.CorruptSoulBoss: EntityFactory.createCorruptSoul(entities,e.x*16,e.y*16);
 				case worldgen.WorldGenerator.EntityType.Item(item): EntityFactory.createItem(entities,item,e.x*16,e.y*16);
 				case worldgen.WorldGenerator.EntityType.Door: EntityFactory.createLockedDoor(entities,e.x*16,e.y*16);
+				case worldgen.WorldGenerator.EntityType.Torch: EntityFactory.createTorch(entities,e.x*16,e.y*16);
 			}
 		}
 

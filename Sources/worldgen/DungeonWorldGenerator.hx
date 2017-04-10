@@ -93,6 +93,7 @@ class DungeonWorldGenerator extends WorldGenerator {
 		while (side == room.attachedFromSide){
 			side = Side.createByIndex(Math.floor(random.generate()*4));
 		}
+
 		
 		var width = 9+Math.floor(random.generate()*6);
 		var height = 9+Math.floor(random.generate()*6);
@@ -189,7 +190,7 @@ class DungeonWorldGenerator extends WorldGenerator {
 						
 						if (get (room.x+x,room.y+y).id != tileInfo.empty) continue;
 						
-						set(room.x+x,room.y+y,{id: tileInfo.floor, zone:room.zone});
+						set(room.x+x,room.y+y,{id: tileInfo.floor, zone:room.zone});		
 
 						if (x==0)
 							set(room.x+x,room.y+y,{id: tileInfo.dungeonwallv, zone:room.zone});
@@ -226,6 +227,7 @@ class DungeonWorldGenerator extends WorldGenerator {
 		for (room in rooms){
 			for (door in room.doorways){
 				set(door.x,door.y,{id:tileInfo.gate,zone:room.zone});
+				
 			}
 		}
 		

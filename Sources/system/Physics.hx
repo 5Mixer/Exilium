@@ -64,22 +64,29 @@ class Physics extends System {
 
 							var otherTransform = otherShape.ofEntity.get(component.Transformation).pos;
 
-							var c = differ.Collision.shapeWithShape(
+							var rect1 = { x: shape.x+transformation.pos.x, y: shape.y+transformation.pos.y, width: shape.width, height:shape.height };
+							var rect2 = { x: otherShape.x+otherTransform.x, y: otherShape.y+otherTransform.y, width: otherShape.width, height: otherShape.height };
+							if (rect1.x < rect2.x + rect2.width &&
+								rect1.x + rect1.width > rect2.x &&
+								rect1.y < rect2.y + rect2.height &&
+								rect1.height + rect1.y > rect2.y) {
+
+								var c = differ.Collision.shapeWithShape(
 								differ.shapes.Polygon.rectangle(shape.x+transformation.pos.x,shape.y+transformation.pos.y,shape.width,shape.height,false),
 								differ.shapes.Polygon.rectangle(otherShape.x+otherTransform.x,otherShape.y+otherTransform.y,otherShape.width,otherShape.height,false));
 							
-							if (c != null && c.separationX != 0){
-								collision = true;
-								collidingShape = otherShape;
-								if (otherShape.ofEntity.get(component.Collisions).stopMovement){
-									transformation.pos.x += c.separationX;
-								}
-								if (physics.reflect){
-									reflectx = true;
-								}
+								if (c.separationX != 0){
 
-								onCollision(shape,otherShape);
-								onCollision(otherShape,shape);
+									collision = true;
+									collidingShape = otherShape;
+									if (otherShape.ofEntity.get(component.Collisions).stopMovement){
+										transformation.pos.x += c.separationX;
+									}
+									reflectx = physics.reflect;
+
+									onCollision(shape,otherShape);
+									onCollision(otherShape,shape);
+								}
 									
 							}
 						}
@@ -93,23 +100,30 @@ class Physics extends System {
 							if (!validCollision(shape,otherShape)) continue;
 							if (!otherShape.ofEntity.has(component.Transformation)) continue;
 							var otherTransform = otherShape.ofEntity.get(component.Transformation).pos;
-							var c = differ.Collision.shapeWithShape(
+
+							var rect1 = { x: shape.x+transformation.pos.x, y: shape.y+transformation.pos.y, width: shape.width, height:shape.height };
+							var rect2 = { x: otherShape.x+otherTransform.x, y: otherShape.y+otherTransform.y, width: otherShape.width, height: otherShape.height };
+							if (rect1.x < rect2.x + rect2.width &&
+								rect1.x + rect1.width > rect2.x &&
+								rect1.y < rect2.y + rect2.height &&
+								rect1.height + rect1.y > rect2.y) {
+
+								var c = differ.Collision.shapeWithShape(
 								differ.shapes.Polygon.rectangle(shape.x+transformation.pos.x,shape.y+transformation.pos.y,shape.width,shape.height,false),
 								differ.shapes.Polygon.rectangle(otherShape.x+otherTransform.x,otherShape.y+otherTransform.y,otherShape.width,otherShape.height,false));
 							
-							if (c != null && c.separationY != 0){
-								collision = true;
-								collidingShape = otherShape;
-								if (otherShape.ofEntity.get(component.Collisions).stopMovement){
-									transformation.pos.y += c.separationY;
-								}
-								if (physics.reflect){
-									reflecty = true;
-								}
+								if (c.separationY != 0){
+									collision = true;
+									collidingShape = otherShape;
+									if (otherShape.ofEntity.get(component.Collisions).stopMovement){
+										transformation.pos.y += c.separationY;
+									}
+									reflecty = physics.reflect;
 
-								onCollision(shape,otherShape);
-								onCollision(otherShape,shape);
+									onCollision(shape,otherShape);
+									onCollision(otherShape,shape);
 
+								}
 							}
 						}
 					}

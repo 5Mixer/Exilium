@@ -218,6 +218,26 @@ class EntityFactory {
 		}
 		return corruptSoul;
 	}
+	public static function createCactusBoss(entities:eskimo.EntityManager,x:Float,y:Float,room:worldgen.DungeonWorldGenerator.Room){
+		var cactusBoss = entities.create();
+		cactusBoss.set(new component.Name("Cactus Boss"));
+		cactusBoss.set(new component.Transformation(new kha.math.Vector2(x,y)));
+		cactusBoss.set(new component.Health(300));
+		cactusBoss.set(new component.Physics());
+		cactusBoss.set(new component.CactusBoss(room));
+		cactusBoss.set(new component.ActiveBoss("Cactus Boss"));
+		cactusBoss.get(component.ActiveBoss).current = 300;
+		cactusBoss.get(component.ActiveBoss).max = 300;
+		cactusBoss.set(new component.Collisions([component.Collisions.CollisionGroup.Enemy],[]));
+		var b:component.Collisions.Rect = new component.Collisions.Rect(0,0,16,16);
+		cactusBoss.get(component.Collisions).registerCollisionRegion(b);
+		cactusBoss.set(new component.Damager(.35));
+		cactusBoss.set(new component.Events());
+		cactusBoss.get(component.Events).listenToEvent(component.Events.Event.Death,function(e){
+			trace("You killed the cactus boss!");
+			
+		});
+	}
 	public static function createPotion(entities:eskimo.EntityManager,x:Float, y:Float){
 		var potion = entities.create();
 		potion.set(new component.Name("Dropped Item"));

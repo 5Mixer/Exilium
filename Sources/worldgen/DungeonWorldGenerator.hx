@@ -20,7 +20,7 @@ typedef Room = {
 }
 
 class DungeonWorldGenerator extends WorldGenerator {
-	var rooms = new Array<Room>();
+	public var rooms = new Array<Room>();
 	var probabilityForTreasureInRoom = .3;
 	
 	var tileInfo = {
@@ -51,6 +51,7 @@ class DungeonWorldGenerator extends WorldGenerator {
 		placeExit();
 		bakerooms();
 		createWallDepth();
+
 	}
 	function placeExit(){
 		//Sort rooms so furtherest rooms are at end of Array
@@ -81,7 +82,7 @@ class DungeonWorldGenerator extends WorldGenerator {
 			}
 		
 	}
-	function middleOfRoom(room:Room){
+	public function middleOfRoom(room:Room){
 		return {x:room.x+Std.int(room.width/2)+2, y: room.y+Std.int(room.height/2)+2}
 	}
 	var roomCount = 0;

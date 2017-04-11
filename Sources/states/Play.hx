@@ -64,6 +64,7 @@ class Play extends states.State {
 		var collisionSys = new system.Collisions(entities);
 		tilemapRender = new rendering.TilemapRenderer(camera,entities);
 		registerRenderSystem(new system.Renderer(entities));
+		registerRenderSystem(new system.CactusBoss(entities));
 		registerRenderSystem(new system.SpikeHandler(entities));
 		registerRenderSystem(new system.ParticleRenderer(entities));
 		registerRenderSystem(new system.GrappleHooker(input,camera,entities,collisionSys));
@@ -203,6 +204,12 @@ class Play extends states.State {
 		EntityFactory.createLadder(entities,generator.exitPoint.x*16,generator.exitPoint.y*16,function (collider){
 			descend();
 		});
+		if (Std.is(generator,worldgen.DungeonWorldGenerator)){
+			var dungeon:worldgen.DungeonWorldGenerator = cast generator;
+			var room = dungeon.rooms[2];
+			var pos = dungeon.middleOfRoom(room);
+			EntityFactory.createCactusBoss(entities,pos.x*16,pos.y*16,room);
+		}
 		//EntityFactory.createMummy(entities,generator.spawnPoint.x*16+10,generator.spawnPoint.y*16);
 
 		p = EntityFactory.createPlayer(entities,{x:generator.spawnPoint.x, y:generator.spawnPoint.y});

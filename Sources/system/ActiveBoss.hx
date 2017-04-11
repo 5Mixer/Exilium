@@ -22,11 +22,13 @@ class ActiveBoss extends System {
 			if (boss.current <= 0){
 				var valid = true;
 
-				var s = entity.get(component.CorruptSoul);
-				for (a in s.children){
-					if (a.get(component.Health) != null && a.get(component.Health).current > 0) {
-						valid = false;
-						break;
+				if (entity.has(component.CorruptSoul)){
+					var s = entity.get(component.CorruptSoul);
+					for (a in s.children){
+						if (a.get(component.Health) != null && a.get(component.Health).current > 0) {
+							valid = false;
+							break;
+						}
 					}
 				}
 				

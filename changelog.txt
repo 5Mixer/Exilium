@@ -13,3 +13,9 @@
 
 6/04/17
  - Made hand made first level that loads into the game.
+
+ 9/04/17
+ - Torches.
+
+ 10/04/17
+ - Cactus boss.

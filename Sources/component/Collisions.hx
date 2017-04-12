@@ -64,7 +64,20 @@ class Collisions extends Component{
 		AABB.height = Math.ceil(Math.max(AABB.height,collisionShape.height));
 		midpoint.x = AABB.width/2;
 		midpoint.y = AABB.height/2;
+		recalculateAABB();
 		return this;
+	}
+	public function recalculateAABB (){
+		AABB.width = 0;
+		AABB.height = 0;
+		for (region in collisionRegions){
+			if (region.x+region.width > AABB.width){
+				AABB.width = Math.ceil(region.x+region.width);
+			}
+			if (region.y+region.height > AABB.height){
+				AABB.height = Math.ceil(region.y+region.height);
+			}
+		}
 	}
 	public function getCollisionWithCollider(other:Collisions){
 

@@ -83,7 +83,7 @@ class DungeonWorldGenerator extends WorldGenerator {
 		
 	}
 	public function middleOfRoom(room:Room){
-		return {x:room.x+Std.int(room.width/2)+2, y: room.y+Std.int(room.height/2)+2}
+		return {x:room.x+Std.int(room.width/2), y: room.y+Std.int(room.height/2)}
 	}
 	var roomCount = 0;
 	function growFromRoom (room:Room){

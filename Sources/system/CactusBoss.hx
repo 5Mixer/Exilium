@@ -16,10 +16,11 @@ class CactusBoss extends System {
 			var image = kha.Assets.images.Cactus;
 			var collisions = entity.get(component.Collisions);
 			cactus.tick++;
-			
+
 			var size = cactus.size;
 			collisions.collisionRegions[0].width = 16*size.width;
 			collisions.collisionRegions[0].height = 16*size.height;
+			collisions.recalculateAABB();
 			if (size.width == 1 && size.height == 1){
 				g.drawSubImage(image,transform.pos.x,transform.pos.y,0,0,16,16);
 			}

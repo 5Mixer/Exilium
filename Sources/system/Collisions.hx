@@ -174,8 +174,16 @@ class Collisions extends System {
 						for (i in 0...3){
 							var particle = entities.create();
 							particle.set(new component.VisualParticle(component.VisualParticle.Effect.Blood));
+
+							var w = 5;
+							var h = 5;
+							if (shapeEntity.has(component.Collisions)){
+								var aabb = shapeEntity.get(component.Collisions).AABB;
+								w = aabb.width;
+								h = aabb.height;
+							}
 							
-							particle.set(new component.Transformation(shapeEntity.get(component.Transformation).pos.add(new kha.math.Vector2(4,0))));
+							particle.set(new component.Transformation(shapeEntity.get(component.Transformation).pos.add(new kha.math.Vector2(Math.random()*w,Math.random()*h))));
 							var phys = new component.Physics();
 							var speed = Math.random()*6;
 							phys.friction = 0.7;

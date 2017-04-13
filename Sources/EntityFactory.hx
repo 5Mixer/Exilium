@@ -57,6 +57,7 @@ class EntityFactory {
 		p.get(component.Light).strength = .8;
 
 		p.get(component.Inventory).putIntoInventory(component.Inventory.Item.CastSheild);
+		p.get(component.Inventory).putIntoInventory(component.Inventory.Item.Blaster);
 
 		// if (lastSave != null && lastSave.player != null){
 		// 	p.get(component.Health).current = lastSave.player.health;

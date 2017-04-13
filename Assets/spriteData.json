@@ -127,6 +127,12 @@
 			"width":16,
 			"height":16
 		},
+		"bullet_small" : {
+			"tileset":"projectiles",
+			"id":5,
+			"width":16,
+			"height":16
+		},
 		"summoned_missile" : {
 			"tileset":"projectiles",
 			"id":3,
@@ -178,6 +184,12 @@
 		"key" : {
 			"tileset":"objects",
 			"id":9,
+			"width":8,
+			"height":8
+		},
+		"blaster" : {
+			"tileset":"objects",
+			"id":10,
 			"width":8,
 			"height":8
 		},

@@ -34,6 +34,9 @@ class Gun extends System {
 					}else if (selectedItem == component.Inventory.Item.LaserGun) {
 						entity.get(component.Gun).gun = component.Gun.GunType.LaserGun;
 						entity.get(component.Gun).fireRate = 4;
+					}else if (selectedItem == component.Inventory.Item.Blaster) {
+						entity.get(component.Gun).gun = component.Gun.GunType.BlasterGun;
+						entity.get(component.Gun).fireRate = 10;
 					}else{
 						entity.get(component.Gun).gun = null;
 
@@ -67,6 +70,8 @@ class Gun extends System {
 						shootSlimeGun(entity,a);
 					if (gun.gun == component.Gun.GunType.LaserGun)
 						shootLaserGun(entity,a);
+					if (gun.gun == component.Gun.GunType.BlasterGun)
+						shootBlaster(entity,a);
 				}
 			}
 		}else{
@@ -162,6 +167,51 @@ class Gun extends System {
 		phys.velocity = new kha.math.Vector2(Math.cos(particleAngle * (Math.PI / 180)) * speed,Math.sin(particleAngle * (Math.PI / 180)) * speed);		
 		particle.set(phys);
 		particle.set(new component.TimedLife(.15));
+		
+	}
+	public function shootBlaster (parent:eskimo.Entity,a){
+
+		kha.audio1.Audio.play(kha.Assets.sounds.shoot3);
+		
+		var spread = 7;
+		var density = .1;
+		for (offseta in 0...spread){
+			var bullet = entities.create();
+			var angle = a+((offseta-(spread/2))/density);
+			var t = new component.Transformation(parent.get(component.Transformation).pos.sub(new kha.math.Vector2(3,3)));
+			t.angle = angle;
+			bullet.set(t);
+			
+			var p = new component.Physics();
+			var speed = 4;
+			p.friction = 0.999;
+			p.velocity = new kha.math.Vector2(Math.cos(angle * (Math.PI / 180)) * speed,Math.sin(angle * (Math.PI / 180)) * speed);
+			bullet.set(p);
+			bullet.set(new component.Sprite(states.Play.spriteData.entity.bullet_small));
+
+			bullet.set(new component.TimedLife(.15+(.5*Math.random())));
+			bullet.set(new component.Damager(1));
+			bullet.set(new component.DieOnCollision([component.Collisions.CollisionGroup.Enemy,component.Collisions.CollisionGroup.Level]));
+			
+			bullet.set(new component.Collisions([component.Collisions.CollisionGroup.Bullet,component.Collisions.CollisionGroup.Friendly],[component.Collisions.CollisionGroup.Bullet,component.Collisions.CollisionGroup.Friendly,component.Collisions.CollisionGroup.Player,component.Collisions.CollisionGroup.Item,component.Collisions.CollisionGroup.Particle]));
+			bullet.get(component.Collisions).registerCollisionRegion(new component.Collisions.Rect(4,4,8,8));
+
+			var particle = entities.create();
+			particle.set(new component.VisualParticle(component.VisualParticle.Effect.Spark));
+			
+
+			var t = new component.Transformation(parent.get(component.Transformation).pos.add(new kha.math.Vector2(5,5)));
+			t.angle = angle;
+			particle.set(t);
+			var phys = new component.Physics();
+			var speed = 3;
+			phys.friction = 0.6;
+			var particleAngle = angle - 6 + Math.random()*12;
+			phys.velocity = new kha.math.Vector2(Math.cos(particleAngle * (Math.PI / 180)) * speed,Math.sin(particleAngle * (Math.PI / 180)) * speed);		
+			particle.set(phys);
+			particle.set(new component.TimedLife(.15));
+		}
+		
 		
 	}
 }

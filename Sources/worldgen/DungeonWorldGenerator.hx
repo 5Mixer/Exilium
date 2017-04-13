@@ -47,8 +47,8 @@ class DungeonWorldGenerator extends WorldGenerator {
 		rooms.push({id:rooms.length, x:Std.int(width/2), y: Std.int(height/2), width: 5, height: 5, attachedFromSide: null, doorways: [], distanceToEntrance:0, zone: Zone.Friendly});
 		spawnPoint = {x:Std.int(width/2)+2, y: Std.int(height/2)+2};
 		growFromRoom(rooms[0]);
-		fillRooms();
 		placeExit();
+		fillRooms();
 		bakerooms();
 		createWallDepth();
 
@@ -62,13 +62,16 @@ class DungeonWorldGenerator extends WorldGenerator {
 		});
 		var farRoom = rooms[rooms.length-1];
 		exitPoint = {x:farRoom.x+Math.floor(farRoom.width/2)+1,y:farRoom.y+Math.floor(farRoom.height/2)};
-		entities.push({type: worldgen.EntityType.CorruptSoulBoss,x:farRoom.x+Math.floor(farRoom.width/2)+1,y:farRoom.y+Math.floor(farRoom.height/2)});
+	
+		for (door in farRoom.doorways) {
+			entities.push({type:worldgen.WorldGenerator.EntityType.Door,x:door.x,y:door.y});
+		}
 	}
 	function placeThingInRoom (room:Room){
 		if (room.id < 2) return; //Don't place in start room
 		var thing = {x:room.x+Math.floor(room.width/2),y:room.y+Math.floor(room.height/2)};
 
-		entities.push({type:EntityType.Lava, x: thing.x+3,y:thing.y});
+		//entities.push({type:EntityType.Lava, x: thing.x+3,y:thing.y});
 		
 		if (random.generate() > probabilityForTreasureInRoom)
 			entities.push({type:EntityType.Treasure,x:thing.x,y:thing.y});
@@ -96,8 +99,8 @@ class DungeonWorldGenerator extends WorldGenerator {
 		}
 
 		
-		var width = 9+Math.floor(random.generate()*6);
-		var height = 9+Math.floor(random.generate()*6);
+		var width = 8+Math.floor(random.generate()*6);
+		var height = 8+Math.floor(random.generate()*6);
 		
 		var doorx = room.x+Math.floor(Math.min(room.width/2,width/2));
 		var doory = room.y+Math.floor(Math.min(room.height/2,height/2));
@@ -168,9 +171,14 @@ class DungeonWorldGenerator extends WorldGenerator {
 		}
 	}
 	function fillRooms (){
+
 		for (room in rooms){
 			placeThingInRoom(room);
 		}
+		var room = Math.floor(Math.random()*(rooms.length-1));
+		var pos = middleOfRoom(rooms[room]);
+		entities.push({type:worldgen.WorldGenerator.EntityType.Item(component.Inventory.Item.Key),x:pos.x+1,y:pos.y});
+						
 	}
 	function createWallDepth (){
 		for (x in 0...width){

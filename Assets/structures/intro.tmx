@@ -1701,8 +1701,6 @@
   <object name="spike" x="128" y="128"/>
   <object name="spike" x="144" y="128"/>
   <object name="slime" x="128" y="256"/>
-  <object name="lava" x="320" y="160"/>
-  <object name="lava" x="336" y="160"/>
   <object name="item" x="219.33" y="261">
    <properties>
     <property name="item" value="Key"/>

@@ -186,6 +186,10 @@ class Play extends states.State {
 		minimap.g2.color = kha.Color.Green;
 		minimap.g2.fillRect(generator.exitPoint.x,generator.exitPoint.y,1,1);
 		minimap.g2.end();
+
+		if (dungeonLevel == 3){
+			EntityFactory.createCorruptSoul(entities,(generator.exitPoint.x+1)*16,generator.exitPoint.y*16);
+		}
 		
 		for (e in generator.entities){
 			switch e.type {
@@ -208,7 +212,7 @@ class Play extends states.State {
 			var dungeon:worldgen.DungeonWorldGenerator = cast generator;
 			var room = dungeon.rooms[2];
 			var pos = dungeon.middleOfRoom(room);
-			EntityFactory.createCactusBoss(entities,pos.x*16,pos.y*16,room);
+			//EntityFactory.createCactusBoss(entities,pos.x*16,pos.y*16,room);
 		}
 		//EntityFactory.createMummy(entities,generator.spawnPoint.x*16+10,generator.spawnPoint.y*16);
 

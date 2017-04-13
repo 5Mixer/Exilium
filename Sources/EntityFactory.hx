@@ -20,7 +20,7 @@ class EntityFactory {
 		var droppedItem = entities.create();
 		droppedItem.set(new component.Name("Dropped Item"));
 		droppedItem.set(new component.Transformation(new kha.math.Vector2(x,y)));
-		droppedItem.set(new component.TimedLife(5+Math.random()*3));
+		//droppedItem.set(new component.TimedLife(5+Math.random()*3));
 		droppedItem.set(new component.Collisions([component.Collisions.CollisionGroup.Item],[component.Collisions.CollisionGroup.Item,component.Collisions.CollisionGroup.Enemy],false).registerCollisionRegion(new component.Collisions.Rect(2,2,4,4)));
 		droppedItem.set(new component.Collectable([component.Collisions.CollisionGroup.Friendly],[item]));
 		droppedItem.set(new component.Magnet());

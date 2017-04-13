@@ -33,7 +33,7 @@ class GrappleHooker extends System {
 					var py = transformation.pos.y + collisions.midpoint.y;
 					var a = Math.atan2(endy-py,endx-px)*(180/Math.PI);
 					var l = collisionSystem.fireRay(new differ.shapes.Ray(new differ.math.Vector(px,py),new differ.math.Vector(endx,endy)),[component.Collisions.CollisionGroup.Player]);
-					g.drawLine(px,py,endx*l,endy*l);
+					//g.drawLine(px,py,endx*l,endy*l);
 					var rayDist = l * Math.sqrt(Math.pow(px-endx,2)+Math.pow(py-endy,2));
 					
 					var hookLength = 8;

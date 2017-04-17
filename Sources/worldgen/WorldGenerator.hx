@@ -10,6 +10,7 @@ enum EntityType {
 	Item(type:component.Inventory.Item);
 	Door;
 	Torch;
+	Sign(message:String);
 }
 
 enum Side {

@@ -5,7 +5,7 @@ class Graph {
 	public var size:kha.math.Vector2;
 	var bgColor:kha.Color;
 	var fgColor:kha.Color;
-	var values = new Array<Float>();
+	public var values = new Array<Float>();
 	public var visible = true;
 	public function new (pos:kha.math.Vector2,size:kha.math.Vector2){
 		this.pos = pos;

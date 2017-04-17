@@ -146,10 +146,10 @@ class ShieldRenderer extends System {
 				var y2 = Math.sin(angleRads+((((segment+1)/segments)-.5)*arcRads))*outset;
 
 				//To smooth.
-				g.fillCircle(x1+sx,y1+sy,width/2);
-				g.fillCircle(x2+sx,y2+sy,width/2);
+				g.fillCircle(x1+tx,y1+ty,width/2);
+				g.fillCircle(x2+tx,y2+ty,width/2);
 				//Draw line
-				g.drawLine(x1+sx,y1+sy,x2+sx,y2+sy,width);
+				g.drawLine(x1+tx,y1+ty,x2+tx,y2+ty,width);
 			}
 
 			g.color = kha.Color.fromBytes(200,130,50);

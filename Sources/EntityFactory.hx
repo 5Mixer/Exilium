@@ -54,7 +54,7 @@ class EntityFactory {
 		p.set(new component.Light());
 		
 		p.get(component.Light).colour = kha.Color.fromBytes(255,200,200);
-		p.get(component.Light).strength = .8;
+		p.get(component.Light).strength = .7;
 
 		p.get(component.Inventory).putIntoInventory(component.Inventory.Item.CastSheild);
 		p.get(component.Inventory).putIntoInventory(component.Inventory.Item.Blaster);
@@ -104,7 +104,7 @@ class EntityFactory {
 		var contents = [];
 		contents.pushx(component.Inventory.Item.Gold,Math.floor(Math.random()*15));
 		contents.pushx(component.Inventory.Item.HealthPotion,Math.floor(Math.random()*2));
-		if (Math.random() > .5) contents.push(component.Inventory.Item.LaserGun);
+		if (Math.random() > .6) contents.push(component.Inventory.Item.LaserGun);
 		if (Math.random() > .75) contents.push(component.Inventory.Item.GrapplingHook);
 		treasure.set(new component.ReleaseOnCollision(contents,[component.Collisions.CollisionGroup.Friendly]));
 		
@@ -144,6 +144,7 @@ class EntityFactory {
 		door.set(new component.Transformation(new kha.math.Vector2(x,y)));
 		door.set(new component.Sprite(cast states.Play.spriteData.entity.door));
 		door.set(new component.Collisions([component.Collisions.CollisionGroup.Level],[]));
+		door.set(new component.Message("Door","One must find a/ngolden key to pass here."));
 		door.get(component.Collisions).registerCollisionRegion(new component.Collisions.Rect(0,0,16,16));
 		door.set(new component.CustomCollisionHandler(null,function (collider) {
 			if (collider.has(component.Inventory)){
@@ -168,7 +169,8 @@ class EntityFactory {
 		shooter.set(new component.Collisions([],[component.Collisions.CollisionGroup.Level,component.Collisions.CollisionGroup.Enemy]));
 		shooter.get(component.Collisions).registerCollisionRegion(new component.Collisions.Rect(5,5,6,6));
 
-		shooter.set(new component.TimedShoot(10));
+		shooter.set(new component.TimedShoot(6+Math.floor(Math.random()*6)));
+		shooter.set(new component.Spin(-2+(Math.random()*4)));
 		
 		return shooter;
 	}
@@ -260,14 +262,26 @@ class EntityFactory {
 		ladder.set(new component.CustomCollisionHandler([component.Collisions.CollisionGroup.Player],onCollide)); 
 		return ladder; 
 	}
+	public static function createSign(entities:eskimo.EntityManager,x:Int,y:Int,message:String){ 
+		var sign = entities.create(); 
+		sign.set(new component.Name("Sign")); 
+		sign.set(new component.Transformation(new kha.math.Vector2(x,y))); 
+		sign.set(new component.Sprite(states.Play.spriteData.entity.sign));
+		sign.set(new component.Message("sign",message));
+		sign.set(new component.Collisions([component.Collisions.CollisionGroup.Level],null,false)); 
+		sign.get(component.Collisions).registerCollisionRegion(new component.Collisions.Rect(2,5,12,9));
+		return sign; 
+	}
 	public static function createSpike(entities:eskimo.EntityManager,x:Int,y:Int){ 
 		var spikes = entities.create(); 
 		spikes.set(new component.Name("Spike")); 
 		spikes.set(new component.Transformation(new kha.math.Vector2(x,y)));
-		spikes.set(new component.Damager(1));
+		spikes.set(new component.Damager(.4));
 		spikes.set(new component.Spike());
+		spikes.set(new component.Zindex(-1));
 		spikes.set(new component.AnimatedSprite(states.Play.spriteData.entity.spikes));
-		spikes.set(new component.Collisions([component.Collisions.CollisionGroup.Enemy],component.Collisions.CollisionGroup.createAll(),false)); 
+		spikes.get(component.AnimatedSprite).playAnimation("raise","up");
+		spikes.set(new component.Collisions([],component.Collisions.CollisionGroup.createAll(),false)); 
 		spikes.get(component.Collisions).registerCollisionRegion(new component.Collisions.Rect(0,0,16,16));
 		return spikes; 
 	} 

@@ -19,13 +19,13 @@ class AnimatedSprite extends Component {
 
 		if (spriteData.tileset != null){
 			switch spriteData.tileset {
-				case "ghost": spriteMap = kha.Assets.images.Ghost;
-				case "slime": spriteMap = kha.Assets.images.Slime; tilesize = 8;
-				case "projectiles": spriteMap = kha.Assets.images.Projectiles;
-				case "objects": spriteMap = kha.Assets.images.Objects; tilesize = 8;
-				case "chest": spriteMap = kha.Assets.images.Chest; tilesize = 11;
-				case "goblin": spriteMap = kha.Assets.images.Goblin; tilesize = 10;
-				case "coin": spriteMap = kha.Assets.images.Coin; tilesize = 8;
+				case "ghost": {spriteMap = kha.Assets.images.Ghost; tilesize = 10;}
+				case "slime": {spriteMap = kha.Assets.images.Slime; tilesize = 8;}
+				case "projectiles": {spriteMap = kha.Assets.images.Projectiles;}
+				case "objects": {spriteMap = kha.Assets.images.Objects; tilesize = 8;}
+				case "chest": {spriteMap = kha.Assets.images.Chest; tilesize = 11;}
+				case "goblin": {spriteMap = kha.Assets.images.Goblin; tilesize = 10;}
+				case "coin": {spriteMap = kha.Assets.images.Coin; tilesize = 8;}
 				case "tileset": {spriteMap = kha.Assets.images.Tileset; tilesize = 16;}
 				case "mummy": {spriteMap = kha.Assets.images.Mummy; tilesize = 10; }
 			}

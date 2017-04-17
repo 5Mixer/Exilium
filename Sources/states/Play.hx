@@ -47,11 +47,11 @@ class Play extends states.State {
 	var mapCollisions:eskimo.Entity;
 	var generator:worldgen.WorldGenerator;
 
+	var paused = false;
+
 	override public function new (){
 		super();
 
-		//mainMusicChannel = kha.audio1.Audio.play(kha.Assets.sounds.Synthwave_Beta_2,true);
-		//mainMusicChannel.volume = .5;
 
 		input = new Input();
 		camera = new Camera();
@@ -71,8 +71,9 @@ class Play extends states.State {
 		registerRenderSystem(new system.DebugView(entities));
 		registerRenderSystem(new system.Healthbars(entities));
 		registerRenderSystem(new system.ActiveBoss(entities));
-		registerRenderSystem(new system.CorruptSoulRenderer(entities));
 		registerRenderSystem(new system.ShieldRenderer(input,camera,entities));
+		registerRenderSystem(new system.CorruptSoulRenderer(entities));
+		registerRenderSystem(new system.MessageRenderer(entities));
 		
 		registerRenderSystem(new system.CollisionDebugView(entities,collisionSys.grid,true));
 		
@@ -88,20 +89,25 @@ class Play extends states.State {
 		systems.add(new system.MummyAI(entities,null));
 		systems.add(new system.Magnets(entities,p));
 		systems.add(new system.TimedShoot(entities));
+		systems.add(new system.Spinner(entities));
 		
 		map = createMap();
 
 		debugInterface = new ui.DebugInterface(p);		
 		//debugInterface.visible = false;
 		
-		input.listenToKeyRelease('r', descend);
+		//input.listenToKeyRelease('r', descend);
 		input.listenToKeyRelease('q',function (){
-			debugInterface.visible = !debugInterface.visible;
+		//	debugInterface.visible = !debugInterface.visible;
 		});
 		input.listenToKeyRelease('m', function (){
 			mapShown = !mapShown;
 		});
+		input.listenToKeyRelease("esc", function (){
+			paused = !paused;
+		});
 		input.wheelListeners.push(function(dir){
+			kha.audio1.Audio.play(kha.Assets.sounds.ui_blip);
 			if (p.get(component.Inventory) == null) return;
 			p.get(component.Inventory).activeIndex += dir;
 			if (p.get(component.Inventory).activeIndex < 0) p.get(component.Inventory).activeIndex = p.get(component.Inventory).length-1;
@@ -187,7 +193,8 @@ class Play extends states.State {
 		minimap.g2.fillRect(generator.exitPoint.x,generator.exitPoint.y,1,1);
 		minimap.g2.end();
 
-		if (dungeonLevel == 3){
+		if (dungeonLevel == 4){
+			EntityFactory.createSign(entities,(generator.spawnPoint.x+1)*16,generator.spawnPoint.y*16,"Beware, a corrupt evil/nlives in this realm.");
 			EntityFactory.createCorruptSoul(entities,(generator.exitPoint.x+1)*16,generator.exitPoint.y*16);
 		}
 		
@@ -202,6 +209,7 @@ class Play extends states.State {
 				case worldgen.WorldGenerator.EntityType.Item(item): EntityFactory.createItem(entities,item,e.x*16,e.y*16);
 				case worldgen.WorldGenerator.EntityType.Door: EntityFactory.createLockedDoor(entities,e.x*16,e.y*16);
 				case worldgen.WorldGenerator.EntityType.Torch: EntityFactory.createTorch(entities,e.x*16,e.y*16);
+				case worldgen.WorldGenerator.EntityType.Sign(message): EntityFactory.createSign(entities,e.x*16,e.y*16,message);
 			}
 		}
 
@@ -234,6 +242,8 @@ class Play extends states.State {
 	}
 	function descend (){
 		dungeonLevel++;
+		if (dungeonLevel == 5)
+			Project.states = [new End()];
 		save();
 		createMap();
 		save();
@@ -295,7 +305,8 @@ class Play extends states.State {
 
 
 
-		cast(systems.get(system.ShieldRenderer),system.ShieldRenderer).prepass();
+		var sr:system.ShieldRenderer = systems.get(system.ShieldRenderer);
+		sr.prepass();
 
 		var g = framebuffer.g2;
 		g.begin();
@@ -344,7 +355,8 @@ class Play extends states.State {
 			for (stack in p.get(component.Inventory).stacks){
 				g.transformation._00 = camera.scale.x;
 				g.transformation._11 = camera.scale.y;
-				system.Renderer.renderSpriteData(g,p.get(component.Inventory).itemData.get(stack.item).sprite,6,x*10);
+				var off = x == pinv.activeIndex ? 1 : 0;
+				system.Renderer.renderSpriteData(g,p.get(component.Inventory).itemData.get(stack.item).sprite,6+off,x*10);
 				
 				g.color = kha.Color.fromBytes(112,107,137);
 				if (x == pinv.activeIndex)
@@ -362,12 +374,28 @@ class Play extends states.State {
 
 		g.transformation = kha.math.FastMatrix3.identity();
 		g.font = kha.Assets.fonts.OpenSans;
-		g.color = kha.Color.White;
+		g.color = kha.Color.fromFloats(1,1,1,.4);
 		g.fontSize = 20;
-		g.drawString("Floor "+dungeonLevel,10,kha.System.windowHeight()-30);
+		g.drawString("Early Exilium Demo. Feedback welcomed! tinyurl.com/exilium1. code - @5mixer. art - @BU773RH4ND5. music - @gas1312_AGD",10,kha.System.windowHeight()-30);
 
 		g.popTransformation();
-		
+
+		g.transformation = kha.math.FastMatrix3.identity();
+		if (paused){
+			g.color = kha.Color.fromFloats(.1,.2,.2,.6);
+			g.fillRect(0,0,framebuffer.width,framebuffer.height);
+
+			g.font = kha.Assets.fonts.trenco;
+			g.fontSize = 38*4;
+
+			g.color = kha.Color.fromBytes(30,30,30);
+			g.fillRect(0,0,400,kha.System.windowHeight());
+			
+			g.color = kha.Color.White;
+			
+			g.drawString("Paused",20,20);
+
+		}
 		g.end();
 
 		g.color = kha.Color.White;
@@ -377,10 +405,16 @@ class Play extends states.State {
 	}
 	override public function update(delta:Float){
 		input.startUpdate();
-				
-		systems.update(delta);
-		cast(systems.get(system.Physics),system.Physics).grid = cast(systems.get(system.Collisions),system.Collisions).grid;
-		cast(systems.get(system.Magnets),system.Magnets).p = p;
+		
+		if (!paused)
+			systems.update(delta);
+		
+		var physsys:system.Physics = systems.get(system.Physics);
+		var colsys:system.Collisions = systems.get(system.Collisions);
+		physsys.grid = colsys.grid;
+
+		var ms:system.Magnets = systems.get(system.Magnets);
+		ms.p = p;
 
 		if (p != null && p.has(component.Transformation))
 			camera.pos = new kha.math.Vector2(p.get(component.Transformation).pos.x-kha.System.windowWidth()/2/camera.scale.x,p.get(component.Transformation).pos.y-kha.System.windowHeight()/2/camera.scale.y);
@@ -397,9 +431,9 @@ class Play extends states.State {
 		// 		]
 		// 	}];
 		// }
-
-		cast(systems.get(system.CollisionDebugView),system.CollisionDebugView).showActiveEntities = (debugInterface.activeCollisionRegionsShown);
-		cast(systems.get(system.CollisionDebugView),system.CollisionDebugView).showStaticEntities = (debugInterface.staticCollisionRegionsShown);
+		var collisionDebugViewSys:system.CollisionDebugView = systems.get(system.CollisionDebugView);
+		collisionDebugViewSys.showActiveEntities = debugInterface.activeCollisionRegionsShown;
+		collisionDebugViewSys.showStaticEntities = debugInterface.staticCollisionRegionsShown;
 		
 		input.endUpdate();
 	}

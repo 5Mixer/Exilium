@@ -65,7 +65,6 @@ class Collisions extends System {
 					if (c != null && c.separationX != 0){
 
 						onCollision(shape,otherShape);
-						onCollision(otherShape,shape);
 							
 					}
 				}
@@ -75,6 +74,8 @@ class Collisions extends System {
 		processFixedEntities = false;
 	}
 	public function onCollision(shape:component.Collisions.Rect,otherShape:component.Collisions.Rect){
+		if (!validCollision(shape,otherShape)) return;
+
 		var shapeEntity = shape.ofEntity;
 		var otherShapeEntity = otherShape.ofEntity;
 
@@ -82,11 +83,35 @@ class Collisions extends System {
 		CustomCollisionHandler(shape,otherShape);
 		ReleaseHandler(shape,otherShape);
 
+		CollectHandler(otherShape,shape);
+		CustomCollisionHandler(otherShape,shape);
+		ReleaseHandler(otherShape,shape);
+		
 		DamageHandler(shape,otherShape);
 		DamageHandler(otherShape,shape);
-		
+
 		DieHandler(shape,otherShape);
+		DieHandler(otherShape,shape);
+
+		if (shapeEntity.has(component.Message)){
+			if (otherShapeEntity.has(component.Collisions))
+				if (otherShapeEntity.get(component.Collisions).collisionGroups.indexOf(component.Collisions.CollisionGroup.Player) != -1)
+					shapeEntity.get(component.Message).shown = true;
+		}
 		
+		
+	}
+	function validCollision(shape:component.Collisions.Rect,otherShape:component.Collisions.Rect){
+		//If both shapes are ignoring nothing, they should collide.
+		if (otherShape.ignoreGroups.length == 0 && shape.ignoreGroups.length == 0) return true;
+		//If the shape has a group that is being ignored by otherShape, don't collide.
+		for (group in shape.group){
+			if (otherShape.ignoreGroups.indexOf(group) != -1){
+				return false;
+			}
+		}
+		return true;
+
 	}
 	public function CollectHandler(shape:component.Collisions.Rect,otherShape:component.Collisions.Rect){
 		var shapeEntity = shape.ofEntity;
@@ -147,18 +172,6 @@ class Collisions extends System {
 		}
 	}
 
-	function validCollision(shape:component.Collisions.Rect,otherShape:component.Collisions.Rect){
-		//If both shapes are ignoring nothing, they should collide.
-		if (otherShape.ignoreGroups.length == 0 && shape.ignoreGroups.length == 0) return true;
-		//If the shape has a group that is being ignored by otherShape, don't collide.
-		for (group in shape.group){
-			if (otherShape.ignoreGroups.indexOf(group) != -1){
-				return false;
-			}
-		}
-		return true;
-
-	}
 
 	public function DamageHandler(shape:component.Collisions.Rect,otherShape:component.Collisions.Rect){
 		var shapeEntity = shape.ofEntity;
@@ -167,11 +180,11 @@ class Collisions extends System {
 			
 			if (otherShapeEntity.has(component.Damager)){
 				var damager = otherShapeEntity.get(component.Damager);
-				if (damager.active && frame % 1 == 0 && (validCollision(shape,otherShape))){
+				if (damager.active && frame % 2 == 0){
 					shapeEntity.get(component.Health).addToHealth(-damager.damage);
 
 					if (damager.causesBlood){
-						for (i in 0...3){
+						for (i in 0...1){
 							var particle = entities.create();
 							particle.set(new component.VisualParticle(component.VisualParticle.Effect.Blood));
 

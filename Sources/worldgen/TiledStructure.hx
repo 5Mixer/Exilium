@@ -6,7 +6,7 @@ class TiledStructure extends WorldGenerator {
 	
 	override public function generate () {
 		var data = haxe.xml.Parser.parse(kha.Assets.blobs.intro_tmx.toString());
-		trace(kha.Assets.blobs.test_tmx.toString());
+		//trace(kha.Assets.blobs.test_tmx.toString());
 		var structure = data.elementsNamed("map").next();
 		width = Std.parseInt(structure.get("width"));
 		height = Std.parseInt(structure.get("height"));
@@ -74,11 +74,11 @@ class TiledStructure extends WorldGenerator {
 					case "door" : entities.push({type: worldgen.WorldGenerator.EntityType.Door, x: Math.floor(Std.parseInt(object.get("x"))/16), y: Math.floor(Std.parseInt(object.get("y"))/16)});
 					case "shooter" : entities.push({type: worldgen.WorldGenerator.EntityType.Shooter, x: Math.floor(Std.parseInt(object.get("x"))/16), y: Math.floor(Std.parseInt(object.get("y"))/16)});
 					case "torch" : entities.push({type: worldgen.WorldGenerator.EntityType.Torch, x: Math.floor(Std.parseInt(object.get("x"))/16), y: Math.floor(Std.parseInt(object.get("y"))/16)});
+					case "sign" : entities.push({type: worldgen.WorldGenerator.EntityType.Sign(properties.get("message").toString()), x: Math.floor(Std.parseInt(object.get("x"))/16), y: Math.floor(Std.parseInt(object.get("y"))/16)});
 				}
 			}
 		}
 
-		trace("Loaded passageway structure. Width: "+width+". Height: "+height+". Tiles: "+tiles);
 		
 	}	
 }

@@ -33,7 +33,7 @@ class Gun extends System {
 						entity.get(component.Gun).fireRate = 7;
 					}else if (selectedItem == component.Inventory.Item.LaserGun) {
 						entity.get(component.Gun).gun = component.Gun.GunType.LaserGun;
-						entity.get(component.Gun).fireRate = 4;
+						entity.get(component.Gun).fireRate = 6;
 					}else if (selectedItem == component.Inventory.Item.Blaster) {
 						entity.get(component.Gun).gun = component.Gun.GunType.BlasterGun;
 						entity.get(component.Gun).fireRate = 10;
@@ -131,7 +131,7 @@ class Gun extends System {
 		t.angle = angle;
 		bullet.set(t);
 		
-		var p = new component.Physics(true);
+		var p = new component.Physics(false);
 		var speed = 4;
 		p.friction = 0.999;
 		p.velocity = new kha.math.Vector2(Math.cos(angle * (Math.PI / 180)) * speed,Math.sin(angle * (Math.PI / 180)) * speed);
@@ -143,14 +143,14 @@ class Gun extends System {
 			s = states.Play.spriteData.entity.summoned_missile_2;
 		}
 		bullet.set(new component.Sprite(s));
-		bullet.set(new component.Damager(1));
+		bullet.set(new component.Damager(.6));
 
 		bullet.set(new component.TimedLife(3));
-		bullet.set(new component.DieOnCollision([component.Collisions.CollisionGroup.Enemy]));
-		bullet.set(new component.ParticleTrail(1,component.VisualParticle.Effect.Spark));
+		bullet.set(new component.DieOnCollision([component.Collisions.CollisionGroup.Level]));
+		bullet.set(new component.ParticleTrail(.3,component.VisualParticle.Effect.Spark));
 
 		
-		bullet.set(new component.Collisions([component.Collisions.CollisionGroup.Bullet,component.Collisions.CollisionGroup.Friendly],[component.Collisions.CollisionGroup.Bullet,component.Collisions.CollisionGroup.Friendly,component.Collisions.CollisionGroup.Player,component.Collisions.CollisionGroup.Item,component.Collisions.CollisionGroup.Particle]));
+		bullet.set(new component.Collisions([component.Collisions.CollisionGroup.Bullet,component.Collisions.CollisionGroup.Friendly],[component.Collisions.CollisionGroup.Bullet,component.Collisions.CollisionGroup.Friendly,component.Collisions.CollisionGroup.Player,component.Collisions.CollisionGroup.Item,component.Collisions.CollisionGroup.Particle],false));
 		bullet.get(component.Collisions).registerCollisionRegion(new component.Collisions.Rect(6,6,4,4));
 
 		var particle = entities.create();
@@ -183,13 +183,13 @@ class Gun extends System {
 			bullet.set(t);
 			
 			var p = new component.Physics();
-			var speed = 4;
-			p.friction = 0.999;
+			var speed = 3;
+			p.friction = 0.98;
 			p.velocity = new kha.math.Vector2(Math.cos(angle * (Math.PI / 180)) * speed,Math.sin(angle * (Math.PI / 180)) * speed);
 			bullet.set(p);
 			bullet.set(new component.Sprite(states.Play.spriteData.entity.bullet_small));
 
-			bullet.set(new component.TimedLife(.15+(.5*Math.random())));
+			bullet.set(new component.TimedLife(.15+(.05*Math.random())));
 			bullet.set(new component.Damager(1));
 			bullet.set(new component.DieOnCollision([component.Collisions.CollisionGroup.Enemy,component.Collisions.CollisionGroup.Level]));
 			

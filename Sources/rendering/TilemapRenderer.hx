@@ -44,7 +44,7 @@ class TilemapRenderer  {
 					for (sx in -1...2){
 						for (sy in -1...2){
 							if (map.get(lightPositionx+sx,lightPositiony+sy) == null) continue;
-							if (map.get(lightPositionx+sx,lightPositiony+sy).id < 0) continue;
+							//if (map.get(lightPositionx+sx,lightPositiony+sy).id < 0) continue;
 							if (map.tileInfo.get(map.get(lightPositionx+sx,lightPositiony+sy).id) == null) {continue; }
 							if (map.tileInfo.get(map.get(lightPositionx+sx,lightPositiony+sy).id).collide) continue;
 							smootherLights.push({x:sx,y:sy});
@@ -81,8 +81,7 @@ class TilemapRenderer  {
 				g.color = kha.Color.fromFloats(Math.min(c.r,1),Math.min(c.g,1),Math.min(c.b,1),1);
 				
 				
-				var id = tileData.id;
-				id += tile.zone.getIndex() * 5;
+				var id = tileData.id + tile.zone.getIndex() * 5;
 				var sourcePos = { x: (id%Math.floor(kha.Assets.images.Dungeonsets.width/tilesize))*tilesize, y:Math.floor(id/Math.floor(kha.Assets.images.Dungeonsets.width/tilesize))*tilesize };
 				
 				g.drawScaledSubImage(kha.Assets.images.Dungeonsets,sourcePos.x,sourcePos.y,tilesize,tilesize,x*tilesize,y*tilesize,tilesize,tilesize);

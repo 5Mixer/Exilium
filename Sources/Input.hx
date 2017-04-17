@@ -83,6 +83,13 @@ class Input {
 				listener.callback();
 			}
 		}
+		if (char == ESC){
+			for (listener in listeners){
+				if (listener.key == "esc"){
+					listener.callback();
+				}
+			}
+		}
 		
 		if(char == LEFT || letter == 'a')
 			left = false;

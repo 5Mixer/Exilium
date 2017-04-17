@@ -24,7 +24,6 @@ class TimedShoot extends System {
 	override public function onUpdate (delta:Float){
 		super.onUpdate(delta);
 		for (entity in view.entities){
-			entity.get(component.Transformation).angle += 2;
 			
 			var timedShoot:component.TimedShoot = entity.get(component.TimedShoot);
 			timedShoot.timeLeft += 1;
@@ -77,8 +76,8 @@ class TimedShoot extends System {
 		bullet.set(new component.DieOnCollision([component.Collisions.CollisionGroup.Friendly,component.Collisions.CollisionGroup.Level]));
 		
 		//Damage and collisions
-		bullet.set(new component.Damager(10));
-		bullet.set(new component.Collisions([component.Collisions.CollisionGroup.Bullet,component.Collisions.CollisionGroup.Enemy],[component.Collisions.CollisionGroup.Bullet,component.Collisions.CollisionGroup.Enemy],true));
+		bullet.set(new component.Damager(15));
+		bullet.set(new component.Collisions([component.Collisions.CollisionGroup.Bullet,component.Collisions.CollisionGroup.Enemy],[component.Collisions.CollisionGroup.Bullet,component.Collisions.CollisionGroup.Enemy],false));
 		bullet.get(component.Collisions).registerCollisionRegion(new component.Collisions.Rect(3,6,10,10));
 
 		//Little particle

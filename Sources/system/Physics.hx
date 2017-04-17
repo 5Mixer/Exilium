@@ -43,7 +43,7 @@ class Physics extends System {
 				
 				var px = transformation.pos.x + (collider.collisionRegions[0].width/2) +1;
 				var py = transformation.pos.y + (collider.collisionRegions[0].height/2) +1;
-				var velocityRayLength = collisionSys.fireRay(new differ.shapes.Ray(new differ.math.Vector(px,py),new differ.math.Vector(px + physics.velocity.x,py + physics.velocity.y)),[component.Collisions.CollisionGroup.Player]);
+				//var velocityRayLength = collisionSys.fireRay(new differ.shapes.Ray(new differ.math.Vector(px,py),new differ.math.Vector(px + physics.velocity.x,py + physics.velocity.y)),[component.Collisions.CollisionGroup.Player]);
 				
 				//physics.velocity.x*=velocityRayLength;
 				//physics.velocity.y*=velocityRayLength;
@@ -59,7 +59,7 @@ class Physics extends System {
 					for (shape in collider.collisionRegions){
 
 						for (otherShape in grid.findContacts(shape)){
-							if (!validCollision(shape,otherShape)) continue;
+							//if (!validCollision(shape,otherShape)) continue;
 							if (!otherShape.ofEntity.has(component.Transformation)) continue;
 
 							var otherTransform = otherShape.ofEntity.get(component.Transformation).pos;
@@ -69,7 +69,7 @@ class Physics extends System {
 							if (rect1.x < rect2.x + rect2.width &&
 								rect1.x + rect1.width > rect2.x &&
 								rect1.y < rect2.y + rect2.height &&
-								rect1.height + rect1.y > rect2.y) {
+								rect1.height + rect1.y > rect2.y && validCollision(shape,otherShape)) {
 
 								var c = differ.Collision.shapeWithShape(
 								differ.shapes.Polygon.rectangle(shape.x+transformation.pos.x,shape.y+transformation.pos.y,shape.width,shape.height,false),
@@ -79,7 +79,7 @@ class Physics extends System {
 
 									collision = true;
 									collidingShape = otherShape;
-									if (otherShape.ofEntity.get(component.Collisions).stopMovement){
+									if (otherShape.ofEntity.get(component.Collisions).stopMovement && validCollision(shape,otherShape)){
 										transformation.pos.x += c.separationX;
 									}
 									reflectx = physics.reflect;
@@ -97,7 +97,7 @@ class Physics extends System {
 					for (shape in collider.collisionRegions){
 						for (otherShape in grid.findContacts(shape)){
 							
-							if (!validCollision(shape,otherShape)) continue;
+							//if (!validCollision(shape,otherShape)) continue;
 							if (!otherShape.ofEntity.has(component.Transformation)) continue;
 							var otherTransform = otherShape.ofEntity.get(component.Transformation).pos;
 
@@ -106,7 +106,7 @@ class Physics extends System {
 							if (rect1.x < rect2.x + rect2.width &&
 								rect1.x + rect1.width > rect2.x &&
 								rect1.y < rect2.y + rect2.height &&
-								rect1.height + rect1.y > rect2.y) {
+								rect1.height + rect1.y > rect2.y && validCollision(shape,otherShape)) {
 
 								var c = differ.Collision.shapeWithShape(
 								differ.shapes.Polygon.rectangle(shape.x+transformation.pos.x,shape.y+transformation.pos.y,shape.width,shape.height,false),
@@ -115,7 +115,7 @@ class Physics extends System {
 								if (c.separationY != 0){
 									collision = true;
 									collidingShape = otherShape;
-									if (otherShape.ofEntity.get(component.Collisions).stopMovement){
+									if (otherShape.ofEntity.get(component.Collisions).stopMovement && validCollision(shape,otherShape)){
 										transformation.pos.y += c.separationY;
 									}
 									reflecty = physics.reflect;

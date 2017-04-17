@@ -1707,27 +1707,42 @@
    </properties>
   </object>
   <object name="door" x="176" y="96"/>
-  <object name="shooter" x="112" y="192">
+  <object name="shooter" x="128" y="64">
    <properties>
     <property name="spin" value="1"/>
    </properties>
   </object>
-  <object name="shooter" x="160" y="192">
-   <properties>
-    <property name="spin" value="-1"/>
-   </properties>
-  </object>
-  <object name="slime" x="160" y="240"/>
-  <object name="slime" x="128" y="240"/>
+  <object name="slime" x="142.667" y="228.333"/>
   <object name="slime" x="144" y="256"/>
   <object name="slime" x="160" y="256"/>
   <object name="slime" x="310" y="129"/>
-  <object name="slime" x="385" y="114.5"/>
   <object name="slime" x="395" y="177"/>
   <object name="slime" x="375.5" y="146"/>
   <object name="slime" x="349" y="118"/>
   <object name="slime" x="290.5" y="170.5"/>
   <object name="torch" x="120.462" y="68.3587"/>
   <object name="torch" x="281.337" y="137.734"/>
+  <object name="spike" x="112" y="128"/>
+  <object name="spike" x="160" y="128"/>
+  <object name="shooter" x="384" y="112">
+   <properties>
+    <property name="spin" value="1"/>
+   </properties>
+  </object>
+  <object name="sign" x="96" y="96">
+   <properties>
+    <property name="message" value="Here lies the soul of the broken necromancer,/nmay he never rise again"/>
+   </properties>
+  </object>
+  <object name="sign" x="320" y="192">
+   <properties>
+    <property name="message" value="Beware, here lies a dangerous prison."/>
+   </properties>
+  </object>
+  <object name="sign" x="176" y="256">
+   <properties>
+    <property name="message" value="May those who hold/nthis key be full of light."/>
+   </properties>
+  </object>
  </objectgroup>
 </map>

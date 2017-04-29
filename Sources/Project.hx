@@ -18,7 +18,7 @@ class Project {
 		Scheduler.addTimeTask(update, 0, 1 / 60);
 
 		
-		var mainMusicChannel = kha.audio1.Audio.play(kha.Assets.sounds.Synthwave_Beta_2,true);
+		var mainMusicChannel = kha.audio1.Audio.play(kha.Assets.sounds.Synthwave_Beta_4,true);
 		mainMusicChannel.volume = .6;
 		
 
@@ -26,7 +26,7 @@ class Project {
 		realLastTime = Scheduler.realTime();
 		lastRenderTime = Scheduler.time();
 		
-		states.push(new states.Menu());
+		states.push(new states.Play());
 	}
 
 	function update() {

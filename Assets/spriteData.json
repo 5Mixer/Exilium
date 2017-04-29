@@ -173,7 +173,10 @@
 			"tileset":"tileset",
 			"id":21,
 			"width":16,
-			"height":16
+			"height":16,
+			"animations" : {
+				"flicker" : [21,22,21,23]
+			}
 		},
 		"sign" : {
 			"tileset":"tileset",

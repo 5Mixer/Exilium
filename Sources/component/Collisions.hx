@@ -8,6 +8,8 @@ enum CollisionGroup {
 	Bullet;
 	Item;
 	Particle;
+	ShooterTrap;
+	Chest;
 }
 
 class Rect {
@@ -132,6 +134,4 @@ class Collisions extends Component{
 
 		return x;
 	}
-
-	
 }

@@ -1,5 +1,6 @@
 package system;
 
+
 class Collisions extends System {
 	var view:eskimo.views.View;
 	public var grid:util.SpatialHash;
@@ -187,7 +188,7 @@ class Collisions extends System {
 						for (i in 0...1){
 							var particle = entities.create();
 							particle.set(new component.VisualParticle(component.VisualParticle.Effect.Blood));
-
+							particle.set(new component.Zindex(-1));
 							var w = 5;
 							var h = 5;
 							if (shapeEntity.has(component.Collisions)){

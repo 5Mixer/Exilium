@@ -11,6 +11,7 @@ enum Effect {
 class VisualParticle extends Component{
 	public var effect:Effect;
 	public var rand = 0.0;
+	public var life = 0;
 	public function new (?e:Effect){
 		effect = e;
 		if (e == null) e = Effect.Spark;

@@ -17,7 +17,6 @@ class TiledStructure extends WorldGenerator {
 
 		for (layer in structure.elementsNamed("layer")){
 			var n = 0;
-			trace("Layer.");
 			var layerTiles = layer.elementsNamed("data").next().elements();
 			
 			for (tile in layerTiles){

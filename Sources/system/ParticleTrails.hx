@@ -12,7 +12,6 @@ class ParticleTrails extends System {
 	override public function onUpdate (delta:Float){
 		super.onUpdate(delta);
 		for (entity in view.entities){
-			entity.get(component.Transformation).angle += 2;
 			
 			var particleTrailer:component.ParticleTrail = entity.get(component.ParticleTrail);
 			var transformation:component.Transformation = entity.get(component.Transformation);
@@ -23,7 +22,13 @@ class ParticleTrails extends System {
 
 				var particle = entities.create();
 				particle.set(new component.VisualParticle(particleTrailer.particle));
-				var off = entity.get(component.Sprite).tilesize/2;
+				var off = 3.;
+				if (entity.has(component.Sprite))
+					off = entity.get(component.Sprite).tilesize/2;
+				
+				if (entity.has(component.AnimatedSprite))
+					off = entity.get(component.AnimatedSprite).tilesize/2;
+				
 				var t = new component.Transformation(transformation.pos.add(new kha.math.Vector2(off,off)));
 				t.angle = transformation.angle;
 				particle.set(t);

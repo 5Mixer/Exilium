@@ -1,28 +1,28 @@
 package ;
 
 using util.ArrayExtender;
+import component.Collisions.CollisionGroup;
 import component.Inventory.ItemType;
 import component.Inventory.Item;
 
 class EntityFactory {
-	public static var itemData:Map<component.Inventory.Item,{name:String, stackable:Bool, type: ItemType, sprite: Dynamic}> = [
-		Item.Gold => { name: "gold", stackable: true, type: ItemType.Currency, sprite:states.Play.spriteData.entity.gold },
-		Item.HealthPotion => { name: "health potion", stackable: true, type: ItemType.Potion, sprite:states.Play.spriteData.entity.healthPotion },
-		Item.SlimeGun => { name: "slime gun", stackable: false, type: ItemType.Gun, sprite:states.Play.spriteData.entity.slimeGun },
-		Item.LaserGun => { name: "laser gun", stackable: false, type: ItemType.Gun, sprite:states.Play.spriteData.entity.laserGun },
-		Item.GrapplingHook => { name: "grappling gun", stackable: false, type: ItemType.Gun, sprite:states.Play.spriteData.entity.grapplingHook },
-		Item.CastSheild => { name: "cast shield", stackable: false, type: ItemType.Other, sprite:states.Play.spriteData.entity.cast_shield },
-		Item.Key => { name: "key", stackable: false, type: ItemType.Other, sprite:states.Play.spriteData.entity.key }
+	public static var itemData:Map<Item,{name:String, stackable:Bool, type: ItemType, sprite: Dynamic}> = [
+		component.Inventory.Item.Gold => { name: "gold", stackable: true, type: ItemType.Currency, sprite:states.Play.spriteData.entity.gold },
+		component.Inventory.Item.HealthPotion => { name: "health potion", stackable: true, type: ItemType.Potion, sprite:states.Play.spriteData.entity.healthPotion },
+		component.Inventory.Item.SlimeGun => { name: "slime gun", stackable: false, type: ItemType.Gun, sprite:states.Play.spriteData.entity.slimeGun },
+		component.Inventory.Item.LaserGun => { name: "laser gun", stackable: false, type: ItemType.Gun, sprite:states.Play.spriteData.entity.laserGun },
+		component.Inventory.Item.GrapplingHook => { name: "grappling gun", stackable: false, type: ItemType.Gun, sprite:states.Play.spriteData.entity.grapplingHook },
+		component.Inventory.Item.CastSheild => { name: "cast shield", stackable: false, type: ItemType.Other, sprite:states.Play.spriteData.entity.cast_shield },
+		component.Inventory.Item.Key => { name: "key", stackable: false, type: ItemType.Other, sprite:states.Play.spriteData.entity.key }
 	];
 
 	public function new () {};
-	public static function createItem (entities:eskimo.EntityManager, item:component.Inventory.Item, x:Float, y:Float){
+	public static function createItem (entities:eskimo.EntityManager, item:Item, x:Float, y:Float){
 		var droppedItem = entities.create();
 		droppedItem.set(new component.Name("Dropped Item"));
 		droppedItem.set(new component.Transformation(new kha.math.Vector2(x,y)));
-		//droppedItem.set(new component.TimedLife(5+Math.random()*3));
-		droppedItem.set(new component.Collisions([component.Collisions.CollisionGroup.Item],[component.Collisions.CollisionGroup.Item,component.Collisions.CollisionGroup.Enemy],false).registerCollisionRegion(new component.Collisions.Rect(2,2,4,4)));
-		droppedItem.set(new component.Collectable([component.Collisions.CollisionGroup.Friendly],[item]));
+		droppedItem.set(new component.Collisions([CollisionGroup.Item],[CollisionGroup.Item,CollisionGroup.Enemy,CollisionGroup.Chest],false).registerCollisionRegion(new component.Collisions.Rect(2,2,4,4)));
+		droppedItem.set(new component.Collectable([CollisionGroup.Friendly],[item]));
 		droppedItem.set(new component.Magnet());
 		droppedItem.set(new component.Physics());
 	
@@ -30,7 +30,6 @@ class EntityFactory {
 			droppedItem.set(new component.AnimatedSprite(states.Play.spriteData.entity.gold).playAnimation("spin").setSpeed(3));
 		}else{
 			droppedItem.set(new component.Sprite(itemData.get(item).sprite));
-
 		}
 		return droppedItem;
 	}
@@ -49,19 +48,17 @@ class EntityFactory {
 		p.set(new component.Gun());
 		p.set(new component.Inventory());
 		p.set(new component.GrappleHook());
-		p.set(new component.Collisions([component.Collisions.CollisionGroup.Friendly,component.Collisions.CollisionGroup.Player],[component.Collisions.CollisionGroup.Friendly,component.Collisions.CollisionGroup.Player,component.Collisions.CollisionGroup.Particle,component.Collisions.CollisionGroup.Item]));
+		p.set(new component.Collisions([CollisionGroup.Friendly,CollisionGroup.Player],[CollisionGroup.Friendly,CollisionGroup.Player,CollisionGroup.Particle,CollisionGroup.Item]));
 		p.get(component.Collisions).registerCollisionRegion(new component.Collisions.Rect(0,0,10,10));
 		p.set(new component.Light());
+		p.set(new component.Zindex(5));
 		
 		p.get(component.Light).colour = kha.Color.fromBytes(255,200,200);
 		p.get(component.Light).strength = .7;
 
-		p.get(component.Inventory).putIntoInventory(component.Inventory.Item.CastSheild);
+		// p.get(component.Inventory).putIntoInventory(component.Inventory.Item.CastSheild);
 		p.get(component.Inventory).putIntoInventory(component.Inventory.Item.Blaster);
 
-		// if (lastSave != null && lastSave.player != null){
-		// 	p.get(component.Health).current = lastSave.player.health;
-		// }
 		return p;
 	}
 	public static function createSlime(entities:eskimo.EntityManager,x:Int,y:Int){
@@ -73,7 +70,7 @@ class EntityFactory {
 		slime.get(component.AnimatedSprite).speed = 4;
 		slime.set(new component.Physics());
 		slime.set(new component.ai.AI(component.ai.AI.AIMode.Slime));
-		slime.set(new component.Collisions([component.Collisions.CollisionGroup.Enemy]));
+		slime.set(new component.Collisions([CollisionGroup.Enemy,CollisionGroup.Chest]));
 		var b:component.Collisions.Rect = new component.Collisions.Rect(0,0,8,8);
 		slime.get(component.Collisions).registerCollisionRegion(b);
 		return slime;
@@ -87,7 +84,7 @@ class EntityFactory {
 		mummy.get(component.AnimatedSprite).speed = 5;
 		mummy.set(new component.Physics());
 		mummy.set(new component.ai.MummyAI());
-		mummy.set(new component.Collisions([component.Collisions.CollisionGroup.Enemy]));
+		mummy.set(new component.Collisions([CollisionGroup.Enemy,CollisionGroup.Chest]));
 		var b:component.Collisions.Rect = new component.Collisions.Rect(0,0,8,8);
 		mummy.get(component.Collisions).registerCollisionRegion(b);
 		return mummy;
@@ -98,7 +95,7 @@ class EntityFactory {
 		treasure.set(new component.Transformation(new kha.math.Vector2(x,y)));
 		treasure.set(new component.AnimatedSprite(cast states.Play.spriteData.entity.chest));
 		treasure.get(component.AnimatedSprite).speed = 2;
-		treasure.set(new component.Collisions([component.Collisions.CollisionGroup.Level],[component.Collisions.CollisionGroup.Level]));
+		treasure.set(new component.Collisions([CollisionGroup.Chest]));
 		treasure.get(component.Collisions).registerCollisionRegion(new component.Collisions.Rect(2,3,8,8));
 		
 		var contents = [];
@@ -106,7 +103,7 @@ class EntityFactory {
 		contents.pushx(component.Inventory.Item.HealthPotion,Math.floor(Math.random()*2));
 		if (Math.random() > .6) contents.push(component.Inventory.Item.LaserGun);
 		if (Math.random() > .75) contents.push(component.Inventory.Item.GrapplingHook);
-		treasure.set(new component.ReleaseOnCollision(contents,[component.Collisions.CollisionGroup.Friendly]));
+		treasure.set(new component.ReleaseOnCollision(contents,[CollisionGroup.Friendly]));
 		
 		return treasure;
 	}
@@ -117,7 +114,7 @@ class EntityFactory {
 		treasure.set(new component.AnimatedSprite(cast states.Play.spriteData.entity.lava));
 		treasure.get(component.AnimatedSprite).speed = 4;
 		treasure.get(component.AnimatedSprite).playAnimation("flow");
-		treasure.set(new component.Collisions([],[component.Collisions.CollisionGroup.Bullet,component.Collisions.CollisionGroup.Item],false));
+		treasure.set(new component.Collisions([],[CollisionGroup.Bullet,CollisionGroup.Item],false));
 		treasure.get(component.Collisions).registerCollisionRegion(new component.Collisions.Rect(0,0,16,16));
 		treasure.set(new component.Damager(.3));
 		treasure.get(component.Damager).causesBlood = false;
@@ -131,8 +128,10 @@ class EntityFactory {
 		var torch = entities.create();
 		torch.set(new component.Name("Torch"));
 		torch.set(new component.Transformation(new kha.math.Vector2(x,y)));
-		torch.set(new component.Sprite(cast states.Play.spriteData.entity.torch));
+		torch.set(new component.AnimatedSprite(cast states.Play.spriteData.entity.torch));
+		torch.get(component.AnimatedSprite).playAnimation("flicker");
 		torch.set(new component.Light());
+		torch.set(new component.ParticleTrail(1,component.VisualParticle.Effect.Smoke));
 		torch.get(component.Light).colour = kha.Color.Red;
 		torch.get(component.Light).strength = .4;
 
@@ -143,7 +142,7 @@ class EntityFactory {
 		door.set(new component.Name("Locked Door"));
 		door.set(new component.Transformation(new kha.math.Vector2(x,y)));
 		door.set(new component.Sprite(cast states.Play.spriteData.entity.door));
-		door.set(new component.Collisions([component.Collisions.CollisionGroup.Level],[]));
+		door.set(new component.Collisions([CollisionGroup.Level],[]));
 		door.set(new component.Message("Door","One must find a/ngolden key to pass here."));
 		door.get(component.Collisions).registerCollisionRegion(new component.Collisions.Rect(0,0,16,16));
 		door.set(new component.CustomCollisionHandler(null,function (collider) {
@@ -166,11 +165,11 @@ class EntityFactory {
 		shooter.get(component.Transformation).angle = angle;
 
 		shooter.set(new component.Sprite(cast states.Play.spriteData.entity.shooter));
-		shooter.set(new component.Collisions([],[component.Collisions.CollisionGroup.Level,component.Collisions.CollisionGroup.Enemy]));
+		shooter.set(new component.Collisions([CollisionGroup.ShooterTrap],[CollisionGroup.Level,CollisionGroup.Enemy]));
 		shooter.get(component.Collisions).registerCollisionRegion(new component.Collisions.Rect(5,5,6,6));
 
-		shooter.set(new component.TimedShoot(6+Math.floor(Math.random()*6)));
-		shooter.set(new component.Spin(-2+(Math.random()*4)));
+		shooter.set(new component.TimedShoot(10+Math.floor(Math.random()*9)));
+		//shooter.set(new component.Spin(-2+(Math.random()*4)));
 		
 		return shooter;
 	}
@@ -183,7 +182,7 @@ class EntityFactory {
 		goblin.get(component.AnimatedSprite).speed = 13;
 		goblin.set(new component.Physics());
 		goblin.set(new component.ai.AI(component.ai.AI.AIMode.Goblin));
-		goblin.set(new component.Collisions([component.Collisions.CollisionGroup.Enemy]));
+		goblin.set(new component.Collisions([CollisionGroup.Enemy,CollisionGroup.Chest]));
 		var b:component.Collisions.Rect = new component.Collisions.Rect(2,1,6,9);
 		goblin.get(component.Collisions).registerCollisionRegion(b);
 		return goblin;
@@ -192,28 +191,23 @@ class EntityFactory {
 		var corruptSoul = entities.create();
 		corruptSoul.set(new component.Name("Corrupt Soul"));
 		corruptSoul.set(new component.Transformation(new kha.math.Vector2(x,y)));
-		//corruptSoul.set(new component.Health(75));
 		corruptSoul.set(new component.Physics());
 		corruptSoul.set(new component.ai.CorruptSoulAI());
 		corruptSoul.set(new component.ActiveBoss("Corrupt Soul"));
-		corruptSoul.set(new component.Collisions([],[component.Collisions.CollisionGroup.Enemy,component.Collisions.CollisionGroup.Bullet,component.Collisions.CollisionGroup.Item],false));
+		corruptSoul.set(new component.Collisions([CollisionGroup.Chest],[CollisionGroup.Enemy,CollisionGroup.Bullet,CollisionGroup.Item],false));
 		var b:component.Collisions.Rect = new component.Collisions.Rect(-3,-3,6,6);
 		corruptSoul.get(component.Collisions).registerCollisionRegion(b);
 		corruptSoul.set(new component.CorruptSoul());
 		corruptSoul.set(new component.Events());
-		corruptSoul.get(component.Events).listenToEvent(component.Events.Event.Death,function(e){
-			trace("You killed the corrupt soul!");
-			
-		});
-		for (i in 0...25){
-			var size = 4+Math.random()*5;
+		for (i in 0...15){
+			var size = 3+Math.random()*3;
 			var corruptSoulChild = entities.create();
 			corruptSoulChild.set(new component.Transformation(new kha.math.Vector2(x,y)));
 			corruptSoulChild.set(new component.Health(10));
 			corruptSoulChild.set(new component.Physics());
 			corruptSoulChild.set(new component.CorruptSoulChild());
 			corruptSoulChild.get(component.Physics).friction = .5;
-			corruptSoulChild.set(new component.Collisions([component.Collisions.CollisionGroup.Enemy],[component.Collisions.CollisionGroup.Enemy],false));
+			corruptSoulChild.set(new component.Collisions([CollisionGroup.Enemy],[CollisionGroup.Enemy],false));
 			var b:component.Collisions.Rect = new component.Collisions.Rect(Math.ceil(-size/2),Math.ceil(-size/2),Math.ceil(size),Math.ceil(size));
 			corruptSoulChild.get(component.Collisions).registerCollisionRegion(b);
 			
@@ -231,7 +225,7 @@ class EntityFactory {
 		cactusBoss.set(new component.ActiveBoss("Cactus Boss"));
 		cactusBoss.get(component.ActiveBoss).current = 300;
 		cactusBoss.get(component.ActiveBoss).max = 300;
-		cactusBoss.set(new component.Collisions([component.Collisions.CollisionGroup.Enemy],[]));
+		cactusBoss.set(new component.Collisions([CollisionGroup.Enemy],[]));
 		var b:component.Collisions.Rect = new component.Collisions.Rect(0,0,16,16);
 		cactusBoss.get(component.Collisions).registerCollisionRegion(b);
 		cactusBoss.set(new component.Damager(.35));
@@ -247,7 +241,7 @@ class EntityFactory {
 		potion.set(new component.Transformation(new kha.math.Vector2(x,y)));
 		potion.set(new component.TimedLife(5+Math.random()*3));
 		potion.set(new component.Magnet());
-		potion.set(new component.Collisions([component.Collisions.CollisionGroup.Item],[component.Collisions.CollisionGroup.Bullet,component.Collisions.CollisionGroup.Enemy,component.Collisions.CollisionGroup.Friendly,component.Collisions.CollisionGroup.Player,component.Collisions.CollisionGroup.Particle,component.Collisions.CollisionGroup.Item]).registerCollisionRegion(new component.Collisions.Rect(2,2,4,4)));
+		potion.set(new component.Collisions([CollisionGroup.Item],[CollisionGroup.Bullet,CollisionGroup.Enemy,CollisionGroup.Friendly,CollisionGroup.Player,CollisionGroup.Particle,CollisionGroup.Item]).registerCollisionRegion(new component.Collisions.Rect(2,2,4,4)));
 		potion.set(new component.Sprite(states.Play.spriteData.entity.healthPotion));
 		return potion;
 
@@ -257,9 +251,9 @@ class EntityFactory {
 		ladder.set(new component.Name("Ladder")); 
 		ladder.set(new component.Transformation(new kha.math.Vector2(x,y))); 
 		ladder.set(new component.Sprite(states.Play.spriteData.entity.ladder)); 
-		ladder.set(new component.Collisions([component.Collisions.CollisionGroup.Level])); 
+		ladder.set(new component.Collisions([CollisionGroup.Level])); 
 		ladder.get(component.Collisions).registerCollisionRegion(new component.Collisions.Rect(0,0,16,16)); 
-		ladder.set(new component.CustomCollisionHandler([component.Collisions.CollisionGroup.Player],onCollide)); 
+		ladder.set(new component.CustomCollisionHandler([CollisionGroup.Player],onCollide)); 
 		return ladder; 
 	}
 	public static function createSign(entities:eskimo.EntityManager,x:Int,y:Int,message:String){ 
@@ -268,9 +262,9 @@ class EntityFactory {
 		sign.set(new component.Transformation(new kha.math.Vector2(x,y))); 
 		sign.set(new component.Sprite(states.Play.spriteData.entity.sign));
 		sign.set(new component.Message("sign",message));
-		sign.set(new component.Collisions([component.Collisions.CollisionGroup.Level],null,false)); 
+		sign.set(new component.Collisions([],null,false)); 
 		sign.get(component.Collisions).registerCollisionRegion(new component.Collisions.Rect(2,5,12,9));
-		return sign; 
+		return sign;
 	}
 	public static function createSpike(entities:eskimo.EntityManager,x:Int,y:Int){ 
 		var spikes = entities.create(); 
@@ -280,8 +274,8 @@ class EntityFactory {
 		spikes.set(new component.Spike());
 		spikes.set(new component.Zindex(-1));
 		spikes.set(new component.AnimatedSprite(states.Play.spriteData.entity.spikes));
-		spikes.get(component.AnimatedSprite).playAnimation("raise","up");
-		spikes.set(new component.Collisions([],component.Collisions.CollisionGroup.createAll(),false)); 
+		spikes.get(component.AnimatedSprite).playAnimation("raise","up").setSpeed(2);
+		spikes.set(new component.Collisions([],CollisionGroup.createAll(),false)); 
 		spikes.get(component.Collisions).registerCollisionRegion(new component.Collisions.Rect(0,0,16,16));
 		return spikes; 
 	} 

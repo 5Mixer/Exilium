@@ -12,6 +12,10 @@ class Input {
 	public var right: Bool;
 	public var up: Bool;
 	public var down: Bool;
+	
+	public var keys = new Map<kha.Key,Bool >();
+	public var chars = new Map<String,Bool >();
+
 	public var mouseEvents = true;
 	public var mousePos:kha.math.Vector2 = new kha.math.Vector2(0,0);
 	public var mouseButtons:{left:Bool, right:Bool} = {
@@ -60,30 +64,34 @@ class Input {
 	}
 
 
-	public function keyDown(char:Key,letter:String) {
-		
+	public function keyDown(key:Key,char:String) {
+		keys.set(key,true);
+		chars.set(char,true);
 
-		if (char == LEFT || letter == "a")
+		if (key == LEFT || char == "a")
 			left = true;
 
-		if (char == RIGHT || letter == "d")
+		if (key == RIGHT || char == "d")
 			right = true;
 
-		if (char == UP || letter == "w")
+		if (key == UP || char == "w")
 			up = true;
 
-		if (char == DOWN || letter == "s")
+		if (key == DOWN || char == "s")
 			down = true;
 	}
 
-	public function keyUp(char: Key,letter) {
+	public function keyUp(key: Key,char) {
+		
+		keys.set(key,false);
+		chars.set(char,false);
 
 		for (listener in listeners){
-			if (letter == listener.key){
+			if (char == listener.key){
 				listener.callback();
 			}
 		}
-		if (char == ESC){
+		if (key == ESC){
 			for (listener in listeners){
 				if (listener.key == "esc"){
 					listener.callback();
@@ -91,13 +99,13 @@ class Input {
 			}
 		}
 		
-		if(char == LEFT || letter == 'a')
+		if(key == LEFT || char == 'a')
 			left = false;
-		if(char == RIGHT || letter == 'd')
+		if(key == RIGHT || char == 'd')
 			right = false;
-		if(char == UP || letter == 'w')
+		if(key == UP || char == 'w')
 			up = false;
-		if(char == DOWN || letter == 's')
+		if(key == DOWN || char == 's')
 			down = false;
 	}
 }

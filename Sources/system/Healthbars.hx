@@ -1,7 +1,5 @@
 package system;
 
-import kha.math.FastMatrix3;
-
 class Healthbars extends System {
 	var view:eskimo.views.View;
 	public function new (entities:eskimo.EntityManager){

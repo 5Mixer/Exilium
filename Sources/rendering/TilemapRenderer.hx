@@ -44,8 +44,7 @@ class TilemapRenderer  {
 					for (sx in -1...2){
 						for (sy in -1...2){
 							if (map.get(lightPositionx+sx,lightPositiony+sy) == null) continue;
-							//if (map.get(lightPositionx+sx,lightPositiony+sy).id < 0) continue;
-							if (map.tileInfo.get(map.get(lightPositionx+sx,lightPositiony+sy).id) == null) {continue; }
+							if (map.tileInfo.get(map.get(lightPositionx+sx,lightPositiony+sy).id) == null) continue;
 							if (map.tileInfo.get(map.get(lightPositionx+sx,lightPositiony+sy).id).collide) continue;
 							smootherLights.push({x:sx,y:sy});
 						}
@@ -77,10 +76,11 @@ class TilemapRenderer  {
 					c.g += colour.G * spec;
 					c.b += colour.B * spec;
 				}
+				//Scale everything to a maximum of 1
+				var max = Math.max(Math.max(c.r,1),Math.max(c.g,c.b));
 				//Now actually apply the tint, again, within a range.
-				g.color = kha.Color.fromFloats(Math.min(c.r,1),Math.min(c.g,1),Math.min(c.b,1),1);
-				
-				
+				g.color = kha.Color.fromFloats(c.r/max,c.g/max,c.b/max,1);
+								
 				var id = tileData.id + tile.zone.getIndex() * 5;
 				var sourcePos = { x: (id%Math.floor(kha.Assets.images.Dungeonsets.width/tilesize))*tilesize, y:Math.floor(id/Math.floor(kha.Assets.images.Dungeonsets.width/tilesize))*tilesize };
 				

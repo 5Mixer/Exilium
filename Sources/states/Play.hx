@@ -14,22 +14,17 @@ typedef Save  = {
 	var dungeons:Array<Dungeon>;
 }
 
-
 class Play extends states.State {
 	var frame = 0;
 	var input:Input;
-	public var entities:eskimo.EntityManager;
-
 	var lastRenderTime = 0.0;
+	public var entities:eskimo.EntityManager;
+	var p:eskimo.Entity;
+	public var camera:Camera;
 
 	var systems:eskimo.systems.SystemManager;
 	var renderSystems = new Array<System>();
 	var renderview:eskimo.views.View;
-	
-	var p:eskimo.Entity;
-	public var camera:Camera;
-
-	var minimap:kha.Image;
 	
 	public static var spriteData = CompileTime.parseJsonFile('../assets/spriteData.json');
 	
@@ -43,15 +38,15 @@ class Play extends states.State {
 	
 	var tilemapRender:rendering.TilemapRenderer;
 	var map:world.Tilemap;
-	var mapShown = true;
 	var mapCollisions:eskimo.Entity;
 	var generator:worldgen.WorldGenerator;
 
+	var minimap:kha.Image;
+	var mapShown = true;
 	var paused = false;
 
 	override public function new (){
 		super();
-
 
 		input = new Input();
 		camera = new Camera();
@@ -74,7 +69,6 @@ class Play extends states.State {
 		registerRenderSystem(new system.ShieldRenderer(input,camera,entities));
 		registerRenderSystem(new system.CorruptSoulRenderer(entities));
 		registerRenderSystem(new system.MessageRenderer(entities));
-		
 		registerRenderSystem(new system.CollisionDebugView(entities,collisionSys.grid,true));
 		
 		systems.add(collisionSys);
@@ -96,9 +90,9 @@ class Play extends states.State {
 		debugInterface = new ui.DebugInterface(p);		
 		//debugInterface.visible = false;
 		
-		//input.listenToKeyRelease('r', descend);
-		input.listenToKeyRelease('q',function (){
-		//	debugInterface.visible = !debugInterface.visible;
+		input.listenToKeyRelease('r', descend);
+		input.listenToKeyRelease('t',function (){
+			debugInterface.visible = !debugInterface.visible;
 		});
 		input.listenToKeyRelease('m', function (){
 			mapShown = !mapShown;
@@ -106,14 +100,7 @@ class Play extends states.State {
 		input.listenToKeyRelease("esc", function (){
 			paused = !paused;
 		});
-		input.wheelListeners.push(function(dir){
-			kha.audio1.Audio.play(kha.Assets.sounds.ui_blip);
-			if (p.get(component.Inventory) == null) return;
-			p.get(component.Inventory).activeIndex += dir;
-			if (p.get(component.Inventory).activeIndex < 0) p.get(component.Inventory).activeIndex = p.get(component.Inventory).length-1;
-			if (p.get(component.Inventory).activeIndex > p.get(component.Inventory).length-1) p.get(component.Inventory).activeIndex = 0;
-			cast(systems.get(system.Inventory),system.Inventory).onChangeItem();
-		});
+		input.wheelListeners.push(offsetInventorySelection);
 
 		lastRenderTime = kha.Scheduler.time();
 	}
@@ -134,12 +121,8 @@ class Play extends states.State {
 		(cast systems.get(system.AI)).map = map;
 
 		var worldSize = 60;
-		if (dungeonLevel == 1) {
-			generator = new worldgen.TiledStructure(worldSize,worldSize);
-		}else if (dungeonLevel > 1){
-			generator = new worldgen.DungeonWorldGenerator(worldSize,worldSize);
-
-		}
+		generator = dungeonLevel == 1 ? new worldgen.TiledStructure(worldSize,worldSize) : new worldgen.DungeonWorldGenerator(worldSize,worldSize);
+		
 		map.tiles = generator.tiles;
 		map.width = generator.width;
 		map.height = generator.height;
@@ -147,7 +130,6 @@ class Play extends states.State {
 		minimap = kha.Image.createRenderTarget(worldSize,worldSize);
 		
 		minimap.g2.begin();
-		minimap.g2.clear(kha.Color.fromBytes(0,0,0,0));
 		var t = 0;
 		var collisionRects = [];
 		while (t < generator.tiles.length-1){
@@ -222,7 +204,7 @@ class Play extends states.State {
 			var pos = dungeon.middleOfRoom(room);
 			//EntityFactory.createCactusBoss(entities,pos.x*16,pos.y*16,room);
 		}
-		//EntityFactory.createMummy(entities,generator.spawnPoint.x*16+10,generator.spawnPoint.y*16);
+		EntityFactory.createMummy(entities,generator.spawnPoint.x*16+10,generator.spawnPoint.y*16);
 
 		p = EntityFactory.createPlayer(entities,{x:generator.spawnPoint.x, y:generator.spawnPoint.y});
 		p.get(component.Inventory).putIntoInventory(component.Inventory.Item.SlimeGun);
@@ -255,7 +237,7 @@ class Play extends states.State {
 			dungeons: dungeons,
 			player: null
 		};
-		if (p.get(component.Transformation) != null)
+		if (p.has(component.Transformation))
 			lastSave.player = {
 				pos: {
 					x: Math.round(p.get(component.Transformation).pos.x),
@@ -270,8 +252,6 @@ class Play extends states.State {
 	override public function render (framebuffer:kha.Framebuffer){
 		var renderDelta = kha.Scheduler.time() - lastRenderTime;
 		lastRenderTime = kha.Scheduler.time();
-
-
 
 		minimap = kha.Image.createRenderTarget(60,60);
 		
@@ -303,134 +283,128 @@ class Play extends states.State {
 		minimap.g2.fillRect(Math.floor((ppos.x+16)/16),Math.floor((ppos.y+5)/16),1,1);
 		minimap.g2.end();
 
-
-
-		var sr:system.ShieldRenderer = systems.get(system.ShieldRenderer);
-		sr.prepass();
+		// var shieldSys:system.ShieldRenderer = systems.get(system.ShieldRenderer);
+		// shieldSys.prepass();
 
 		var g = framebuffer.g2;
 		g.begin();
 		g.color = kha.Color.White;
-		
+
 		//Let individual systems render.
 		camera.transform(g);
 		tilemapRender.render(g,map);
 		for (system in renderSystems)
 			system.render(g);
 		camera.restore(g);
+		g.color = kha.Color.White;
 		
 		//Draw mouse cursor.
 		if (debugInterface.visible){
 			kha.input.Mouse.get().showSystemCursor();
-			input.mouseEvents = false;
 		}else{
 			input.mouseEvents = true;
 			kha.input.Mouse.get().hideSystemCursor();
-			g.color = kha.Color.White;
 			g.drawSubImage(kha.Assets.images.Entities,input.mousePos.x/4 -8,input.mousePos.y/4 -8,2*16,0,16,16);
 		}
 
-		//Clear any transformation for the UI.
 		if (mapShown){
-			g.pushTransformation(kha.math.FastMatrix3.identity());
-			g.transformation._00 = 4;
-			g.transformation._11 = 4;
+			//Draw minimap at the top right of the screen.
+			g.transformation = kha.math.FastMatrix3.scale(4,4);
 			g.drawImage(minimap,kha.System.windowWidth()/4 - map.width,0);
-
 		}
-		g.transformation = kha.math.FastMatrix3.identity();
-
-		var x = 0;
-		g.color = kha.Color.White;
-		g.font = kha.Assets.fonts.trenco;
-		g.fontSize = 38;
+		g.transformation = kha.math.FastMatrix3.identity(); //Reset after map transformation.
 
 		var pinv = p.get(component.Inventory);
-		g.color = kha.Color.fromBytes(234,211,220);
 
-		if (p.has(component.Inventory)){
+		if (pinv != null){	
+			g.font = kha.Assets.fonts.trenco;
+			g.color = kha.Color.fromBytes(234,211,220);
+			g.fontSize = 38;
 			g.drawString(pinv.itemData.get(pinv.getByIndex(pinv.activeIndex).item).name,(3*4), -1*4);
 			
 			g.translate(0,8*4);
+			var n = 0;
 			for (stack in p.get(component.Inventory).stacks){
 				g.transformation._00 = camera.scale.x;
 				g.transformation._11 = camera.scale.y;
-				var off = x == pinv.activeIndex ? 1 : 0;
-				system.Renderer.renderSpriteData(g,p.get(component.Inventory).itemData.get(stack.item).sprite,6+off,x*10);
+				var off = n == pinv.activeIndex ? 1 : 0;
+				system.Renderer.renderSpriteData(g,p.get(component.Inventory).itemData.get(stack.item).sprite,8+off,n*10);
 				
 				g.color = kha.Color.fromBytes(112,107,137);
-				if (x == pinv.activeIndex)
-					g.fillRect(1,x*10+1,1,6);
+				if (n == pinv.activeIndex)
+					g.fillRect(1,n*10+1,1,6);
 
 				g.transformation._00 = 1;
 				g.transformation._11 = 1;
 				g.color = kha.Color.fromBytes(234,211,220);
-				g.drawString(stack.quantity+"",(3*4), (x*10*4)-8);
+				g.drawString(stack.quantity+"",(3*4), (n*10*4)-8);
 				
-				x++;
-				
+				n++;
 			}
 		}
 
+		//Alpha text.
 		g.transformation = kha.math.FastMatrix3.identity();
 		g.font = kha.Assets.fonts.OpenSans;
 		g.color = kha.Color.fromFloats(1,1,1,.4);
 		g.fontSize = 20;
-		g.drawString("Early Exilium Demo. Feedback welcomed! tinyurl.com/exilium1. code - @5mixer. art - @BU773RH4ND5. music - @gas1312_AGD",10,kha.System.windowHeight()-30);
+		g.drawString("Exilium 0.1.0. @5mixer, @BU773RH4ND5, @gas1312_AGD",10,kha.System.windowHeight()-30);
 
-		g.popTransformation();
-
-		g.transformation = kha.math.FastMatrix3.identity();
 		if (paused){
+			//Pause overlay.
 			g.color = kha.Color.fromFloats(.1,.2,.2,.6);
 			g.fillRect(0,0,framebuffer.width,framebuffer.height);
-
-			g.font = kha.Assets.fonts.trenco;
-			g.fontSize = 38*4;
 
 			g.color = kha.Color.fromBytes(30,30,30);
 			g.fillRect(0,0,400,kha.System.windowHeight());
 			
 			g.color = kha.Color.White;
-			
+			g.font = kha.Assets.fonts.trenco;
+			g.fontSize = 38*4;
 			g.drawString("Paused",20,20);
 
 		}
-		g.end();
-
 		g.color = kha.Color.White;
+		g.end();
+		
 		debugInterface.render(g);
 		debugInterface.updateGraph.pushValue(1/renderDelta/debugInterface.updateGraph.size.y);
 		
 	}
+	public function offsetInventorySelection(offset:Int){
+		kha.audio1.Audio.play(kha.Assets.sounds.ui_blip);
+		if (p.get(component.Inventory) == null) return;
+		p.get(component.Inventory).activeIndex += offset;
+		if (p.get(component.Inventory).activeIndex < 0) p.get(component.Inventory).activeIndex = p.get(component.Inventory).length-1;
+		if (p.get(component.Inventory).activeIndex > p.get(component.Inventory).length-1) p.get(component.Inventory).activeIndex = 0;
+		cast(systems.get(system.Inventory),system.Inventory).onChangeItem();
+	}
+
 	override public function update(delta:Float){
+		debugInterface.fpsGraph.pushValue(1/delta/debugInterface.fpsGraph.size.y);
+		input.mouseEvents = debugInterface.visible;
 		input.startUpdate();
-		
+		frame++;
 		if (!paused)
 			systems.update(delta);
+
+		//Q/E Inventory slide.
+		if (input.chars.get("q") && frame%7==0)
+			offsetInventorySelection(-1);
+		if (input.chars.get("e") && frame%7==0)
+			offsetInventorySelection(1);
+			
 		
 		var physsys:system.Physics = systems.get(system.Physics);
 		var colsys:system.Collisions = systems.get(system.Collisions);
 		physsys.grid = colsys.grid;
 
-		var ms:system.Magnets = systems.get(system.Magnets);
-		ms.p = p;
+		var magnetsSystem:system.Magnets = systems.get(system.Magnets);
+		magnetsSystem.p = p;
 
 		if (p != null && p.has(component.Transformation))
 			camera.pos = new kha.math.Vector2(p.get(component.Transformation).pos.x-kha.System.windowWidth()/2/camera.scale.x,p.get(component.Transformation).pos.y-kha.System.windowHeight()/2/camera.scale.y);
 		
-		debugInterface.fpsGraph.pushValue(1/delta/debugInterface.fpsGraph.size.y);
-		
-		// if (p.has(component.Transformation)){
-		// 	var playerPosition = p.get(component.Transformation).pos;
-		// 	var playerZone = map.get(Math.round(playerPosition.x/16),Math.round(playerPosition.y/16)).zone;
-		// 	debugInterface.windows = [{
-		// 		title:"world",
-		// 		contents: [
-		// 			ui.DebugInterface.Module.Label("Zone: "+playerZone)
-		// 		]
-		// 	}];
-		// }
 		var collisionDebugViewSys:system.CollisionDebugView = systems.get(system.CollisionDebugView);
 		collisionDebugViewSys.showActiveEntities = debugInterface.activeCollisionRegionsShown;
 		collisionDebugViewSys.showStaticEntities = debugInterface.staticCollisionRegionsShown;

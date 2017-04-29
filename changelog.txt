@@ -19,3 +19,13 @@
 
  10/04/17
  - Cactus boss.
+
+ --- Lot's of work getting out a demo, which received feedback and bug reports, to be fixed and improved with ---
+
+ 29/04/17
+ - Made bullets not collide with signs.
+ - Cleaned up the project class a little.
+ - Alter lighting slightly. Tile's RGB are not capped individually under one, but rather scaled so the largest peaks at 1.
+ - Animated and added (bad looking) smoke to torches.
+ - Made Q/E switch opened item.
+ - Fixed some item collisions. Eg - signs don't stop bullets

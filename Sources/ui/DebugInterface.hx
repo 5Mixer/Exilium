@@ -15,7 +15,7 @@ class DebugInterface {
 	var debugui: Zui;
 	public var fpsGraph:ui.Graph;
 	public var updateGraph:ui.Graph;
-	public var visible = false;
+	public var visible = true;
 
 	public var activeCollisionRegionsShown = false;
 	public var staticCollisionRegionsShown = false;
@@ -35,20 +35,17 @@ class DebugInterface {
 		g.transformation = (kha.math.FastMatrix3.identity());
 		
 		
-			var fpsImage = fpsGraph.renderToImage();
-			var upsImage = updateGraph.renderToImage();
+		var fpsImage = fpsGraph.renderToImage();
+		var upsImage = updateGraph.renderToImage();
 
-			/*debugui.begin(g);
+		debugui.begin(g);
 			
 		if (visible){
 			//Ensure ZUI refreshes for animations.
 			var hwin = Id.handle();
 			hwin.redraws = 1;
-
-			var a = Id.handle();
-			//a.redraws = 1;
 			
-			if (debugui.window(a,10,10,200,600,true)){
+			if (debugui.window(hwin,10,10,200,600,true)){
 				debugui.text("Debug Interface");
 				var k = Id.handle({selected: true});
 				if (debugui.panel(k, "Stats")) {
@@ -77,6 +74,6 @@ class DebugInterface {
 				x += 220;
 			}
 		}
-		debugui.end();*/
+		debugui.end();
 	}
 }

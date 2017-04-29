@@ -15,6 +15,7 @@ class ParticleRenderer extends System {
 		for (entity in view.entities){
 			var transform = entity.get(component.Transformation);
 			var particle = entity.get(component.VisualParticle);
+			particle.life++;
 			switch(particle.effect){
 				case Effect.Blood: {
 					var variant = Math.floor(particle.rand*5);
@@ -28,6 +29,12 @@ class ParticleRenderer extends System {
 					}else{
 						g.fillCircle(transform.pos.x,transform.pos.y,3,4);
 					}
+				}
+				case Effect.Smoke: {
+					g.color = kha.Color.fromBytes(100,90,90,100-particle.life);
+					transform.pos.x += Math.floor(-1+Math.random()*2);
+					g.fillCircle(transform.pos.x-3+(particle.life/2),transform.pos.y-particle.life,2,8);
+					
 				}
 				case Effect.Text(t): {
 					var offx = 0.0;

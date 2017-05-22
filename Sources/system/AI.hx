@@ -28,11 +28,11 @@ class AI extends System {
 				slimeAIMode(entity,transformation,physics,AI);
 
 			if (AI.mode == component.ai.AI.AIMode.Goblin)
-				goblineAIMode(entity,transformation,physics,AI);
+				goblineAIMode(entity,transformation,physics,AI,delta);
 			
 		}
 	}
-	public function goblineAIMode (entity:eskimo.Entity,transformation:component.Transformation,physics:component.Physics,AI:component.ai.AI){
+	public function goblineAIMode (entity:eskimo.Entity,transformation:component.Transformation,physics:component.Physics,AI:component.ai.AI,delta:Float){
 		var closestTarget = null;
 		var distanceToTarget = Math.POSITIVE_INFINITY;
 		for (target in targets.entities){
@@ -99,15 +99,15 @@ class AI extends System {
 			//Chase						
 			var dir = closestTarget.get(component.Transformation).pos.add(new kha.math.Vector2(-10+Math.random()*20,-10+Math.random()*20)).sub(entity.get(component.Transformation).pos);
 			dir.normalize();
-			entity.get(component.Physics).velocity = dir.mult(2);
+			entity.get(component.Physics).velocity = dir.mult(70);
 			slitherAnimation(entity);
 		}else{
 			//Idle
 			var angle = Math.atan2(entity.get(component.Physics).velocity.y,entity.get(component.Physics).velocity.x);
 			angle += (-25+ Math.random()*50) * Math.PI/180;
 
-			entity.get(component.Physics).velocity.x = Math.cos(angle)*1.4;
-			entity.get(component.Physics).velocity.y = Math.sin(angle)*1.4;
+			entity.get(component.Physics).velocity.x = Math.cos(angle)*35;
+			entity.get(component.Physics).velocity.y = Math.sin(angle)*35;
 
 			slitherAnimation(entity);
 			
@@ -175,15 +175,15 @@ class AI extends System {
 			//Chase						
 			var dir = closestTarget.get(component.Transformation).pos.add(new kha.math.Vector2(-10+Math.random()*20,-10+Math.random()*20)).sub(entity.get(component.Transformation).pos);
 			dir.normalize();
-			entity.get(component.Physics).velocity = dir.mult(2);
+			entity.get(component.Physics).velocity = dir.mult(40);
 			//slitherAnimation(entity);
 		}else{
 			//Idle
 			var angle = Math.atan2(entity.get(component.Physics).velocity.y,entity.get(component.Physics).velocity.x);
 			angle += (-25+ Math.random()*50) * Math.PI/180;
 
-			entity.get(component.Physics).velocity.x = Math.cos(angle)*1.4;
-			entity.get(component.Physics).velocity.y = Math.sin(angle)*1.4;
+			entity.get(component.Physics).velocity.x = Math.cos(angle)*30;
+			entity.get(component.Physics).velocity.y = Math.sin(angle)*30;
 			
 		}
 	}

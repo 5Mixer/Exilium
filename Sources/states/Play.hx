@@ -63,6 +63,7 @@ class Play extends states.State {
 		registerRenderSystem(new system.SpikeHandler(entities));
 		registerRenderSystem(new system.ParticleRenderer(entities));
 		registerRenderSystem(new system.GrappleHooker(input,camera,entities,collisionSys));
+		registerRenderSystem(new system.Gun(input,camera,entities));
 		registerRenderSystem(new system.DebugView(entities));
 		registerRenderSystem(new system.Healthbars(entities));
 		registerRenderSystem(new system.ActiveBoss(entities));
@@ -77,10 +78,10 @@ class Play extends states.State {
 		systems.add(new system.Inventory(input,entities));
 		systems.add(new system.TimedLife(entities));
 		systems.add(new system.ParticleTrails(entities));
-		systems.add(new system.Gun(input,camera,entities));
 		systems.add(new system.AI(entities,null));
 		systems.add(new system.CorruptSoulAI(entities,null));
 		systems.add(new system.MummyAI(entities,null));
+		systems.add(new system.BatAI(entities));
 		systems.add(new system.Magnets(entities,p));
 		systems.add(new system.TimedShoot(entities));
 		systems.add(new system.Spinner(entities));
@@ -88,7 +89,7 @@ class Play extends states.State {
 		map = createMap();
 
 		debugInterface = new ui.DebugInterface(p);		
-		//debugInterface.visible = false;
+		debugInterface.visible = false;
 		
 		input.listenToKeyRelease('r', descend);
 		input.listenToKeyRelease('t',function (){
@@ -98,6 +99,7 @@ class Play extends states.State {
 			mapShown = !mapShown;
 		});
 		input.listenToKeyRelease("esc", function (){
+			kha.audio1.Audio.play(kha.Assets.sounds.button_click);
 			paused = !paused;
 		});
 		input.wheelListeners.push(offsetInventorySelection);
@@ -192,6 +194,7 @@ class Play extends states.State {
 				case worldgen.WorldGenerator.EntityType.Door: EntityFactory.createLockedDoor(entities,e.x*16,e.y*16);
 				case worldgen.WorldGenerator.EntityType.Torch: EntityFactory.createTorch(entities,e.x*16,e.y*16);
 				case worldgen.WorldGenerator.EntityType.Sign(message): EntityFactory.createSign(entities,e.x*16,e.y*16,message);
+				case worldgen.WorldGenerator.EntityType.Bat: EntityFactory.createBat(entities,e.x*16,e.y*16);
 			}
 		}
 
@@ -223,6 +226,7 @@ class Play extends states.State {
 		return map;
 	}
 	function descend (){
+		kha.audio1.Audio.play(kha.Assets.sounds.new_level_descend);
 		dungeonLevel++;
 		if (dungeonLevel == 5)
 			Project.states = [new End()];
@@ -255,8 +259,8 @@ class Play extends states.State {
 
 		minimap = kha.Image.createRenderTarget(60,60);
 		
-		minimap.g2.begin();
-		minimap.g2.clear(kha.Color.fromBytes(0,0,0,0));
+		minimap.g2.begin(false);
+		minimap.g2.clear(kha.Color.fromFloats(0,0,0,0));
 		var t = 0;
 		while (t < map.tiles.length-1){
 			var tile = map.tiles[t];
@@ -350,6 +354,14 @@ class Play extends states.State {
 		g.fontSize = 20;
 		g.drawString("Exilium 0.1.0. @5mixer, @BU773RH4ND5, @gas1312_AGD",10,kha.System.windowHeight()-30);
 
+		if (p.get(component.GhostMode).enabled){
+			g.color = kha.Color.fromFloats(.1,.2,.2,.6);
+			g.fillRect(0,0,framebuffer.width,framebuffer.height);
+			p.get(component.KeyMovement).speed = 140;
+		}else{
+			p.get(component.KeyMovement).speed = 110;
+		}
+
 		if (paused){
 			//Pause overlay.
 			g.color = kha.Color.fromFloats(.1,.2,.2,.6);
@@ -384,9 +396,11 @@ class Play extends states.State {
 		debugInterface.fpsGraph.pushValue(1/delta/debugInterface.fpsGraph.size.y);
 		input.mouseEvents = debugInterface.visible;
 		input.startUpdate();
+		p.get(component.GhostMode).enabled = input.keys.get(kha.Key.CTRL);
 		frame++;
+		var globalMultiplier = input.chars.get("f") ? 1/100 : 1/60;
 		if (!paused)
-			systems.update(delta);
+			systems.update(globalMultiplier);
 
 		//Q/E Inventory slide.
 		if (input.chars.get("q") && frame%7==0)

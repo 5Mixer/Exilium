@@ -70,6 +70,10 @@ class DungeonWorldGenerator extends WorldGenerator {
 	function placeThingInRoom (room:Room){
 		if (room.id < 2) return; //Don't place in start room
 		var thing = {x:room.x+Math.floor(room.width/2),y:room.y+Math.floor(room.height/2)};
+		entities.push({type: worldgen.WorldGenerator.EntityType.Bat,x:thing.x+2,y:thing.y});
+		entities.push({type: worldgen.WorldGenerator.EntityType.Bat,x:thing.x-2,y:thing.y});
+		entities.push({type: worldgen.WorldGenerator.EntityType.Bat,x:thing.x,y:thing.y+2});
+		entities.push({type: worldgen.WorldGenerator.EntityType.Bat,x:thing.x,y:thing.y-2});
 
 		//entities.push({type:EntityType.Lava, x: thing.x+3,y:thing.y});
 		
@@ -178,7 +182,7 @@ class DungeonWorldGenerator extends WorldGenerator {
 		var room = Math.floor(Math.random()*(rooms.length-1));
 		var pos = middleOfRoom(rooms[room]);
 		entities.push({type:worldgen.WorldGenerator.EntityType.Item(component.Inventory.Item.Key),x:pos.x+1,y:pos.y});
-						
+		
 	}
 	function createWallDepth (){
 		for (x in 0...width){

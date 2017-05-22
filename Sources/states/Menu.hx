@@ -45,6 +45,7 @@ class Menu extends states.State {
 			//var promise = thx.promise.Promise.create(function(resolve : states.Play -> Void, reject : thx.Error -> Void) {
 				
 				var p = new states.Play();
+				kha.audio1.Audio.play(kha.Assets.sounds.button_click);
 				Project.states.push(p);
 				//resolve(p);
 				

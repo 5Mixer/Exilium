@@ -38,6 +38,7 @@ class Dead extends states.State {
 			transition++;
 			if (transition >= 29){
 				transitioning = false;
+				kha.audio1.Audio.play(kha.Assets.sounds.button_click);
 				Project.states.push(new states.Play());
 
 			}

@@ -1,15 +1,13 @@
 package system;
 
-class MummyAI extends System {
+class BatAI extends System {
 	var view:eskimo.views.View;
 	var frame = 0.0;
 	var entities:eskimo.EntityManager;
-	public var map:world.Tilemap;
 	var targets:eskimo.views.View;
-	public function new (entities:eskimo.EntityManager,tilemap:world.Tilemap){
+	public function new (entities:eskimo.EntityManager){
 		this.entities = entities;
-		map = tilemap;
-		view = new eskimo.views.View(new eskimo.filters.Filter([component.ai.MummyAI,component.Physics,component.Transformation]),entities);
+		view = new eskimo.views.View(new eskimo.filters.Filter([component.ai.BatAI,component.Physics,component.Transformation]),entities);
 		targets = new eskimo.views.View(new eskimo.filters.Filter([component.ai.AITarget]),entities);
 		super();
 	}
@@ -21,7 +19,7 @@ class MummyAI extends System {
 		for (entity in view.entities){
 			var transformation = entity.get(component.Transformation);
 			var physics = entity.get(component.Physics);
-			var AI = entity.get(component.ai.MummyAI);
+			var AI = entity.get(component.ai.BatAI);
 			AI.life += 1;
 
 			var closestTarget = null;
@@ -39,10 +37,6 @@ class MummyAI extends System {
 
 			if (distanceToTarget < 16){
 				//Attack
-				attackAnimation(entity);
-				if (entity.get(component.AnimatedSprite).frame == 2){
-					closestTarget.get(component.Health).current -= 1;
-				}
 			}else if (distanceToTarget < AI.visionLength){
 				//Chase						
 				var dir = closestTarget.get(component.Transformation).pos.add(new kha.math.Vector2(-10+Math.random()*20,-10+Math.random()*20)).sub(entity.get(component.Transformation).pos);

@@ -97,6 +97,12 @@
 				"walk_up_right" : [41,42]
 			}
 		},
+		"bat" : {
+			"tileset" : "bat",
+			"animations" : {
+				"fly" : [0,1,2,3]
+			}
+		},
 		"chest" : {
 			"tileset":"chest",
 			"width": 11,
@@ -199,6 +205,12 @@
 		"blaster" : {
 			"tileset":"objects",
 			"id":10,
+			"width":8,
+			"height":8
+		},
+		"bow" : {
+			"tileset":"objects",
+			"id":11,
 			"width":8,
 			"height":8
 		},

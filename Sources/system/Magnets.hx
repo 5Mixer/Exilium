@@ -22,7 +22,7 @@ class Magnets extends System{
 				var difference = ptransform.sub(entityTransform.pos);
 				var distance = difference.length;
 				difference.normalize();
-				difference = difference.mult(Math.max(entity.get(component.Magnet).range/distance*.75,1));
+				difference = difference.mult(Math.max(entity.get(component.Magnet).range/distance*75,1));
 				entity.get(component.Physics).velocity = entity.get(component.Physics).velocity.add(difference);
 			}
 		}

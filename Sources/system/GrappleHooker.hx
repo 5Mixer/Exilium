@@ -86,6 +86,8 @@ class GrappleHooker extends System {
 						}
 					}else{						
 						hook.fired = true;
+						
+						kha.audio1.Audio.play(kha.Assets.sounds.grapplehook);
 
 						var dir = transformation.pos.sub(camera.screenToWorld(input.mousePos.sub(new kha.math.Vector2(24,24))));
 						var a = Math.round(Math.atan2(-dir.y,-dir.x)*(180/Math.PI));

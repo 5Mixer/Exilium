@@ -9,6 +9,7 @@ enum Item {
 	CastSheild;
 	Key;
 	Blaster;
+	Bow;
 }
 enum ItemType {
 	Gun;
@@ -33,9 +34,10 @@ class Inventory extends Component {
 		Item.SlimeGun => { name: "slime gun", stackable: false, type: ItemType.Gun, sprite:states.Play.spriteData.entity.slimeGun },
 		Item.LaserGun => { name: "laser gun", stackable: false, type: ItemType.Gun, sprite:states.Play.spriteData.entity.laserGun },
 		Item.GrapplingHook => { name: "grappling gun", stackable: false, type: ItemType.Gun, sprite:states.Play.spriteData.entity.grapplingHook },
-		Item.CastSheild => { name: "cast shield", stackable: false, type: ItemType.Other, sprite:states.Play.spriteData.entity.cast_shield },
-		Item.Key => { name: "key", stackable: false, type: ItemType.Other, sprite:states.Play.spriteData.entity.key },
-		Item.Blaster => { name: "blaster gun", stackable: false, type: ItemType.Gun, sprite:states.Play.spriteData.entity.blaster }
+		Item.CastSheild => { name: "cast shield", stackable: true, type: ItemType.Other, sprite:states.Play.spriteData.entity.cast_shield },
+		Item.Key => { name: "key", stackable: true, type: ItemType.Other, sprite:states.Play.spriteData.entity.key },
+		Item.Blaster => { name: "blaster gun", stackable: false, type: ItemType.Gun, sprite:states.Play.spriteData.entity.blaster },
+		Item.Bow => { name: "bow", stackable: false, type: ItemType.Gun, sprite:states.Play.spriteData.entity.bow }
 	];
 	override public function new (){
 		super();

@@ -32,7 +32,7 @@ class ParticleTrails extends System {
 				var t = new component.Transformation(transformation.pos.add(new kha.math.Vector2(off,off)));
 				t.angle = transformation.angle;
 				particle.set(t);
-				particle.set(new component.TimedLife(.05));
+				particle.set(new component.TimedLife(.5));
 			
 			}			
 		}

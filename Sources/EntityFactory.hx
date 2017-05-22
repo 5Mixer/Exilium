@@ -48,16 +48,19 @@ class EntityFactory {
 		p.set(new component.Gun());
 		p.set(new component.Inventory());
 		p.set(new component.GrappleHook());
+		p.set(new component.GhostModeCustomMultiplier(1/60));
 		p.set(new component.Collisions([CollisionGroup.Friendly,CollisionGroup.Player],[CollisionGroup.Friendly,CollisionGroup.Player,CollisionGroup.Particle,CollisionGroup.Item]));
 		p.get(component.Collisions).registerCollisionRegion(new component.Collisions.Rect(0,0,10,10));
 		p.set(new component.Light());
 		p.set(new component.Zindex(5));
+		p.set(new component.GhostMode());
 		
 		p.get(component.Light).colour = kha.Color.fromBytes(255,200,200);
 		p.get(component.Light).strength = .7;
 
 		// p.get(component.Inventory).putIntoInventory(component.Inventory.Item.CastSheild);
 		p.get(component.Inventory).putIntoInventory(component.Inventory.Item.Blaster);
+		p.get(component.Inventory).putIntoInventory(component.Inventory.Item.Bow);
 
 		return p;
 	}
@@ -168,7 +171,7 @@ class EntityFactory {
 		shooter.set(new component.Collisions([CollisionGroup.ShooterTrap],[CollisionGroup.Level,CollisionGroup.Enemy]));
 		shooter.get(component.Collisions).registerCollisionRegion(new component.Collisions.Rect(5,5,6,6));
 
-		shooter.set(new component.TimedShoot(10+Math.floor(Math.random()*9)));
+		shooter.set(new component.TimedShoot(.5+Math.random()));
 		//shooter.set(new component.Spin(-2+(Math.random()*4)));
 		
 		return shooter;
@@ -186,6 +189,22 @@ class EntityFactory {
 		var b:component.Collisions.Rect = new component.Collisions.Rect(2,1,6,9);
 		goblin.get(component.Collisions).registerCollisionRegion(b);
 		return goblin;
+	}
+	public static function createBat (entities:eskimo.EntityManager,x:Int, y:Int){
+		//TODO: Make a 'flying' component.
+		var bat = entities.create();
+		bat.set(new component.Name("Bat"));
+		bat.set(new component.Transformation(new kha.math.Vector2(x,y)));
+		bat.set(new component.AnimatedSprite(states.Play.spriteData.entity.bat));
+		bat.get(component.AnimatedSprite).playAnimation("fly");
+		// bat.set(new component.Health(15));
+		bat.get(component.AnimatedSprite).speed = 5;
+		bat.set(new component.Physics());
+		bat.set(new component.ai.BatAI());
+		// bat.set(new component.Collisions([CollisionGroup.Enemy]));
+		var b:component.Collisions.Rect = new component.Collisions.Rect(1,1,6,6);
+		// bat.get(component.Collisions).registerCollisionRegion(b);
+		return bat;
 	}
 	public static function createCorruptSoul (entities:eskimo.EntityManager,x:Int, y:Int){
 		var corruptSoul = entities.create();

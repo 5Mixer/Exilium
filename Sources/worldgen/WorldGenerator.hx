@@ -11,6 +11,7 @@ enum EntityType {
 	Door;
 	Torch;
 	Sign(message:String);
+	Bat;
 }
 
 enum Side {

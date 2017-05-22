@@ -124,6 +124,9 @@ class Collisions extends System {
 					if (otherShape.group.indexOf(group) != -1){
 						for (thing in shapeEntity.get(component.Collectable).items)
 							otherShapeEntity.get(component.Inventory).putIntoInventory(thing);
+
+							
+						//kha.audio1.Audio.play(kha.Assets.sounds.pickup_item);
 					
 						shapeEntity.destroy();
 						break;
@@ -153,9 +156,12 @@ class Collisions extends System {
 			var roc = shapeEntity.get(component.ReleaseOnCollision);
 			for (releaseGroup in roc.collisionGroups){
 				if (otherShape.group.indexOf(releaseGroup) != -1){
+					
+					//kha.audio1.Audio.play(kha.Assets.sounds.treasure_open);
+					
 					for (item in roc.release){
 						var droppedItem = EntityFactory.createItem(entities,item,shapeEntity.get(component.Transformation).pos.x,shapeEntity.get(component.Transformation).pos.y);
-						droppedItem.set(new component.Physics().setVelocity(new kha.math.Vector2(-6+Math.random()*12,-6+Math.random()*12)));
+						droppedItem.set(new component.Physics().setVelocity(new kha.math.Vector2(-20+Math.random()*40,-20+Math.random()*40)));
 					}
 					shapeEntity.set(new component.Light());
 					shapeEntity.get(component.Light).colour = kha.Color.fromBytes(250,240,180);//kha.Color.Green;
@@ -181,32 +187,32 @@ class Collisions extends System {
 			
 			if (otherShapeEntity.has(component.Damager)){
 				var damager = otherShapeEntity.get(component.Damager);
-				if (damager.active && frame % 2 == 0){
+				if (damager.active){
 					shapeEntity.get(component.Health).addToHealth(-damager.damage);
 
-					if (damager.causesBlood){
-						for (i in 0...1){
-							var particle = entities.create();
-							particle.set(new component.VisualParticle(component.VisualParticle.Effect.Blood));
-							particle.set(new component.Zindex(-1));
-							var w = 5;
-							var h = 5;
-							if (shapeEntity.has(component.Collisions)){
-								var aabb = shapeEntity.get(component.Collisions).AABB;
-								w = aabb.width;
-								h = aabb.height;
-							}
+					// if (damager.causesBlood && frame % 5 == 0){
+					// 	for (i in 0...1){
+					// 		var particle = entities.create();
+					// 		particle.set(new component.VisualParticle(component.VisualParticle.Effect.Blood));
+					// 		particle.set(new component.Zindex(-1));
+					// 		var w = 5;
+					// 		var h = 5;
+					// 		if (shapeEntity.has(component.Collisions)){
+					// 			var aabb = shapeEntity.get(component.Collisions).AABB;
+					// 			w = aabb.width;
+					// 			h = aabb.height;
+					// 		}
 							
-							particle.set(new component.Transformation(shapeEntity.get(component.Transformation).pos.add(new kha.math.Vector2(Math.random()*w,Math.random()*h))));
-							var phys = new component.Physics();
-							var speed = Math.random()*6;
-							phys.friction = 0.7;
-							var particleAngle = Math.random()*360;
-							phys.velocity = new kha.math.Vector2(Math.cos(particleAngle * (Math.PI / 180)) * speed,Math.sin(particleAngle * (Math.PI / 180)) * speed);		
-							particle.set(phys);
-							particle.set(new component.TimedLife(5+Math.random()*5));
-						}
-					}
+					// 		particle.set(new component.Transformation(shapeEntity.get(component.Transformation).pos.add(new kha.math.Vector2(Math.random()*w,Math.random()*h))));
+					// 		var phys = new component.Physics();
+					// 		var speed = Math.random()*6;
+					// 		phys.friction = 0.7;
+					// 		var particleAngle = Math.random()*360;
+					// 		phys.velocity = new kha.math.Vector2(Math.cos(particleAngle * (Math.PI / 180)) * speed,Math.sin(particleAngle * (Math.PI / 180)) * speed);		
+					// 		particle.set(phys);
+					// 		particle.set(new component.TimedLife(5+Math.random()*5));
+					// 	}
+					// }
 				}
 			}
 		}

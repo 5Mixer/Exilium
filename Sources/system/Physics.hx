@@ -29,11 +29,14 @@ class Physics extends System {
 
 			physics.velocity = physics.velocity.mult(physics.friction);
 
-			
+			var localDelta = delta;
+			if (entity.has(component.GhostModeCustomMultiplier)){
+				localDelta = entity.get(component.GhostModeCustomMultiplier).multiplier;
+			}
 
 			if (collider == null){
-				transformation.pos.x += physics.velocity.x;
-				transformation.pos.y += physics.velocity.y;
+				transformation.pos.x += physics.velocity.x * localDelta;
+				transformation.pos.y += physics.velocity.y * localDelta;
 			}else{
 				
 
@@ -55,7 +58,7 @@ class Physics extends System {
 				var reflectx = false;
 				var reflecty = false;
 				for (sample in 0...multiSamples){
-					transformation.pos.x += physics.velocity.x*sampleMultiplier;
+					transformation.pos.x += physics.velocity.x*sampleMultiplier*localDelta;
 					for (shape in collider.collisionRegions){
 
 						for (otherShape in grid.findContacts(shape)){
@@ -92,7 +95,7 @@ class Physics extends System {
 						}
 					}
 					
-					transformation.pos.y += physics.velocity.y*sampleMultiplier;
+					transformation.pos.y += physics.velocity.y*sampleMultiplier*localDelta;
 					
 					for (shape in collider.collisionRegions){
 						for (otherShape in grid.findContacts(shape)){

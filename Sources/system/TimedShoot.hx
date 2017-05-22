@@ -26,14 +26,14 @@ class TimedShoot extends System {
 		for (entity in view.entities){
 			
 			var timedShoot:component.TimedShoot = entity.get(component.TimedShoot);
-			timedShoot.timeLeft += 1;
+			timedShoot.timeLeft += delta;
 			
 			if (timedShoot.timeLeft > timedShoot.fireRate){
 				//var gun = entity.get(component.Gun);
 				//gun.gun =
 				//gun.fire()???
 				timedShoot.timeLeft = 0;
-				fireArrow(entity,entity.get(component.Transformation).angle+Math.random()*6 -3);
+				fireArrow(entity,entity.get(component.Transformation).angle+Math.random()*6 -3,delta);
 
 				var animation = entity.get(component.AnimatedSprite);
 				if (animation != null){
@@ -44,7 +44,7 @@ class TimedShoot extends System {
 			
 		}
 	}
-	public function fireArrow (parent:eskimo.Entity,angle:Float){
+	public function fireArrow (parent:eskimo.Entity,angle:Float, delta:Float){
 
 		var angleDegrees = angle;
 		var angleRadians = angle * (Math.PI / 180);
@@ -64,7 +64,7 @@ class TimedShoot extends System {
 		//Physics
 		var physics = new component.Physics();
 		physics.friction = 0.999;
-		var speed = 4;
+		var speed = 160;
 		physics.velocity = new kha.math.Vector2(Math.cos(angleRadians) * speed, Math.sin(angleRadians) * speed);
 		bullet.set(physics);
 
@@ -93,7 +93,7 @@ class TimedShoot extends System {
 		var phys = new component.Physics();
 		phys.friction = 0.6;
 		
-		var speed = 3;
+		var speed = 130;
 		var particleAngle = angle - 6 + Math.random()*12;
 		var particleAngleRadians = particleAngle * (Math.PI / 180);
 		phys.velocity = new kha.math.Vector2(Math.cos(particleAngleRadians) * speed,Math.sin(particleAngleRadians) * speed);

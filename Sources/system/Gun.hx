@@ -35,7 +35,7 @@ class Gun extends System {
 
 					if (selectedItem == component.Inventory.Item.SlimeGun){
 						gun.gun = component.Gun.GunType.SlimeGun;
-						gun.fireRate = .2;
+						gun.fireRate = .02;
 					}else if (selectedItem == component.Inventory.Item.LaserGun) {
 						gun.gun = component.Gun.GunType.LaserGun;
 						gun.fireRate = .4;

@@ -53,7 +53,7 @@ class Physics extends System {
 
 
 				var sampleMaxLength = 1;
-				var multiSamples = Math.ceil(Math.sqrt(Math.pow(physics.velocity.x,2)+Math.pow(physics.velocity.y,2))/sampleMaxLength);
+				var multiSamples = 1;//Math.ceil(Math.sqrt(Math.pow(physics.velocity.x,2)+Math.pow(physics.velocity.y,2))/sampleMaxLength);
 				var sampleMultiplier = 1/multiSamples;
 				var reflectx = false;
 				var reflecty = false;

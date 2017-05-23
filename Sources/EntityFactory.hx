@@ -197,13 +197,13 @@ class EntityFactory {
 		bat.set(new component.Transformation(new kha.math.Vector2(x,y)));
 		bat.set(new component.AnimatedSprite(states.Play.spriteData.entity.bat));
 		bat.get(component.AnimatedSprite).playAnimation("fly");
-		// bat.set(new component.Health(15));
+		bat.set(new component.Health(15));
 		bat.get(component.AnimatedSprite).speed = 5;
 		bat.set(new component.Physics());
 		bat.set(new component.ai.BatAI());
-		// bat.set(new component.Collisions([CollisionGroup.Enemy]));
+		bat.set(new component.Collisions([CollisionGroup.Enemy]));
 		var b:component.Collisions.Rect = new component.Collisions.Rect(1,1,6,6);
-		// bat.get(component.Collisions).registerCollisionRegion(b);
+		bat.get(component.Collisions).registerCollisionRegion(b);
 		return bat;
 	}
 	public static function createCorruptSoul (entities:eskimo.EntityManager,x:Int, y:Int){

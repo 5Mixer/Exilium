@@ -37,6 +37,7 @@ class Healthbars extends System {
 				if (entity.has(component.Events)){
 					entity.get(component.Events).callEvent(component.Events.Event.Death,null);
 				}
+				//kha.audio1.Audio.play(kha.Assets.sounds.die);
 				entity.destroy();
 			}
 		}

@@ -64,7 +64,7 @@ class TilemapRenderer  {
 					
 				}
 				//Now add these colours togethor and store in one variable.
-				var c = {r: 0.1, g: 0.1, b:0.1, a: 1.0};
+				var c = {r: 0.07, g: 0.08, b:0.08, a: 1.0};
 				if (tileData.ambient != null){
 					c.r = tileData.ambient.R;
 					c.g = tileData.ambient.G;

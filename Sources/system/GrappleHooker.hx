@@ -78,8 +78,9 @@ class GrappleHooker extends System {
 					if (hook.fired){
 						var distToHook = Math.sqrt(Math.pow(transformation.pos.x-hook.destination.x,2)+Math.pow(transformation.pos.y-hook.destination.y,2));
 						if (distToHook > 15){
-							physics.velocity.x += (hook.destination.x - transformation.pos.x)/distToHook*8;
-							physics.velocity.y += (hook.destination.y - transformation.pos.y)/distToHook*8;
+							var angle = Math.atan2(hook.destination.y - transformation.pos.y,hook.destination.x - transformation.pos.x);
+							physics.velocity.x += Math.cos(angle)*7000*delta;
+							physics.velocity.y += Math.sin(angle)*7000*delta;
 						}
 						if (distToHook<15){
 							hook.active = false;
@@ -91,8 +92,8 @@ class GrappleHooker extends System {
 
 						var dir = transformation.pos.sub(camera.screenToWorld(input.mousePos.sub(new kha.math.Vector2(24,24))));
 						var a = Math.round(Math.atan2(-dir.y,-dir.x)*(180/Math.PI));
-						var endx = Math.cos(a*(Math.PI/180))*1000;
-						var endy = Math.sin(a*(Math.PI/180))*1000;
+						var endx = Math.cos(a*(Math.PI/180))*1900;
+						var endy = Math.sin(a*(Math.PI/180))*1900;
 						var px = transformation.pos.x + 4;
 						var py = transformation.pos.y + 4;
 						var l = collisionSystem.fireRay(new differ.shapes.Ray(new differ.math.Vector(px,py),new differ.math.Vector(px+endx,py+endy)),[component.Collisions.CollisionGroup.Player]);

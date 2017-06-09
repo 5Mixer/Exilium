@@ -5,7 +5,7 @@ import zui.Id;
 
 class AudioInterface {
 	var ui:Zui;
-	public var visible = true;
+	public var visible = false;
 
 	var audioBrowseWindow = {
 		shown : false,

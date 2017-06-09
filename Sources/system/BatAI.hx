@@ -37,7 +37,7 @@ class BatAI extends System {
 
 			if (distanceToTarget < 16){
 				//Attack
-			}else if (distanceToTarget < AI.visionLength){
+			}else if (distanceToTarget < 80){
 				//Chase						
 				var dir = closestTarget.get(component.Transformation).pos.add(new kha.math.Vector2(-10+Math.random()*20,-10+Math.random()*20)).sub(entity.get(component.Transformation).pos);
 				dir.normalize();
@@ -48,13 +48,13 @@ class BatAI extends System {
 				//Idle
 				var angle = Math.atan2(entity.get(component.Physics).velocity.y,entity.get(component.Physics).velocity.x);
 
-				if (AI.life % 20 == 0){
-					angle += (-90+ Math.random()*180) * Math.PI/180;
+				if (AI.life % AI.moveRate == 0){
+					angle += (-180+ Math.random()*360) * Math.PI/180;
 
 				}
 				
-				entity.get(component.Physics).velocity.x = Math.cos(angle)*70;
-				entity.get(component.Physics).velocity.y = Math.sin(angle)*70;
+				entity.get(component.Physics).velocity.x = Math.cos(angle)*AI.speed;
+				entity.get(component.Physics).velocity.y = Math.sin(angle)*AI.speed;
 
 				slitherAnimation(entity);
 				

@@ -9,6 +9,7 @@ typedef PlayerSave = {
 	var pos : {x: Int, y:Int};
 	var health: Int;
 	var inventory: Array<component.Inventory.Stack>;
+	var inventoryIndex:Int;
 }
 typedef Save  = {
 	var player : PlayerSave;
@@ -55,6 +56,8 @@ class Play extends states.State {
 		input = new Input();
 		camera = new Camera();
 		kha.input.Mouse.get().hideSystemCursor();
+		
+		minimap = kha.Image.createRenderTarget(60,60);
 
 		var components = new eskimo.ComponentManager();
 		entities = new eskimo.EntityManager(components);
@@ -219,11 +222,12 @@ class Play extends states.State {
 		p = EntityFactory.createPlayer(entities,{x:generator.spawnPoint.x, y:generator.spawnPoint.y});
 		p.get(component.Inventory).putIntoInventory(component.Inventory.Item.SlimeGun);
 		p.get(component.Events).listenToEvent(component.Events.Event.Death,function (args){
-			Project.states.push(new states.Dead());
+			Project.states = [new states.Dead()];
 		});
 		if (lastSave != null && lastSave.player != null){
 			p.get(component.Health).current = lastSave.player.health;
 			p.get(component.Inventory).stacks = lastSave.player.inventory;
+			p.get(component.Inventory).activeIndex = lastSave.player.inventoryIndex;
 		}
 
 		dungeons.push ({
@@ -235,8 +239,8 @@ class Play extends states.State {
 	function descend (){
 		kha.audio1.Audio.play(kha.Assets.sounds.new_level_descend);
 		dungeonLevel++;
-		if (dungeonLevel == 5)
-			Project.states = [new End()];
+		// if (dungeonLevel == 5)
+		// 	Project.states = [new End()];
 		save();
 		createMap();
 		save();
@@ -255,7 +259,8 @@ class Play extends states.State {
 					y: Math.round(p.get(component.Transformation).pos.y)
 				},
 				health: Math.round(p.get(component.Health).current),
-				inventory: p.get(component.Inventory).stacks
+				inventory: p.get(component.Inventory).stacks,
+				inventoryIndex: p.get(component.Inventory).activeIndex
 			}
 		
 	}
@@ -264,7 +269,6 @@ class Play extends states.State {
 		var renderDelta = kha.Scheduler.time() - lastRenderTime;
 		lastRenderTime = kha.Scheduler.time();
 
-		minimap = kha.Image.createRenderTarget(60,60);
 		
 		minimap.g2.begin(false);
 		minimap.g2.clear(kha.Color.fromFloats(0,0,0,0));

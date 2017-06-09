@@ -60,7 +60,7 @@ class EntityFactory {
 
 		// p.get(component.Inventory).putIntoInventory(component.Inventory.Item.CastSheild);
 		p.get(component.Inventory).putIntoInventory(component.Inventory.Item.Blaster);
-		p.get(component.Inventory).putIntoInventory(component.Inventory.Item.Bow);
+		// p.get(component.Inventory).putIntoInventory(component.Inventory.Item.Bow);
 
 		return p;
 	}

@@ -68,7 +68,7 @@ class DungeonWorldGenerator extends WorldGenerator {
 		}
 	}
 	function placeThingInRoom (room:Room){
-		if (room.id < 2) return; //Don't place in start room
+		if (room.id < 1) return; //Don't place in start room
 		var thing = {x:room.x+Math.floor(room.width/2),y:room.y+Math.floor(room.height/2)};
 		entities.push({type: worldgen.WorldGenerator.EntityType.Bat,x:thing.x+2,y:thing.y});
 		entities.push({type: worldgen.WorldGenerator.EntityType.Bat,x:thing.x-2,y:thing.y});
@@ -82,11 +82,11 @@ class DungeonWorldGenerator extends WorldGenerator {
 
 		var enemy = {x: room.x+2+Math.floor(random.generate()*(room.width-4)),y: room.y+2+Math.floor(random.generate()*(room.height-4))};
 		if (thing.x != enemy.x && thing.y != enemy.y)
-			if (Math.random()>.5){
+			// if (Math.random()>.5){
 				entities.push({type:EntityType.Enemy,x:enemy.x,y:enemy.y});
-			}else{
-				entities.push({type:Math.random()>.8?EntityType.Spike:EntityType.Shooter,x:enemy.x,y:enemy.y});
-			}
+			// }else{
+			// 	entities.push({type:Math.random()>.8?EntityType.Spike:EntityType.Shooter,x:enemy.x,y:enemy.y});
+			// }
 		
 	}
 	public function middleOfRoom(room:Room){
@@ -175,7 +175,6 @@ class DungeonWorldGenerator extends WorldGenerator {
 		}
 	}
 	function fillRooms (){
-
 		for (room in rooms){
 			placeThingInRoom(room);
 		}
@@ -195,26 +194,27 @@ class DungeonWorldGenerator extends WorldGenerator {
 		}
 	}
 	
-	inline function bakerooms () {
+	function bakerooms () {
 		for (room in rooms){
 			if (room.structure == null){
 				for (x in 0...room.width){
 					for (y in 0...room.height){
 						
-						if (get (room.x+x,room.y+y).id != tileInfo.empty) continue;
+						if (get (room.x+x,room.y+y).id != tileInfo.empty) continue; //If there is already a tile somewhere don't override
 						
-						set(room.x+x,room.y+y,{id: tileInfo.floor, zone:room.zone});		
+						set(room.x+x,room.y+y,{id: tileInfo.floor, zone:room.zone}); //By default set to zone tile.	
 
-						if (x==0)
+						//Fill in walls with appropriate tiles.
+						if (x == 0)
 							set(room.x+x,room.y+y,{id: tileInfo.dungeonwallv, zone:room.zone});
 
-						if ((x==room.width-1))
+						if (x == room.width-1)
 							set(room.x+x,room.y+y,{id: tileInfo.dungeonwallv, zone:room.zone});
 
-						if ((y==0))
+						if (y == 0)
 							set(room.x+x,room.y+y,{id: tileInfo.dungeonwallh, zone:room.zone});
 
-						if (y==room.height-1)
+						if (y == room.height-1)
 							set(room.x+x,room.y+y,{id:tileInfo.dungeonwallh,zone:room.zone});
 
 						//Corner tiles.
@@ -240,15 +240,12 @@ class DungeonWorldGenerator extends WorldGenerator {
 		for (room in rooms){
 			for (door in room.doorways){
 				set(door.x,door.y,{id:tileInfo.gate,zone:room.zone});
-				
 			}
 		}
-		
 
-		if (tiles.length != width*height){
+		if (tiles.length != width*height)
 			throw "Odd level data - Different number of tiles than width*height";
-		}
-
+		
 	}
 	
 	inline function roomsTouch (room1,room2){

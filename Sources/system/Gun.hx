@@ -136,8 +136,8 @@ class Gun extends System {
 	}
 	public function shootSlimeGun (parent:eskimo.Entity,angle){
 
-		
-		kha.audio1.Audio.play(kha.Assets.sounds.shoot2);
+		AudioManager.play("LASER_SHOOT");
+		// kha.audio1.Audio.play(kha.Assets.sounds.shoot2);
 		
 		var bullet = entities.create();
 

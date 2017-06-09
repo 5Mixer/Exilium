@@ -24,7 +24,7 @@ class Camera {
 		g.translate(Math.round(-pos.x*scale.x),Math.round(-pos.y*scale.y));
 
 		offset = offset.mult(offsetRestore);
-	}
+	} 
 	public function restore (g:kha.graphics2.Graphics) {
 		g.popTransformation();
 	}

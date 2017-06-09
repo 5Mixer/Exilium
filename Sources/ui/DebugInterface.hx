@@ -24,8 +24,8 @@ class DebugInterface {
 
 	var player:eskimo.Entity;
 
-	public function new (player:eskimo.Entity){
-		debugui = new Zui({font: kha.Assets.fonts.OpenSans});
+	public function new (zuiInstance:Zui,player:eskimo.Entity){
+		debugui = zuiInstance;
 		fpsGraph = new ui.Graph(new kha.math.Vector2(0,0),new kha.math.Vector2(180,60));
 		updateGraph = new ui.Graph(new kha.math.Vector2(0,0),new kha.math.Vector2(180,60));
 		this.player = player;
@@ -38,7 +38,6 @@ class DebugInterface {
 		var fpsImage = fpsGraph.renderToImage();
 		var upsImage = updateGraph.renderToImage();
 
-		debugui.begin(g);
 			
 		if (visible){
 			//Ensure ZUI refreshes for animations.
@@ -74,6 +73,5 @@ class DebugInterface {
 				x += 220;
 			}
 		}
-		debugui.end();
 	}
 }

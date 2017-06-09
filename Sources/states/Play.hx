@@ -1,5 +1,7 @@
 package states;
 
+import zui.Zui;
+
 typedef Dungeon = {
 	var seed:Int;
 }
@@ -34,7 +36,9 @@ class Play extends states.State {
 	var dungeons:Array<Dungeon> = [];
 	
 	var debugInterface:ui.DebugInterface;
+	var audioInterface:ui.AudioInterface;
 	var mainMusicChannel:kha.audio1.AudioChannel;
+	var zuiInstance:Zui;
 	
 	var tilemapRender:rendering.TilemapRenderer;
 	var map:world.Tilemap;
@@ -88,12 +92,15 @@ class Play extends states.State {
 		
 		map = createMap();
 
-		debugInterface = new ui.DebugInterface(p);		
+		zuiInstance = new Zui({font: kha.Assets.fonts.OpenSans});
+		debugInterface = new ui.DebugInterface(zuiInstance,p);
 		debugInterface.visible = false;
+		audioInterface = new ui.AudioInterface(zuiInstance);		
 		
 		input.listenToKeyRelease('r', descend);
 		input.listenToKeyRelease('t',function (){
 			debugInterface.visible = !debugInterface.visible;
+			audioInterface.visible = debugInterface.visible;
 		});
 		input.listenToKeyRelease('m', function (){
 			mapShown = !mapShown;
@@ -379,8 +386,11 @@ class Play extends states.State {
 		g.color = kha.Color.White;
 		g.end();
 		
+		zuiInstance.begin(g);
 		debugInterface.render(g);
 		debugInterface.updateGraph.pushValue(1/renderDelta/debugInterface.updateGraph.size.y);
+		audioInterface.render(g);
+		zuiInstance.end();
 		
 	}
 	public function offsetInventorySelection(offset:Int){

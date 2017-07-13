@@ -11,9 +11,7 @@ class Main {
 			//	kha.Scheduler.addFrameTask(hxt.advance_frame.bind(null), 0);
 			#end
 
-			kha.Assets.loadEverything(function(){
-				new Project();
-			});
+			new Project();
 		});
 	}
 }

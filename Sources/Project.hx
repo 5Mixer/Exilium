@@ -34,7 +34,7 @@ class Project {
 		var delta = Scheduler.time() - lastTime;
 		var realDelta = Scheduler.realTime() - realLastTime;
 
-		states[states.length-1].update(delta);
+		states[states.length-1].update(realDelta);
 		
 		lastTime = Scheduler.time();
 		realLastTime = Scheduler.realTime();

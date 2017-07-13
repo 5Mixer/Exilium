@@ -266,8 +266,8 @@ class Play extends states.State {
 	}
 	
 	override public function render (framebuffer:kha.Framebuffer){
-		var renderDelta = kha.Scheduler.time() - lastRenderTime;
-		lastRenderTime = kha.Scheduler.time();
+		var renderDelta = kha.Scheduler.realTime() - lastRenderTime;
+		lastRenderTime = kha.Scheduler.realTime();
 
 		
 		minimap.g2.begin(false);

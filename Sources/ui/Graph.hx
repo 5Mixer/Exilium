@@ -7,14 +7,21 @@ class Graph {
 	var fgColor:kha.Color;
 	public var values = new Array<Float>();
 	public var visible = true;
+	var tempImg:kha.Image;
+	
 	public function new (pos:kha.math.Vector2,size:kha.math.Vector2){
 		this.pos = pos;
 		this.size = size;
 		bgColor = kha.Color.fromBytes(145,198,167,128);
 		fgColor = kha.Color.fromBytes(108,252,168,240);
+
+		tempImg = kha.Image.createRenderTarget(Math.ceil(this.size.x),Math.ceil(this.size.y));
 	}
 	public function pushValue(value:Float){
 		values.push(value);
+		if (values.length > size.x){
+			values.shift();
+		}
 	}
 	public function render(g:kha.graphics2.Graphics){
 		if (!visible) return;
@@ -31,7 +38,6 @@ class Graph {
 	}
 	//Remember to call this outside any other .begin/.end graphics!
 	public function renderToImage (){
-		var tempImg = kha.Image.createRenderTarget(Math.ceil(this.size.x),Math.ceil(this.size.y));
 		tempImg.g2.begin(true,kha.Color.fromBytes(0,0,0,0));
 		render(tempImg.g2);
 		tempImg.g2.end();

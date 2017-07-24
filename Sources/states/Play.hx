@@ -50,10 +50,13 @@ class Play extends states.State {
 	var mapShown = true;
 	var paused = false;
 
+	var openShop:ui.Shop ;
+
 	override public function new (){
 		super();
 
 		input = new Input();
+		openShop = new ui.PotionShop(input);
 		camera = new Camera();
 		kha.input.Mouse.get().hideSystemCursor();
 		
@@ -312,7 +315,8 @@ class Play extends states.State {
 			system.render(g);
 		camera.restore(g);
 		g.color = kha.Color.White;
-		
+		//openShop.render(g);
+
 		//Draw mouse cursor.
 		if (debugInterface.visible){
 			kha.input.Mouse.get().showSystemCursor();

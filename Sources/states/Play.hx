@@ -144,7 +144,6 @@ class Play extends states.State {
 		
 		minimap = kha.Image.createRenderTarget(worldSize,worldSize);
 		
-		minimap.g2.begin();
 		var t = 0;
 		var collisionRects = [];
 		while (t < generator.tiles.length-1){
@@ -160,12 +159,7 @@ class Play extends states.State {
 				}*/
 				
 				collisionRects.push({x:x,y:y,width:width,height:height,resolved:false,t:t});
-
 				t += width;
-
-				minimap.g2.color = map.tileInfo.get(tile.id).colour;
-				minimap.g2.fillRect(t%map.width,Math.floor(t/map.width),1,1);
-				
 			}else{
 				t+=1;
 			}
@@ -182,13 +176,6 @@ class Play extends states.State {
 					rect.x*16,rect.y*16,
 					width*16,rect.height*16));
 		}
-
-		minimap.g2.color = kha.Color.Red;
-		minimap.g2.fillRect(generator.spawnPoint.x,generator.spawnPoint.y,1,1);
-
-		minimap.g2.color = kha.Color.Green;
-		minimap.g2.fillRect(generator.exitPoint.x,generator.exitPoint.y,1,1);
-		minimap.g2.end();
 
 		if (dungeonLevel == 4){
 			EntityFactory.createSign(entities,(generator.spawnPoint.x+1)*16,generator.spawnPoint.y*16,"Beware, a corrupt evil/nlives in this realm.");
@@ -272,7 +259,6 @@ class Play extends states.State {
 		var renderDelta = kha.Scheduler.realTime() - lastRenderTime;
 		lastRenderTime = kha.Scheduler.realTime();
 
-		
 		minimap.g2.begin(false);
 		minimap.g2.clear(kha.Color.fromFloats(0,0,0,0));
 		var t = 0;
@@ -308,16 +294,49 @@ class Play extends states.State {
 		g.begin();
 		g.color = kha.Color.White;
 
-		//Let individual systems render.
 		camera.transform(g);
 		tilemapRender.render(g,map);
 		for (system in renderSystems)
 			system.render(g);
 		camera.restore(g);
-		g.color = kha.Color.White;
+		
 		//openShop.render(g);
 
-		//Draw mouse cursor.
+		drawCursor(g);
+		drawMap(g);
+		inventory(g);
+		watermark(g);
+
+		if (p.get(component.GhostMode).enabled){
+			g.color = kha.Color.fromFloats(.1,.2,.2,.6);
+			g.fillRect(0,0,framebuffer.width,framebuffer.height);
+			p.get(component.KeyMovement).speed = 140;
+		}else{
+			p.get(component.KeyMovement).speed = 110;
+		}
+
+		pauseOverlay(g);
+		
+		g.color = kha.Color.White;
+		g.end();
+		
+		zuiInstance.begin(g);
+		debugInterface.render(g);
+		debugInterface.updateGraph.pushValue(1/renderDelta/debugInterface.updateGraph.size.y);
+		audioInterface.render(g);
+		zuiInstance.end();
+		
+	}
+	public function offsetInventorySelection(offset:Int){
+		kha.audio1.Audio.play(kha.Assets.sounds.ui_blip);
+		if (p.get(component.Inventory) == null) return;
+		p.get(component.Inventory).activeIndex += offset;
+		if (p.get(component.Inventory).activeIndex < 0) p.get(component.Inventory).activeIndex = p.get(component.Inventory).length-1;
+		if (p.get(component.Inventory).activeIndex > p.get(component.Inventory).length-1) p.get(component.Inventory).activeIndex = 0;
+		cast(systems.get(system.Inventory),system.Inventory).onChangeItem();
+	}
+
+	function drawCursor (g:kha.graphics2.Graphics){
 		if (debugInterface.visible){
 			kha.input.Mouse.get().showSystemCursor();
 		}else{
@@ -325,14 +344,42 @@ class Play extends states.State {
 			kha.input.Mouse.get().hideSystemCursor();
 			g.drawSubImage(kha.Assets.images.Entities,input.mousePos.x/4 -8,input.mousePos.y/4 -8,2*16,0,16,16);
 		}
+	}
+	function watermark (g:kha.graphics2.Graphics){
+		g.transformation = kha.math.FastMatrix3.identity();
+		g.font = kha.Assets.fonts.OpenSans;
+		g.color = kha.Color.fromFloats(1,1,1,.4);
+		g.fontSize = 20;
+		g.drawString("Exilium 0.1.0. @5mixer, @BU773RH4ND5, @gas1312_AGD",10,kha.System.windowHeight()-30);
+	}
 
+	function pauseOverlay (g:kha.graphics2.Graphics){
+		if (paused){
+			//Pause overlay.
+			g.color = kha.Color.fromFloats(.1,.2,.2,.6);
+			g.fillRect(0,0,kha.System.windowWidth(),kha.System.windowHeight());
+
+			g.color = kha.Color.fromBytes(30,30,30);
+			g.fillRect(0,0,400,kha.System.windowHeight());
+			
+			g.color = kha.Color.White;
+			g.font = kha.Assets.fonts.trenco;
+			g.fontSize = 38*4;
+			g.drawString("Paused",20,20);
+
+		}
+	}
+
+	function drawMap (g:kha.graphics2.Graphics) {
 		if (mapShown){
 			//Draw minimap at the top right of the screen.
 			g.transformation = kha.math.FastMatrix3.scale(4,4);
 			g.drawImage(minimap,kha.System.windowWidth()/4 - map.width,0);
+			g.transformation = kha.math.FastMatrix3.identity();
 		}
-		g.transformation = kha.math.FastMatrix3.identity(); //Reset after map transformation.
+	}
 
+	function inventory (g:kha.graphics2.Graphics) {
 		var pinv = p.get(component.Inventory);
 
 		if (pinv != null){	
@@ -361,53 +408,6 @@ class Play extends states.State {
 				n++;
 			}
 		}
-
-		//Alpha text.
-		g.transformation = kha.math.FastMatrix3.identity();
-		g.font = kha.Assets.fonts.OpenSans;
-		g.color = kha.Color.fromFloats(1,1,1,.4);
-		g.fontSize = 20;
-		g.drawString("Exilium 0.1.0. @5mixer, @BU773RH4ND5, @gas1312_AGD",10,kha.System.windowHeight()-30);
-
-		if (p.get(component.GhostMode).enabled){
-			g.color = kha.Color.fromFloats(.1,.2,.2,.6);
-			g.fillRect(0,0,framebuffer.width,framebuffer.height);
-			p.get(component.KeyMovement).speed = 140;
-		}else{
-			p.get(component.KeyMovement).speed = 110;
-		}
-
-		if (paused){
-			//Pause overlay.
-			g.color = kha.Color.fromFloats(.1,.2,.2,.6);
-			g.fillRect(0,0,framebuffer.width,framebuffer.height);
-
-			g.color = kha.Color.fromBytes(30,30,30);
-			g.fillRect(0,0,400,kha.System.windowHeight());
-			
-			g.color = kha.Color.White;
-			g.font = kha.Assets.fonts.trenco;
-			g.fontSize = 38*4;
-			g.drawString("Paused",20,20);
-
-		}
-		g.color = kha.Color.White;
-		g.end();
-		
-		zuiInstance.begin(g);
-		debugInterface.render(g);
-		debugInterface.updateGraph.pushValue(1/renderDelta/debugInterface.updateGraph.size.y);
-		audioInterface.render(g);
-		zuiInstance.end();
-		
-	}
-	public function offsetInventorySelection(offset:Int){
-		kha.audio1.Audio.play(kha.Assets.sounds.ui_blip);
-		if (p.get(component.Inventory) == null) return;
-		p.get(component.Inventory).activeIndex += offset;
-		if (p.get(component.Inventory).activeIndex < 0) p.get(component.Inventory).activeIndex = p.get(component.Inventory).length-1;
-		if (p.get(component.Inventory).activeIndex > p.get(component.Inventory).length-1) p.get(component.Inventory).activeIndex = 0;
-		cast(systems.get(system.Inventory),system.Inventory).onChangeItem();
 	}
 
 	override public function update(delta:Float){

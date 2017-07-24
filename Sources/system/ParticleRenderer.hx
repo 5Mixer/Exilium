@@ -31,10 +31,11 @@ class ParticleRenderer extends System {
 					}
 				}
 				case Effect.Smoke: {
-					g.color = kha.Color.fromBytes(100,90,90,100-particle.life);
+					g.color = kha.Color.fromBytes(200-particle.life*4,90,90,100-particle.life*3);
 					transform.pos.x += Math.floor(-1+Math.random()*2);
-					g.fillCircle(transform.pos.x-3+(particle.life/2),transform.pos.y-particle.life,2,8);
-					
+					//g.fillCircle(transform.pos.x-3+(particle.life/2),transform.pos.y-particle.life,2,8);
+					var s = Math.max(0,2-(particle.life/10));
+					g.fillRect(transform.pos.x-3+(particle.life/2),transform.pos.y-particle.life,s,s);
 				}
 				case Effect.Text(t): {
 					var offx = 0.0;

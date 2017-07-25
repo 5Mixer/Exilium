@@ -36,7 +36,7 @@ class Collisions extends System {
 	}
 	override public function onUpdate (delta:Float){
 		super.onUpdate(delta);
-		return;
+		
 		grid.empty();
 		frame++;
 		

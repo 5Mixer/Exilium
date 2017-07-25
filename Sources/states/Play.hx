@@ -424,9 +424,18 @@ class Play extends states.State {
 		var magnetsSystem:system.Magnets = systems.get(system.Magnets);
 		magnetsSystem.p = p;
 
-		if (p != null && p.has(component.Transformation))
-			camera.pos = new kha.math.Vector2(p.get(component.Transformation).pos.x-kha.System.windowWidth()/2/camera.scale.x,p.get(component.Transformation).pos.y-kha.System.windowHeight()/2/camera.scale.y);
-		
+		// (input.mousePos.x - kha.System.windowWidth() / 2)
+		//(input.mousePos.y - kha.System.windowHeight() / 2)
+
+		var mouseCamMovement = .03;
+
+		if (p != null && p.has(component.Transformation)){
+			camera.pos = new kha.math.Vector2(
+				(p.get(component.Transformation).pos.x - (kha.System.windowWidth()/2) /camera.scale.x) + (input.mousePos.x - kha.System.windowWidth()/2)*mouseCamMovement,
+				(p.get(component.Transformation).pos.y - (kha.System.windowHeight()/2) /camera.scale.y) + (input.mousePos.y - kha.System.windowHeight()/2)*mouseCamMovement
+			);
+		}
+
 		var collisionDebugViewSys:system.CollisionDebugView = systems.get(system.CollisionDebugView);
 		collisionDebugViewSys.showActiveEntities = debugInterface.activeCollisionRegionsShown;
 		collisionDebugViewSys.showStaticEntities = debugInterface.staticCollisionRegionsShown;

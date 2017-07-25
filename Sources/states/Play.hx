@@ -198,9 +198,12 @@ class Play extends states.State {
 			}
 		}
 
+		//Place ladder
 		EntityFactory.createLadder(entities,generator.exitPoint.x*16,generator.exitPoint.y*16,function (collider){
 			descend();
 		});
+
+		//Place cactus boss
 		if (Std.is(generator,worldgen.DungeonWorldGenerator)){
 			var dungeon:worldgen.DungeonWorldGenerator = cast generator;
 			var room = dungeon.rooms[2];
@@ -209,11 +212,14 @@ class Play extends states.State {
 		}
 		EntityFactory.createMummy(entities,generator.spawnPoint.x*16+10,generator.spawnPoint.y*16);
 
+		//Creator the player.
 		p = EntityFactory.createPlayer(entities,{x:generator.spawnPoint.x, y:generator.spawnPoint.y});
 		p.get(component.Inventory).putIntoInventory(component.Inventory.Item.SlimeGun);
 		p.get(component.Events).listenToEvent(component.Events.Event.Death,function (args){
 			Project.states = [new states.Dead()];
 		});
+
+		//Load the player
 		if (lastSave != null && lastSave.player != null){
 			p.get(component.Health).current = lastSave.player.health;
 			p.get(component.Inventory).stacks = lastSave.player.inventory;

@@ -45,6 +45,7 @@ class EntityFactory {
 		p.get(component.AnimatedSprite).tilesize = 10;
 		p.set(new component.KeyMovement());
 		p.set(new component.Physics());
+		p.get(component.Physics).pushStrength = .4;
 		p.set(new component.Gun());
 		p.set(new component.Inventory());
 		p.set(new component.GrappleHook());

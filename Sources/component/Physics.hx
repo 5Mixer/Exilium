@@ -4,6 +4,7 @@ class Physics extends Component{
 	public var velocity:kha.math.Vector2;
 	public var friction:Float=.7;
 	public var reflect = false;
+	public var pushStrength = 0.;
 	override public function new (reflect = false){
 		velocity = new kha.math.Vector2();
 		this.reflect = reflect;

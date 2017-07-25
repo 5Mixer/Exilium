@@ -21,7 +21,6 @@ class Physics extends System {
 
 	override public function onUpdate (delta:Float){
 		super.onUpdate(delta);
-
 		for (entity in view.entities){
 			var transformation = entity.get(component.Transformation);
 			var physics = entity.get(component.Physics);
@@ -39,18 +38,16 @@ class Physics extends System {
 				transformation.pos.y += physics.velocity.y * localDelta;
 			}else{
 				
-
 				var collision = false;
 				var collidingShape:component.Collisions.Rect = null;
 				//Cast ray so fast movement doesn't go through walls
 				
-				var px = transformation.pos.x + (collider.collisionRegions[0].width/2) +1;
-				var py = transformation.pos.y + (collider.collisionRegions[0].height/2) +1;
+				//var px = transformation.pos.x + (collider.collisionRegions[0].width/2) +1;
+				//var py = transformation.pos.y + (collider.collisionRegions[0].height/2) +1;
 				//var velocityRayLength = collisionSys.fireRay(new differ.shapes.Ray(new differ.math.Vector(px,py),new differ.math.Vector(px + physics.velocity.x,py + physics.velocity.y)),[component.Collisions.CollisionGroup.Player]);
 				
 				//physics.velocity.x*=velocityRayLength;
 				//physics.velocity.y*=velocityRayLength;
-
 
 				var sampleMaxLength = 1;
 				var multiSamples = 1;//Math.ceil(Math.sqrt(Math.pow(physics.velocity.x,2)+Math.pow(physics.velocity.y,2))/sampleMaxLength);
@@ -67,12 +64,9 @@ class Physics extends System {
 
 							var otherTransform = otherShape.ofEntity.get(component.Transformation).pos;
 
-							var rect1 = { x: shape.x+transformation.pos.x, y: shape.y+transformation.pos.y, width: shape.width, height:shape.height };
-							var rect2 = { x: otherShape.x+otherTransform.x, y: otherShape.y+otherTransform.y, width: otherShape.width, height: otherShape.height };
-							if (rect1.x < rect2.x + rect2.width &&
-								rect1.x + rect1.width > rect2.x &&
-								rect1.y < rect2.y + rect2.height &&
-								rect1.height + rect1.y > rect2.y && validCollision(shape,otherShape)) {
+							if (aabb(shape.x+transformation.pos.x, shape.y+transformation.pos.y, shape.width, shape.height,
+									otherShape.x+otherTransform.x,otherShape.y+otherTransform.y,otherShape.width,otherShape.height)
+								 && validCollision(shape,otherShape)) {
 
 								var c = differ.Collision.shapeWithShape(
 								differ.shapes.Polygon.rectangle(shape.x+transformation.pos.x,shape.y+transformation.pos.y,shape.width,shape.height,false),
@@ -83,7 +77,7 @@ class Physics extends System {
 									collision = true;
 									collidingShape = otherShape;
 									if (otherShape.ofEntity.get(component.Collisions).stopMovement && validCollision(shape,otherShape)){
-										transformation.pos.x += c.separationX;
+										transformation.pos.x += c.separationX - (c.separationX * physics.pushStrength);
 									}
 									reflectx = physics.reflect;
 
@@ -104,12 +98,10 @@ class Physics extends System {
 							if (!otherShape.ofEntity.has(component.Transformation)) continue;
 							var otherTransform = otherShape.ofEntity.get(component.Transformation).pos;
 
-							var rect1 = { x: shape.x+transformation.pos.x, y: shape.y+transformation.pos.y, width: shape.width, height:shape.height };
-							var rect2 = { x: otherShape.x+otherTransform.x, y: otherShape.y+otherTransform.y, width: otherShape.width, height: otherShape.height };
-							if (rect1.x < rect2.x + rect2.width &&
-								rect1.x + rect1.width > rect2.x &&
-								rect1.y < rect2.y + rect2.height &&
-								rect1.height + rect1.y > rect2.y && validCollision(shape,otherShape)) {
+							if (aabb(shape.x+transformation.pos.x, shape.y+transformation.pos.y, shape.width, shape.height,
+									otherShape.x+otherTransform.x,otherShape.y+otherTransform.y,otherShape.width,otherShape.height)
+								 && validCollision(shape,otherShape)) {
+
 
 								var c = differ.Collision.shapeWithShape(
 								differ.shapes.Polygon.rectangle(shape.x+transformation.pos.x,shape.y+transformation.pos.y,shape.width,shape.height,false),
@@ -119,7 +111,7 @@ class Physics extends System {
 									collision = true;
 									collidingShape = otherShape;
 									if (otherShape.ofEntity.get(component.Collisions).stopMovement && validCollision(shape,otherShape)){
-										transformation.pos.y += c.separationY;
+										transformation.pos.y += c.separationY - (c.separationY * physics.pushStrength);
 									}
 									reflecty = physics.reflect;
 
@@ -164,5 +156,12 @@ class Physics extends System {
 		}
 		return true;
 
+	}
+
+	function aabb(ax:Float,ay:Float,awidth:Float,aheight:Float,bx:Float,by:Float,bwidth:Float,bheight:Float){
+		return (ax < bx + bwidth &&
+				ax + awidth > bx &&
+				ay < by + bheight &&
+				aheight + ay > by);
 	}
 }

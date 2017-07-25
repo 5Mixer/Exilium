@@ -164,8 +164,7 @@ class Gun extends System {
 		bullet.get(component.Light).colour = kha.Color.Green;
 		bullet.get(component.Light).strength = .1;
 
-		bullet.set(new component.Collisions([CollisionGroup.Bullet,CollisionGroup.Friendly],[CollisionGroup.Bullet,CollisionGroup.Friendly,CollisionGroup.Player,CollisionGroup.Item,CollisionGroup.Particle]));
-		bullet.get(component.Collisions).registerCollisionRegion(new component.Collisions.Rect(4,4,8,8));
+		bullet.set(new component.Collisions([CollisionGroup.Bullet,CollisionGroup.Friendly],[CollisionGroup.Bullet,CollisionGroup.Friendly,CollisionGroup.Player,CollisionGroup.Item,CollisionGroup.Particle],new component.Collisions.Rect(4,4,8,8)));
 
 		var particle = entities.create();
 		particle.set(new component.VisualParticle(component.VisualParticle.Effect.Spark));
@@ -216,8 +215,7 @@ class Gun extends System {
 		bullet.set(new component.DieOnCollision([CollisionGroup.Level,CollisionGroup.ShooterTrap,CollisionGroup.Chest]));
 		bullet.set(new component.ParticleTrail(.2,component.VisualParticle.Effect.Spark));
 
-		bullet.set(new component.Collisions([CollisionGroup.Bullet,CollisionGroup.Friendly],[CollisionGroup.Bullet,CollisionGroup.Friendly,CollisionGroup.Player,CollisionGroup.Item,CollisionGroup.Particle],false));
-		bullet.get(component.Collisions).registerCollisionRegion(new component.Collisions.Rect(6,6,4,4));
+		bullet.set(new component.Collisions([CollisionGroup.Bullet,CollisionGroup.Friendly],[CollisionGroup.Bullet,CollisionGroup.Friendly,CollisionGroup.Player,CollisionGroup.Item,CollisionGroup.Particle],new component.Collisions.Rect(6,6,4,4),false));
 
 		var particle = entities.create();
 		particle.set(new component.VisualParticle(component.VisualParticle.Effect.Spark));
@@ -259,8 +257,7 @@ class Gun extends System {
 			bullet.set(new component.Damager(2));
 			bullet.set(new component.DieOnCollision([CollisionGroup.Enemy,CollisionGroup.Level,CollisionGroup.ShooterTrap,CollisionGroup.Chest]));
 			
-			bullet.set(new component.Collisions([CollisionGroup.Bullet,CollisionGroup.Friendly],[CollisionGroup.Bullet,CollisionGroup.Friendly,CollisionGroup.Player,CollisionGroup.Item,CollisionGroup.Particle]));
-			bullet.get(component.Collisions).registerCollisionRegion(new component.Collisions.Rect(4,4,8,8));
+			bullet.set(new component.Collisions([CollisionGroup.Bullet,CollisionGroup.Friendly],[CollisionGroup.Bullet,CollisionGroup.Friendly,CollisionGroup.Player,CollisionGroup.Item,CollisionGroup.Particle],new component.Collisions.Rect(4,4,8,8)));
 
 			var particle = entities.create();
 			particle.set(new component.VisualParticle(component.VisualParticle.Effect.Spark));
@@ -314,8 +311,7 @@ class Gun extends System {
 		
 		//Damage and collisions
 		bullet.set(new component.Damager(30));
-		bullet.set(new component.Collisions([component.Collisions.CollisionGroup.Bullet,component.Collisions.CollisionGroup.Friendly],[component.Collisions.CollisionGroup.Friendly,component.Collisions.CollisionGroup.Bullet,component.Collisions.CollisionGroup.Player],false));
-		bullet.get(component.Collisions).registerCollisionRegion(new component.Collisions.Rect(4,4,8,8));
+		bullet.set(new component.Collisions([component.Collisions.CollisionGroup.Bullet,component.Collisions.CollisionGroup.Friendly],[component.Collisions.CollisionGroup.Friendly,component.Collisions.CollisionGroup.Bullet,component.Collisions.CollisionGroup.Player],new component.Collisions.Rect(4,4,8,8),false));
 
 		//////bullet.set(new component.ParticleTrail((17-strength*1.4),component.VisualParticle.Effect.Spark));
 		//Little particle

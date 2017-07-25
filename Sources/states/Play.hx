@@ -131,8 +131,8 @@ class Play extends states.State {
 		map = new world.Tilemap();
 		mapCollisions = entities.create();
 		mapCollisions.set(new component.Transformation(new kha.math.Vector2()));
-		mapCollisions.set(new component.Collisions([component.Collisions.CollisionGroup.Level],[]));
-		mapCollisions.get(component.Collisions).fixed = true;
+		// mapCollisions.set(new component.Collisions([component.Collisions.CollisionGroup.Level],[]));
+		// mapCollisions.get(component.Collisions).fixed = true;
 		(cast systems.get(system.AI)).map = map;
 
 		var worldSize = 60;
@@ -144,37 +144,21 @@ class Play extends states.State {
 		
 		minimap = kha.Image.createRenderTarget(worldSize,worldSize);
 		
-		var t = 0;
-		var collisionRects = [];
-		while (t < generator.tiles.length-1){
-			var tile = generator.tiles[t];
-
+		var i = 0;
+		for (tile in generator.tiles){
 			if (map.tileInfo.get(tile.id).collide){
-				var x = t%map.width;
-				var y = Math.floor(t/map.width);
-				var width = 1;
-				var height = 1;
-				/*while (map.get(component.Tilemap).tileInfo.get(generator.tiles[t+width]).collide && Math.floor((t+width)/map.get(component.Tilemap).width) == y){
-					width += 1;
-				}*/
+				var x = i%map.width;
+				var y = Math.floor(i/map.width);
+
+				var mapCollisions = entities.create();
+				mapCollisions.set(new component.Transformation(new kha.math.Vector2(x*16,y*16)));
+				mapCollisions.set(new component.Collisions([component.Collisions.CollisionGroup.Level],[],new component.Collisions.Rect(0,0,16,16)));
 				
-				collisionRects.push({x:x,y:y,width:width,height:height,resolved:false,t:t});
-				t += width;
-			}else{
-				t+=1;
+				// mapCollisions.get(component.Collisions).registerCollisionRegion(new component.Collisions.Rect(
+				// 		x*16,y*16,
+				// 		16,16));
 			}
-		}
-		for (rect in collisionRects){
-			if (rect.resolved) continue;
-			var width = 1;
-			/*while (generator.tiles[rect.t+width] != null && map.get(component.Tilemap).tileInfo.get(generator.tiles[rect.t+width]).collide && Math.floor((rect.t+width)/map.get(component.Tilemap).width) == rect.y){
-				width += 1;
-				collisionRects[rect.t+width].resolved=true;
-				rect.resolved = true;
-			}*/
-			mapCollisions.get(component.Collisions).registerCollisionRegion(new component.Collisions.Rect(
-					rect.x*16,rect.y*16,
-					width*16,rect.height*16));
+			i++;
 		}
 
 		if (dungeonLevel == 4){

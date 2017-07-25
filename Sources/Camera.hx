@@ -9,6 +9,8 @@ class Camera {
 	public function new (){
 		pos = new kha.math.Vector2(-kha.System.windowWidth()/2,-kha.System.windowHeight()/2);
 		offset = new kha.math.Vector2();
+
+		scale.x = scale.y = 4;// kha.System.screenDpi()/20;
 	}
 	public function transform (g:kha.graphics2.Graphics) {
 		g.pushTransformation(g.transformation);

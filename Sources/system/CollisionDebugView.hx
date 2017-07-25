@@ -29,8 +29,8 @@ class CollisionDebugView extends System {
 			for (entity in view.entities){
 				var transform = entity.get(component.Transformation);
 				var collisions = entity.get(component.Collisions);
-				for (region in collisions.collisionRegions){
-					if (region.gridIndex == null) continue;
+				// for (region in collisions.collisionRegions){
+					if (collisions.AABB.gridIndex == null) continue;
 					/*for (cell in region.gridIndex){
 						
 						g.color = kha.Color.White;
@@ -40,15 +40,15 @@ class CollisionDebugView extends System {
 						
 					}*/
 					g.color = kha.Color.Cyan;
-					g.drawRect(region.x+transform.pos.x,region.y+transform.pos.y,region.width,region.height,.5);
-				}
+					g.drawRect(collisions.AABB.x+transform.pos.x,collisions.AABB.y+transform.pos.y,collisions.AABB.width,collisions.AABB.height,.5);
+				// }
 			}
 		if (showStaticEntities)
 			for (entity in staticview.entities){
 				var transform = entity.get(component.Transformation);
 				var collisions = entity.get(component.Collisions);
-				for (region in collisions.collisionRegions){
-					if (region.gridIndex == null) continue;
+				// for (region in collisions.collisionRegions){
+					if (collisions.AABB.gridIndex == null) continue;
 					/*for (cell in region.gridIndex){
 						
 						g.color = kha.Color.White;
@@ -58,8 +58,8 @@ class CollisionDebugView extends System {
 						public 
 					}*/
 					g.color = kha.Color.Cyan;
-					g.drawRect(region.x+transform.pos.x,region.y+transform.pos.y,region.width,region.height,.5);
-				}
+					g.drawRect(collisions.AABB.x+transform.pos.x,collisions.AABB.y+transform.pos.y,collisions.AABB.width,collisions.AABB.height,.5);
+				// }
 			}
 
 		g.color = kha.Color.White;

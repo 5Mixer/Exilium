@@ -56,69 +56,66 @@ class Physics extends System {
 				var reflecty = false;
 				for (sample in 0...multiSamples){
 					transformation.pos.x += physics.velocity.x*sampleMultiplier*localDelta;
-					for (shape in collider.collisionRegions){
+					
+					for (otherShape in grid.findContacts(collider.AABB)){
+						//if (!validCollision(shape,otherShape)) continue;
+						if (!otherShape.ofEntity.has(component.Transformation)) continue;
 
-						for (otherShape in grid.findContacts(shape)){
-							//if (!validCollision(shape,otherShape)) continue;
-							if (!otherShape.ofEntity.has(component.Transformation)) continue;
+						var otherTransform = otherShape.ofEntity.get(component.Transformation).pos;
 
-							var otherTransform = otherShape.ofEntity.get(component.Transformation).pos;
+						if (aabb(collider.AABB.x+transformation.pos.x, collider.AABB.y+transformation.pos.y, collider.AABB.width, collider.AABB.height,
+								otherShape.x+otherTransform.x,otherShape.y+otherTransform.y,otherShape.width,otherShape.height)
+								&& validCollision(collider.AABB,otherShape)) {
 
-							if (aabb(shape.x+transformation.pos.x, shape.y+transformation.pos.y, shape.width, shape.height,
-									otherShape.x+otherTransform.x,otherShape.y+otherTransform.y,otherShape.width,otherShape.height)
-								 && validCollision(shape,otherShape)) {
+							var c = differ.Collision.shapeWithShape(
+							differ.shapes.Polygon.rectangle(collider.AABB.x+transformation.pos.x,collider.AABB.y+transformation.pos.y,collider.AABB.width,collider.AABB.height,false),
+							differ.shapes.Polygon.rectangle(otherShape.x+otherTransform.x,otherShape.y+otherTransform.y,otherShape.width,otherShape.height,false));
+						
+							if (c.separationX != 0){
 
-								var c = differ.Collision.shapeWithShape(
-								differ.shapes.Polygon.rectangle(shape.x+transformation.pos.x,shape.y+transformation.pos.y,shape.width,shape.height,false),
-								differ.shapes.Polygon.rectangle(otherShape.x+otherTransform.x,otherShape.y+otherTransform.y,otherShape.width,otherShape.height,false));
-							
-								if (c.separationX != 0){
-
-									collision = true;
-									collidingShape = otherShape;
-									if (otherShape.ofEntity.get(component.Collisions).stopMovement && validCollision(shape,otherShape)){
-										transformation.pos.x += c.separationX - (c.separationX * physics.pushStrength);
-									}
-									reflectx = physics.reflect;
-
-									onCollision(shape,otherShape);
-									onCollision(otherShape,shape);
+								collision = true;
+								collidingShape = otherShape;
+								if (otherShape.ofEntity.get(component.Collisions).stopMovement && validCollision(collider.AABB,otherShape)){
+									transformation.pos.x += c.separationX - (c.separationX * physics.pushStrength);
 								}
-									
+								reflectx = physics.reflect;
+
+								onCollision(collider.AABB,otherShape);
+								onCollision(otherShape,collider.AABB);
 							}
+								
 						}
+						
 					}
 					
 					transformation.pos.y += physics.velocity.y*sampleMultiplier*localDelta;
 					
-					for (shape in collider.collisionRegions){
-						for (otherShape in grid.findContacts(shape)){
-							
-							//if (!validCollision(shape,otherShape)) continue;
-							if (!otherShape.ofEntity.has(component.Transformation)) continue;
-							var otherTransform = otherShape.ofEntity.get(component.Transformation).pos;
+					for (otherShape in grid.findContacts(collider.AABB)){
+						
+						//if (!validCollision(shape,otherShape)) continue;
+						if (!otherShape.ofEntity.has(component.Transformation)) continue;
+						var otherTransform = otherShape.ofEntity.get(component.Transformation).pos;
 
-							if (aabb(shape.x+transformation.pos.x, shape.y+transformation.pos.y, shape.width, shape.height,
-									otherShape.x+otherTransform.x,otherShape.y+otherTransform.y,otherShape.width,otherShape.height)
-								 && validCollision(shape,otherShape)) {
+						if (aabb(collider.AABB.x+transformation.pos.x, collider.AABB.y+transformation.pos.y, collider.AABB.width, collider.AABB.height,
+								otherShape.x+otherTransform.x,otherShape.y+otherTransform.y,otherShape.width,otherShape.height)
+								&& validCollision(collider.AABB,otherShape)) {
 
 
-								var c = differ.Collision.shapeWithShape(
-								differ.shapes.Polygon.rectangle(shape.x+transformation.pos.x,shape.y+transformation.pos.y,shape.width,shape.height,false),
-								differ.shapes.Polygon.rectangle(otherShape.x+otherTransform.x,otherShape.y+otherTransform.y,otherShape.width,otherShape.height,false));
-							
-								if (c.separationY != 0){
-									collision = true;
-									collidingShape = otherShape;
-									if (otherShape.ofEntity.get(component.Collisions).stopMovement && validCollision(shape,otherShape)){
-										transformation.pos.y += c.separationY - (c.separationY * physics.pushStrength);
-									}
-									reflecty = physics.reflect;
-
-									onCollision(shape,otherShape);
-									onCollision(otherShape,shape);
-
+							var c = differ.Collision.shapeWithShape(
+							differ.shapes.Polygon.rectangle(collider.AABB.x+transformation.pos.x,collider.AABB.y+transformation.pos.y,collider.AABB.width,collider.AABB.height,false),
+							differ.shapes.Polygon.rectangle(otherShape.x+otherTransform.x,otherShape.y+otherTransform.y,otherShape.width,otherShape.height,false));
+						
+							if (c.separationY != 0){
+								collision = true;
+								collidingShape = otherShape;
+								if (otherShape.ofEntity.get(component.Collisions).stopMovement && validCollision(collider.AABB,otherShape)){
+									transformation.pos.y += c.separationY - (c.separationY * physics.pushStrength);
 								}
+								reflecty = physics.reflect;
+
+								onCollision(collider.AABB,otherShape);
+								onCollision(otherShape,collider.AABB);
+
 							}
 						}
 					}
@@ -147,6 +144,7 @@ class Physics extends System {
 	//If the other shape is not ignoring one of shapes groups.
 	function validCollision(shape:component.Collisions.Rect,otherShape:component.Collisions.Rect){
 		//If both shapes are ignoring nothing, they should collide.
+		if (otherShape.ignoreGroups == null || shape.ignoreGroups == null) return true;
 		if (otherShape.ignoreGroups.length == 0 && shape.ignoreGroups.length == 0) return true;
 		//If the shape has a group that is being ignored by otherShape, don't collide.
 		for (group in shape.group){

@@ -1,6 +1,6 @@
 package;
 
-import kha.Key;
+import kha.input.KeyCode;
 
 typedef Listener = {
 	var key : String;
@@ -61,51 +61,34 @@ class Input {
 	public function endUpdate() {
 		mouseReleased = false;
 
-	}
+	public function keyDown(key:KeyCode) {
+		
 
-
-	public function keyDown(key:Key,char:String) {
-		keys.set(key,true);
-		chars.set(char,true);
-
-		if (key == LEFT || char == "a")
+		if (key == KeyCode.Left || key == KeyCode.A)
 			left = true;
 
-		if (key == RIGHT || char == "d")
+		if (key == KeyCode.Right || key == KeyCode.D)
 			right = true;
 
-		if (key == UP || char == "w")
+		if (key == KeyCode.Up || key == KeyCode.W)
 			up = true;
 
-		if (key == DOWN || char == "s")
+		if (key == KeyCode.Down || key == KeyCode.S)
 			down = true;
 	}
 
-	public function keyUp(key: Key,char) {
+	public function keyUp(key:KeyCode) {
+		if (key == KeyCode.R)
+			if (onRUp != null)
+				onRUp();
 		
-		keys.set(key,false);
-		chars.set(char,false);
-
-		for (listener in listeners){
-			if (char == listener.key){
-				listener.callback();
-			}
-		}
-		if (key == ESC){
-			for (listener in listeners){
-				if (listener.key == "esc"){
-					listener.callback();
-				}
-			}
-		}
-		
-		if(key == LEFT || char == 'a')
+		if(key == KeyCode.Left || key == KeyCode.A)
 			left = false;
-		if(key == RIGHT || char == 'd')
+		if(key == KeyCode.Right || key == KeyCode.D)
 			right = false;
-		if(key == UP || char == 'w')
+		if(key == KeyCode.Up || key == KeyCode.W)
 			up = false;
-		if(key == DOWN || char == 's')
+		if(key == KeyCode.Down || key == KeyCode.S)
 			down = false;
 	}
 }

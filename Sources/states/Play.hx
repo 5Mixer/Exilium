@@ -56,7 +56,6 @@ class Play extends states.State {
 		super();
 
 		input = new Input();
-		openShop = new ui.PotionShop(input);
 		camera = new Camera();
 		kha.input.Mouse.get().hideSystemCursor();
 		
@@ -84,6 +83,7 @@ class Play extends states.State {
 		
 		systems.add(collisionSys);
 		systems.add(new system.KeyMovement(input,entities));
+		systems.add(new system.PotionEffects(entities));
 		systems.add(new system.Physics(entities,collisionSys.grid,collisionSys));
 		systems.add(new system.Inventory(input,entities));
 		systems.add(new system.TimedLife(entities));
@@ -290,7 +290,8 @@ class Play extends states.State {
 			system.render(g);
 		camera.restore(g);
 		
-		//openShop.render(g);
+		if (openShop != null)
+			openShop.render(g);
 
 		drawCursor(g);
 		drawMap(g);
@@ -327,8 +328,12 @@ class Play extends states.State {
 	}
 
 	function drawCursor (g:kha.graphics2.Graphics){
-		if (debugInterface.visible){
-			kha.input.Mouse.get().showSystemCursor();
+		if (debugInterface.visible || openShop != null){
+			// kha.input.Mouse.get().showSystemCursor();
+			g.transformation = kha.math.FastMatrix3.scale(4,4);
+			g.drawSubImage(kha.Assets.images.Entities,input.mousePos.x/4,input.mousePos.y/4,2*16,16,16,16);
+
+			input.mouseEvents = false;
 		}else{
 			input.mouseEvents = true;
 			kha.input.Mouse.get().hideSystemCursor();
@@ -403,8 +408,13 @@ class Play extends states.State {
 
 	override public function update(delta:Float){
 		debugInterface.fpsGraph.pushValue(1/delta/debugInterface.fpsGraph.size.y);
-		input.mouseEvents = debugInterface.visible;
 		input.startUpdate();
+		if (input.keysReleased.get(kha.input.KeyCode.V)){
+			if (openShop == null){ openShop = new ui.PotionShop(input,p.get(component.Inventory)); }
+			else { openShop = null; }
+		}
+		if (openShop != null)
+			openShop.update();
 		p.get(component.GhostMode).enabled = input.keys.get(kha.input.KeyCode.Shift);
 		frame++;
 		var globalMultiplier = input.keys.get(kha.input.KeyCode.F) ? 1/100 : 1/60;

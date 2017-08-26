@@ -5,6 +5,9 @@ enum Item {
 	SlimeGun;
 	LaserGun;
 	HealthPotion;
+	SpeedPotion;
+	DefensivePotion;
+	MayhamPotion;
 	GrapplingHook;
 	CastSheild;
 	Key;
@@ -29,15 +32,20 @@ class Inventory extends Component {
 	public var length(get,null) = 0;
 	public var activeIndex:Int = 0;
 	public var itemData:Map<Item,{name:String, stackable:Bool, type: ItemType, sprite: Dynamic}> = [
-		Item.Gold => { name: "gold", stackable: true, type: ItemType.Currency, sprite:states.Play.spriteData.entity.gold },
 		Item.HealthPotion => { name: "health potion", stackable: true, type: ItemType.Potion, sprite:states.Play.spriteData.entity.healthPotion },
+		Item.SpeedPotion => { name: "speed potion", stackable: true, type: ItemType.Potion, sprite:states.Play.spriteData.entity.speedPotion },
+		Item.DefensivePotion => { name: "Defensive potion", stackable: true, type: ItemType.Potion, sprite:states.Play.spriteData.entity.defensivePotion },
+		Item.MayhamPotion => { name: "Mayham potion", stackable: true, type: ItemType.Potion, sprite:states.Play.spriteData.entity.mayhamPotion },
+		
 		Item.SlimeGun => { name: "slime gun", stackable: false, type: ItemType.Gun, sprite:states.Play.spriteData.entity.slimeGun },
 		Item.LaserGun => { name: "laser gun", stackable: false, type: ItemType.Gun, sprite:states.Play.spriteData.entity.laserGun },
-		Item.GrapplingHook => { name: "grappling gun", stackable: false, type: ItemType.Gun, sprite:states.Play.spriteData.entity.grapplingHook },
-		Item.CastSheild => { name: "cast shield", stackable: true, type: ItemType.Other, sprite:states.Play.spriteData.entity.cast_shield },
-		Item.Key => { name: "key", stackable: true, type: ItemType.Other, sprite:states.Play.spriteData.entity.key },
 		Item.Blaster => { name: "blaster gun", stackable: false, type: ItemType.Gun, sprite:states.Play.spriteData.entity.blaster },
-		Item.Bow => { name: "bow", stackable: false, type: ItemType.Gun, sprite:states.Play.spriteData.entity.bow }
+		Item.GrapplingHook => { name: "grappling gun", stackable: false, type: ItemType.Gun, sprite:states.Play.spriteData.entity.grapplingHook },
+		Item.Bow => { name: "bow", stackable: false, type: ItemType.Gun, sprite:states.Play.spriteData.entity.bow },
+		Item.CastSheild => { name: "cast shield", stackable: true, type: ItemType.Other, sprite:states.Play.spriteData.entity.cast_shield },
+		
+		Item.Gold => { name: "gold", stackable: true, type: ItemType.Currency, sprite:states.Play.spriteData.entity.gold },
+		Item.Key => { name: "key", stackable: true, type: ItemType.Other, sprite:states.Play.spriteData.entity.key }
 	];
 	override public function new (){
 		super();

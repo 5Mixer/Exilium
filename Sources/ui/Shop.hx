@@ -5,6 +5,7 @@ typedef ShopItem = {
 	var description:String;
 	var image:kha.Image;
 	var price:Int;
+	var item:component.Inventory.Item;
 }
 
 class Shop {
@@ -13,14 +14,35 @@ class Shop {
 	var height = 64;
 	var name = "Shop";
 	var input:Input;
-	public function new (input:Input){
+	var inventory:component.Inventory;
+	public function new (input:Input,inventory:component.Inventory){
 		this.input = input;
+		this.inventory = inventory;
+	}
+	public function update (){
+		if (input.mouseReleased){
+		var y = 10;
+			for (item in items){
+				if (input.mousePos.x > 201 && input.mousePos.x < 201+(width*4)-22&&
+					input.mousePos.y > 210+(y*4) && input.mousePos.y < 210+(y*4)+(18*4)){
+					if (inventory.getStack(component.Inventory.Item.Gold) != null){
+						if (inventory.getStack(component.Inventory.Item.Gold).quantity >= item.price){
+							inventory.putIntoInventory(item.item,1);
+							inventory.takeFromInventory(component.Inventory.Item.Gold, item.price);
+							kha.audio1.Audio.play(kha.Assets.sounds.buy);
+						}
+					}
+				}
+				y += 20;
+			}
+		}
+
 	}
 	public function render(g:kha.graphics2.Graphics){
 		g.pushTranslation(200,200);
 
 		g.color = kha.Color.fromBytes(220,190,160);
-		g.fillRect(0,0,width,10+items.length*20);
+		g.fillRect(0,0,1+(width)*4,(9+items.length*20)*4);
 
 		
 		g.transformation._00 = 1;
@@ -63,6 +85,7 @@ class Shop {
 
 			y += 20;
 		}
+		g.drawSubImage(kha.Assets.images.Sellers,0-20,0,0,0,16,16);
 
 		g.popTransformation();
 		g.color = kha.Color.White;

@@ -17,6 +17,14 @@ class KeyMovement extends System {
 			var physics:component.Physics = entity.get(component.Physics);
 
 			var speed = keymovement.speed;
+			if (entity.has(component.PotionAffected)){
+				var effects = entity.get(component.PotionAffected).effects;
+				if (effects.exists(component.PotionAffected.EntityModifier.Speed)){
+					if (effects.get(component.PotionAffected.EntityModifier.Speed) > 0){
+						speed *= 2; //TODO: Make this not a magic constant - what should speed by multiplied by?
+					}
+				}
+			}
 			var animation = "walk";
 			if (input.up) {
 				physics.velocity.y = -speed;

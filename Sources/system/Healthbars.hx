@@ -2,8 +2,10 @@ package system;
 
 class Healthbars extends System {
 	var view:eskimo.views.View;
+	var entities:eskimo.EntityManager;
 	public function new (entities:eskimo.EntityManager){
 		view = new eskimo.views.View(new eskimo.filters.Filter([component.Health,component.Transformation]), entities);
+		this.entities = entities;
 		super();
 	}
 
@@ -37,6 +39,16 @@ class Healthbars extends System {
 				if (entity.has(component.Events)){
 					entity.get(component.Events).callEvent(component.Events.Event.Death,null);
 				}
+
+				//kha.audio1.Audio.play(kha.Assets.sounds.treasure_open);
+				if (entity.has(component.ReleaseOnDeath)){
+					var release = entity.get(component.ReleaseOnDeath);
+					for (item in release.release){
+						var droppedItem = EntityFactory.createItem(entities,item,entity.get(component.Transformation).pos.x,entity.get(component.Transformation).pos.y);
+						droppedItem.set(new component.Physics().setVelocity(new kha.math.Vector2(-20+Math.random()*40,-20+Math.random()*40)));
+					}
+				}
+
 				//kha.audio1.Audio.play(kha.Assets.sounds.die);
 				entity.destroy();
 			}

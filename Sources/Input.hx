@@ -14,6 +14,7 @@ class Input {
 	public var down: Bool;
 	
 	public var keys = new Map<KeyCode,Bool >();
+	public var keysReleased = new Map<KeyCode,Bool >();
 
 	public var mouseEvents = true;
 	public var mousePos:kha.math.Vector2 = new kha.math.Vector2(0,0);
@@ -36,12 +37,12 @@ class Input {
 
 	}
 	public function mouseDown(button,y,z){
-		if (!mouseEvents) return;
+		// if (!mouseEvents) return;
 		if (button==0) mouseButtons.left=true;
 		if (button==1) mouseButtons.right=true;
 	}
 	public function mouseUp(button,y,z){
-		if (!mouseEvents) return;
+		// if (!mouseEvents) return;
 		if (button==0) { mouseButtons.left=false; mouseReleased = true; }
 		if (button==1) mouseButtons.right=false;
 
@@ -59,10 +60,11 @@ class Input {
 	}
 	public function endUpdate() {
 		mouseReleased = false;
+		keysReleased = new Map<KeyCode,Bool >();
 	}
 
 	public function keyDown(key:KeyCode) {
-		
+		keys.set(key,true);
 
 		if (key == KeyCode.Left || key == KeyCode.A)
 			left = true;
@@ -78,6 +80,9 @@ class Input {
 	}
 
 	public function keyUp(key:KeyCode) {
+		
+		keys.set(key,false);
+		keysReleased.set(key,true);
 		// if (key == KeyCode.R)
 		// 	if (onRUp != null)
 		// 		onRUp();

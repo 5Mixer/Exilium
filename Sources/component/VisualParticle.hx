@@ -6,6 +6,7 @@ enum Effect {
 	Flame;
 	Blood;
 	Text(t:String);
+	Speed(xoff:Float,yoff:Float);
 }
 
 class VisualParticle extends Component{

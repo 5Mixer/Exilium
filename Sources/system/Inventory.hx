@@ -32,14 +32,15 @@ class Inventory extends System {
 		for (entity in inventoryHolders.entities){
 			var inventory = entity.get(component.Inventory);
 			var activeItem = inventory.getByIndex(inventory.activeIndex);
-			if (activeItem.item == component.Inventory.Item.HealthPotion){
-				if (input.mouseReleased){
+			if (input.mouseReleased){
+				if (activeItem.item == component.Inventory.Item.HealthPotion){
 					if (entity.has(component.Health)){
 						kha.audio1.Audio.play(kha.Assets.sounds.DrinkPotion);
 						entity.get(component.Health).addToHealth(40);
+
+						// +health particle effect.
 						var particle = entities.create();
 						particle.set(new component.VisualParticle(component.VisualParticle.Effect.Text("+"+40)));
-						
 						particle.set(new component.Transformation(entity.get(component.Transformation).pos.add(new kha.math.Vector2(4,0))));
 						var phys = new component.Physics();
 						var speed = 9+Math.random()*4;
@@ -48,11 +49,29 @@ class Inventory extends System {
 						phys.velocity = new kha.math.Vector2(Math.cos(particleAngle * (Math.PI / 180)) * speed,Math.sin(particleAngle * (Math.PI / 180)) * speed);		
 						particle.set(phys);
 						particle.set(new component.TimedLife(.75));
+
 					}
-					var pos = entity.get(component.Transformation).pos.mult(1);
-					//var p = EntityFactory.createPotion(entities,pos.x+0,pos.y+0);
-					//p.set(new component.Physics().setVelocity(new kha.math.Vector2(-5+Math.random()*10,-5+Math.random()*10)));
-					inventory.takeFromInventory(component.Inventory.Item.HealthPotion);
+				}
+
+				if (activeItem.item == component.Inventory.Item.DefensivePotion){
+					if (entity.has(component.PotionAffected)){
+						kha.audio1.Audio.play(kha.Assets.sounds.DrinkPotion);
+						entity.get(component.PotionAffected).effects.set(component.PotionAffected.EntityModifier.Defence,15);
+					}
+				}
+				if (activeItem.item == component.Inventory.Item.SpeedPotion){
+					if (entity.has(component.PotionAffected)){
+						kha.audio1.Audio.play(kha.Assets.sounds.DrinkPotion);
+						entity.get(component.PotionAffected).effects.set(component.PotionAffected.EntityModifier.Speed,15);
+					}
+				}
+				if (activeItem.item == component.Inventory.Item.MayhamPotion){
+					if (entity.has(component.PotionAffected)){
+						kha.audio1.Audio.play(kha.Assets.sounds.DrinkPotion);
+						entity.get(component.PotionAffected).effects.set(component.PotionAffected.EntityModifier.Speed,8);
+						entity.get(component.PotionAffected).effects.set(component.PotionAffected.EntityModifier.Defence,8);
+						entity.get(component.PotionAffected).effects.set(component.PotionAffected.EntityModifier.FireRate,8);
+					}
 				}
 			}
 		}

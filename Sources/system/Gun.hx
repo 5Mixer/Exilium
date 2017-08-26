@@ -22,7 +22,7 @@ class Gun extends System {
 		super.onUpdate(delta);
 		frame+=delta;
 		
-		if (input.mouseButtons.left){
+		if (input.mouseButtons.left && input.mouseEvents){
 			for (entity in view.entities){
 				if (entity.get(component.Inventory) != null){
 					var pinv = entity.get(component.Inventory);
@@ -110,7 +110,7 @@ class Gun extends System {
 		}
 	}
 	override public function render(g:kha.graphics2.Graphics) {
-		if (input.mouseButtons.left){
+		if (input.mouseButtons.left && input.mouseEvents){
 			for (entity in view.entities){
 				if (entity.get(component.Inventory) != null){
 					var pinv = entity.get(component.Inventory);

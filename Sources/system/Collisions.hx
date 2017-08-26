@@ -125,7 +125,7 @@ class Collisions extends System {
 							otherShapeEntity.get(component.Inventory).putIntoInventory(thing);
 
 							
-						//kha.audio1.Audio.play(kha.Assets.sounds.pickup_item);
+						// kha.audio1.Audio.play(kha.Assets.sounds.pickup_item);
 					
 						shapeEntity.destroy();
 						break;

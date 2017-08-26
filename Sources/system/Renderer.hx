@@ -106,6 +106,14 @@ class Renderer extends System {
 				g.pushTransformation(g.transformation.multmat(kha.math.FastMatrix3.translation(x + originX, y + originY)).multmat(kha.math.FastMatrix3.rotation(angle*(Math.PI / 180))).multmat(kha.math.FastMatrix3.translation(-x - originX, -y - originY)));
 						
 				g.drawScaledSubImage(animation.spriteMap,Math.floor(((actualFrameIndex)%Math.floor(animation.spriteMap.width/tilesize))*tilesize)+inset,Math.floor(Math.floor((actualFrameIndex)/Math.floor(animation.spriteMap.width/tilesize))*tilesize)+inset,tilesize-(inset*2),tilesize-(inset*2),x,y,tilesize,tilesize);
+
+				// Draw glow around things that have a light.
+				// if (entity.has(component.Light)){
+					// var c = entity.get(component.Light).colour;
+					// g.color = kha.Color.fromFloats(c.R,c.G,c.B,.2);
+					// g.fillRect(x,y,tilesize,tilesize);
+					// g.color = kha.Color.White;
+				// }
 				
 				g.popTransformation();
 			}

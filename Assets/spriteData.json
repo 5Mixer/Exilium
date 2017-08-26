@@ -236,7 +236,25 @@
 		},
 		"healthPotion" : {
 			"tileset":"objects",
-			"id":2,
+			"id":24,
+			"width": 8,
+			"height":8
+		},
+		"speedPotion" : {
+			"tileset":"objects",
+			"id":25,
+			"width": 8,
+			"height":8
+		},
+		"defensivePotion" : {
+			"tileset":"objects",
+			"id":26,
+			"width": 8,
+			"height":8
+		},
+		"mayhamPotion" : {
+			"tileset":"objects",
+			"id":27,
 			"width": 8,
 			"height":8
 		},

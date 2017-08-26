@@ -30,6 +30,10 @@ class ParticleRenderer extends System {
 						g.fillCircle(transform.pos.x,transform.pos.y,3,4);
 					}
 				}
+				case Effect.Speed(xoff,yoff): {
+					g.drawLine(transform.pos.x,transform.pos.y,transform.pos.x+xoff,transform.pos.y+yoff);
+					
+				}
 				case Effect.Smoke: {
 					g.color = kha.Color.fromBytes(200-particle.life*4,90,90,100-particle.life*3);
 					transform.pos.x += Math.floor(-1+Math.random()*2);

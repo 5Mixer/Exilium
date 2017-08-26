@@ -13,8 +13,7 @@ class Input {
 	public var up: Bool;
 	public var down: Bool;
 	
-	public var keys = new Map<kha.Key,Bool >();
-	public var chars = new Map<String,Bool >();
+	public var keys = new Map<KeyCode,Bool >();
 
 	public var mouseEvents = true;
 	public var mousePos:kha.math.Vector2 = new kha.math.Vector2(0,0);
@@ -60,6 +59,7 @@ class Input {
 	}
 	public function endUpdate() {
 		mouseReleased = false;
+	}
 
 	public function keyDown(key:KeyCode) {
 		
@@ -78,9 +78,9 @@ class Input {
 	}
 
 	public function keyUp(key:KeyCode) {
-		if (key == KeyCode.R)
-			if (onRUp != null)
-				onRUp();
+		// if (key == KeyCode.R)
+		// 	if (onRUp != null)
+		// 		onRUp();
 		
 		if(key == KeyCode.Left || key == KeyCode.A)
 			left = false;

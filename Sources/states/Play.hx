@@ -319,6 +319,7 @@ class Play extends states.State {
 		}else{
 			input.mouseEvents = true;
 			kha.input.Mouse.get().hideSystemCursor();
+			g.transformation = kha.math.FastMatrix3.scale(4,4);
 			g.drawSubImage(kha.Assets.images.Entities,input.mousePos.x/4 -8,input.mousePos.y/4 -8,2*16,0,16,16);
 		}
 
@@ -410,16 +411,16 @@ class Play extends states.State {
 		debugInterface.fpsGraph.pushValue(1/delta/debugInterface.fpsGraph.size.y);
 		input.mouseEvents = debugInterface.visible;
 		input.startUpdate();
-		p.get(component.GhostMode).enabled = input.keys.get(kha.Key.CTRL);
+		p.get(component.GhostMode).enabled = input.keys.get(kha.input.KeyCode.Shift);
 		frame++;
-		var globalMultiplier = input.chars.get("f") ? 1/100 : 1/60;
+		var globalMultiplier = input.keys.get(kha.input.KeyCode.F) ? 1/100 : 1/60;
 		if (!paused)
 			systems.update(globalMultiplier);
 
 		//Q/E Inventory slide.
-		if (input.chars.get("q") && frame%7==0)
+		if (input.keys.get(kha.input.KeyCode.Q) && frame%7==0)
 			offsetInventorySelection(-1);
-		if (input.chars.get("e") && frame%7==0)
+		if (input.keys.get(kha.input.KeyCode.E) && frame%7==0)
 			offsetInventorySelection(1);
 			
 		

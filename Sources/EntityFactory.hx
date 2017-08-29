@@ -62,7 +62,7 @@ class EntityFactory {
 
 		// p.get(component.Inventory).putIntoInventory(component.Inventory.Item.CastSheild);
 		p.get(Inventory).putIntoInventory(component.Inventory.Item.Blaster);
-		for (i in 0...100)
+		for (i in 0...999)
 			p.get(Inventory).putIntoInventory(component.Inventory.Item.Gold);
 		// p.get(component.Inventory).putIntoInventory(component.Inventory.Item.Bow);
 

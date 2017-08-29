@@ -70,6 +70,7 @@ class Play extends states.State {
 		registerRenderSystem(new system.Renderer(entities));
 		registerRenderSystem(new system.CactusBoss(entities));
 		registerRenderSystem(new system.SpikeHandler(entities));
+		registerRenderSystem(new system.PotionEffects(entities));
 		registerRenderSystem(new system.ParticleRenderer(entities));
 		registerRenderSystem(new system.GrappleHooker(input,camera,entities,collisionSys));
 		registerRenderSystem(new system.Gun(input,camera,entities));
@@ -83,7 +84,6 @@ class Play extends states.State {
 		
 		systems.add(collisionSys);
 		systems.add(new system.KeyMovement(input,entities));
-		systems.add(new system.PotionEffects(entities));
 		systems.add(new system.Physics(entities,collisionSys.grid,collisionSys));
 		systems.add(new system.Inventory(input,entities));
 		systems.add(new system.TimedLife(entities));

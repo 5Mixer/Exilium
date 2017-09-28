@@ -220,17 +220,23 @@ class Play extends states.State {
 	}
 	function descend (){
 		kha.audio1.Audio.play(kha.Assets.sounds.new_level_descend);
-		motion.Actuate.tween (Project.mainMusicChannel, 1, { volume: 0 }, true).ease (motion.easing.Quad.easeInOut).reflect(true).repeat(1);
-		motion.Actuate.tween (this, 1, {overlayShade: 1}, true).ease (motion.easing.Quad.easeInOut).reflect(true).repeat(1);
-		motion.Actuate.timer(.5).onComplete(actuallyDescend);
-		
-	}
-	function actuallyDescend(){
+
 		dungeonLevel++;
 		// if (dungeonLevel == 5)
 		// 	Project.states = [new End()];
 		save();
+		openShop = new ui.PotionShop(input,p.get(component.Inventory));
+		openShop.close = function () {
+			openShop = null;
+			
+			motion.Actuate.tween (Project.mainMusicChannel, 1, { volume: 0 }, true).ease (motion.easing.Quad.easeInOut).reflect(true).repeat(1);
+			motion.Actuate.tween (this, 1, {overlayShade: 1}, true).ease (motion.easing.Quad.easeInOut).reflect(true).repeat(1);
+			motion.Actuate.timer(1).onComplete(actuallyDescend);
+		}		
+	}
+	function actuallyDescend(){
 		createMap();
+
 		save();
 	}
 	
@@ -429,6 +435,7 @@ class Play extends states.State {
 		p.get(component.GhostMode).enabled = input.keys.get(kha.input.KeyCode.Shift);
 		frame++;
 		var globalMultiplier = input.keys.get(kha.input.KeyCode.F) ? 1/100 : 1/60;
+		if (openShop != null) globalMultiplier = 0;
 		if (!paused)
 			systems.update(globalMultiplier);
 
@@ -440,13 +447,8 @@ class Play extends states.State {
 
 		if (input.keysReleased.get(kha.input.KeyCode.P)) descend();
 			
-		
-		var physsys:system.Physics = systems.get(system.Physics);
-		var colsys:system.Collisions = systems.get(system.Collisions);
-		physsys.grid = colsys.grid;
+		(cast systems.get(system.Physics)).grid = (cast systems.get(system.Collisions)).grid;
 
-		var magnetsSystem:system.Magnets = systems.get(system.Magnets);
-		magnetsSystem.p = p;
 
 		// (input.mousePos.x - kha.System.windowWidth() / 2)
 		//(input.mousePos.y - kha.System.windowHeight() / 2)

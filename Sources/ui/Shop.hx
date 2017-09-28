@@ -14,6 +14,7 @@ class Shop {
 	var height = 64;
 	var name = "Shop";
 	var input:Input;
+	public var close:Void->Void;
 	var inventory:component.Inventory;
 	public function new (input:Input,inventory:component.Inventory){
 		this.input = input;
@@ -21,10 +22,10 @@ class Shop {
 	}
 	public function update (){
 		if (input.mouseReleased){
-		var y = 10;
+			var y = 10;
 			for (item in items){
 				if (input.mousePos.x > 201 && input.mousePos.x < 201+(width*4)-22&&
-					input.mousePos.y > 210+(y*4) && input.mousePos.y < 210+(y*4)+(18*4)){
+					input.mousePos.y > 200+(y*4) && input.mousePos.y < 200+(y*4)+(18*4)){
 					if (inventory.getStack(component.Inventory.Item.Gold) != null){
 						if (inventory.getStack(component.Inventory.Item.Gold).quantity >= item.price){
 							inventory.putIntoInventory(item.item,1);
@@ -37,6 +38,9 @@ class Shop {
 			}
 		}
 
+		if (input.keysReleased.get(kha.input.KeyCode.Escape))
+			close();
+		
 	}
 	public function render(g:kha.graphics2.Graphics){
 		g.pushTranslation(200,200);
@@ -60,7 +64,7 @@ class Shop {
 		for (item in items){
 			g.color = kha.Color.fromBytes(105,105,105);
 			if (input.mousePos.x > 201 && input.mousePos.x < 201+(width*4)-22&&
-				input.mousePos.y > 210+(y*4) && input.mousePos.y < 210+(y*4)+(18*4)){
+				input.mousePos.y > 200+(y*4) && input.mousePos.y < 200+(y*4)+(18*4)){
 				g.color = kha.Color.fromBytes(120,120,120);
 			}
 			g.fillRect(1,y,width-2-18-2,18);

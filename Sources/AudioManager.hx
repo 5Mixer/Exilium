@@ -1,7 +1,7 @@
 package ;
 
 typedef ChannelData = {
-	var volume:Float; 
+	var volume:Float;
 }
 typedef SoundData = {
 	var file:String;
@@ -19,7 +19,7 @@ class AudioManager {
 	public static var sounds = new Map<String,SoundData>();
 	public static var soundFiles = new Map<String,kha.Sound>();
 	public function new (){
-		throw "Audio Manager isn't too be instanced; use it through it's static methods.";
+		throw "Audio Manager isn't to be instanced; use it through it's static methods.";
 	}
 	public static function init(){
 		soundFiles = [

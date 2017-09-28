@@ -13,11 +13,13 @@ enum Item {
 	Key;
 	Blaster;
 	Bow;
+	Bomb;
 }
 enum ItemType {
 	Gun;
 	Potion;
 	Sword;
+	Explosive;
 	Currency;
 	Other;
 }
@@ -43,6 +45,7 @@ class Inventory extends Component {
 		Item.GrapplingHook => { name: "grappling gun", stackable: false, type: ItemType.Gun, sprite:states.Play.spriteData.entity.grapplingHook },
 		Item.Bow => { name: "bow", stackable: false, type: ItemType.Gun, sprite:states.Play.spriteData.entity.bow },
 		Item.CastSheild => { name: "cast shield", stackable: true, type: ItemType.Other, sprite:states.Play.spriteData.entity.cast_shield },
+		Item.Bomb => { name: "bomb", stackable: true, type: ItemType.Explosive, sprite:states.Play.spriteData.entity.bomb },
 		
 		Item.Gold => { name: "gold", stackable: true, type: ItemType.Currency, sprite:states.Play.spriteData.entity.gold },
 		Item.Key => { name: "key", stackable: true, type: ItemType.Other, sprite:states.Play.spriteData.entity.key }

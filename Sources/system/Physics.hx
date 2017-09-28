@@ -26,6 +26,19 @@ class Physics extends System {
 			var physics = entity.get(component.Physics);
 			var collider = entity.get(component.Collisions);
 
+			physics.z += physics.velocityz;
+			// if (Math.abs(physics.velocityz) < .1){
+			// 	physics.velocityz = 0;
+			// 	physics.z = 0;
+			// }
+			if (physics.z <= 0.){
+				physics.velocityz *= -.5;
+				physics.z = 0;
+			}else{		
+				if (physics.zgraivity)
+					physics.velocityz -= .1;
+			}
+
 			physics.velocity = physics.velocity.mult(physics.friction);
 
 			var localDelta = delta;

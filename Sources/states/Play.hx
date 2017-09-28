@@ -52,6 +52,8 @@ class Play extends states.State {
 
 	var openShop:ui.Shop ;
 
+	var overlayShade = 0.;
+
 	override public function new (){
 		super();
 
@@ -179,6 +181,7 @@ class Play extends states.State {
 				case worldgen.WorldGenerator.EntityType.Torch: EntityFactory.createTorch(entities,e.x*16,e.y*16);
 				case worldgen.WorldGenerator.EntityType.Sign(message): EntityFactory.createSign(entities,e.x*16,e.y*16,message);
 				case worldgen.WorldGenerator.EntityType.Bat: EntityFactory.createBat(entities,e.x*16,e.y*16);
+				case worldgen.WorldGenerator.EntityType.Mummy: EntityFactory.createMummy(entities,e.x*16+10,e.y*16);
 			}
 		}
 
@@ -194,7 +197,6 @@ class Play extends states.State {
 			var pos = dungeon.middleOfRoom(room);
 			//EntityFactory.createCactusBoss(entities,pos.x*16,pos.y*16,room);
 		}
-		EntityFactory.createMummy(entities,generator.spawnPoint.x*16+10,generator.spawnPoint.y*16);
 
 		//Creator the player.
 		p = EntityFactory.createPlayer(entities,{x:generator.spawnPoint.x, y:generator.spawnPoint.y});
@@ -218,6 +220,12 @@ class Play extends states.State {
 	}
 	function descend (){
 		kha.audio1.Audio.play(kha.Assets.sounds.new_level_descend);
+		motion.Actuate.tween (Project.mainMusicChannel, 1, { volume: 0 }, true).ease (motion.easing.Quad.easeInOut).reflect(true).repeat(1);
+		motion.Actuate.tween (this, 1, {overlayShade: 1}, true).ease (motion.easing.Quad.easeInOut).reflect(true).repeat(1);
+		motion.Actuate.timer(.5).onComplete(actuallyDescend);
+		
+	}
+	function actuallyDescend(){
 		dungeonLevel++;
 		// if (dungeonLevel == 5)
 		// 	Project.states = [new End()];
@@ -307,6 +315,9 @@ class Play extends states.State {
 		}
 
 		pauseOverlay(g);
+
+		g.color = kha.Color.fromFloats(0,0,0,overlayShade);
+		g.fillRect(0,0,kha.System.windowWidth(),kha.System.windowHeight());
 		
 		g.color = kha.Color.White;
 		g.end();
@@ -426,6 +437,8 @@ class Play extends states.State {
 			offsetInventorySelection(-1);
 		if (input.keys.get(kha.input.KeyCode.E) && frame%7==0)
 			offsetInventorySelection(1);
+
+		if (input.keysReleased.get(kha.input.KeyCode.P)) descend();
 			
 		
 		var physsys:system.Physics = systems.get(system.Physics);

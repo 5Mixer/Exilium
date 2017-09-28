@@ -29,6 +29,7 @@ class AnimatedSprite extends Component {
 				case "tileset": {spriteMap = kha.Assets.images.Tileset; tilesize = 16;}
 				case "mummy": {spriteMap = kha.Assets.images.Mummy; tilesize = 10; }
 				case "bat": {spriteMap = kha.Assets.images.Bat; tilesize = 8; }
+				case "explosions": {spriteMap = kha.Assets.images.Explosion; tilesize = 32; }
 			}
 		}
 

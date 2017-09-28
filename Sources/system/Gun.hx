@@ -17,11 +17,11 @@ class Gun extends System {
 		view = new eskimo.views.View(new eskimo.filters.Filter([component.Inventory,component.Gun,component.Transformation]),entities);
 		super();
 	}
-
+var n =0;
 	override public function onUpdate (delta:Float){
 		super.onUpdate(delta);
 		frame+=delta;
-		
+		n++;
 		if (input.mouseButtons.left && input.mouseEvents){
 			for (entity in view.entities){
 				if (entity.get(component.Inventory) != null){
@@ -48,6 +48,28 @@ class Gun extends System {
 					}else{
 						gun.gun = null;
 
+					}
+
+					if (selectedItem == component.Inventory.Item.Bomb && n % 10 == 0){
+						var transform = entity.get(component.Transformation);
+						var throwSound = kha.audio1.Audio.play(kha.Assets.sounds.throwItem);
+						throwSound.volume = .4 + Math.random()*.3;
+						if (transform != null){
+							var dir = transform.pos.sub(camera.screenToWorld(input.mousePos.sub(new kha.math.Vector2(24,24))));
+							var a = Math.round(Math.atan2(-dir.y,-dir.x)*(180/Math.PI));
+							var speed = 100;
+							var bomb = EntityFactory.createBomb(entities,transform.pos.x,transform.pos.y,Math.cos(a * (Math.PI / 180)) * speed,Math.sin(a * (Math.PI / 180)) * speed);
+							bomb.get(component.Physics).velocityz = 1.5;
+							bomb.get(component.Physics).friction = .95;
+							var c = new hxColorToolkit.spaces.HSB(n%256,50,50).toRGB();
+							var kc = kha.Color.fromBytes(Math.floor(c.red),Math.floor(c.blue),Math.floor(c.green));
+							bomb.get(component.Colour).colour = kc;
+							bomb.get(component.Physics).zgraivity = true;
+							// bomb.set(new component.Light());
+							// bomb.get(component.Light).colour = kc;
+							// bomb.get(component.Light).strength = .1;
+			
+						}
 					}
 				
 

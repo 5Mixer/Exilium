@@ -13,13 +13,13 @@ class Project {
 
 	public static var states:Array<states.State> = [];
 
+	public static var mainMusicChannel:kha.audio1.AudioChannel;
+
 
 	public function new() {
 		kha.System.notifyOnRender(render);
 		Scheduler.addTimeTask(update, 0, 1 / 60);
 		
-		// var mainMusicChannel = kha.audio1.Audio.play(kha.Assets.sounds.Synthwave_Beta_4,true);
-		// mainMusicChannel.volume = .6;
 		
 
 		lastTime = Scheduler.time();
@@ -28,6 +28,9 @@ class Project {
 		
 		kha.Assets.loadEverything(function(){
 			AudioManager.init();
+			mainMusicChannel = kha.audio1.Audio.play(kha.Assets.sounds.Synthwave_Beta_4,true);
+			mainMusicChannel.volume = .6;
+
 			states.push(new states.Play());
 		});
 	}

@@ -28,7 +28,7 @@ class PotionShop extends Shop {
 			},
 			{
 				name: "Mayham Potion",
-				description: "For 8 seconds, double speed, defence and fire rate.",
+				description: "For 8 seconds increases speed and defence.",
 				image: kha.Assets.images.Bat,
 				price: 300,
 				item: component.Inventory.Item.MayhamPotion

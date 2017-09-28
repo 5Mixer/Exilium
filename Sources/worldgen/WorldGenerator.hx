@@ -12,6 +12,7 @@ enum EntityType {
 	Torch;
 	Sign(message:String);
 	Bat;
+	Mummy;
 }
 
 enum Side {

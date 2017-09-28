@@ -234,6 +234,22 @@
 				"spin":[0,1,2,3]
 			}
 		},
+		"bomb" : {
+			"tileset":"objects",
+			"id":13,
+			"width":8,
+			"height":8
+		},
+		"explosion" : {
+			"tileset":"explosions",
+			"id":0,
+			"width":32,
+			"height":32,
+			"speed":4,
+			"animations" : {
+				"explode" : [0,1,2,3,4,5]
+			}
+		},
 		"healthPotion" : {
 			"tileset":"objects",
 			"id":24,

@@ -71,8 +71,7 @@ class DungeonWorldGenerator extends WorldGenerator {
 		if (room.id < 1) return; //Don't place in start room
 		var thing = {x:room.x+Math.floor(room.width/2),y:room.y+Math.floor(room.height/2)};
 		entities.push({type: worldgen.WorldGenerator.EntityType.Bat,x:thing.x+2,y:thing.y});
-		entities.push({type: worldgen.WorldGenerator.EntityType.Bat,x:thing.x-2,y:thing.y});
-		entities.push({type: worldgen.WorldGenerator.EntityType.Bat,x:thing.x,y:thing.y+2});
+		entities.push({type: worldgen.WorldGenerator.EntityType.Mummy,x:thing.x,y:thing.y+2});
 		entities.push({type: worldgen.WorldGenerator.EntityType.Bat,x:thing.x,y:thing.y-2});
 
 		//entities.push({type:EntityType.Lava, x: thing.x+3,y:thing.y});

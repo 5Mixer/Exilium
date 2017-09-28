@@ -28,7 +28,7 @@ class ParticleTrails extends System {
 				
 				if (entity.has(component.AnimatedSprite))
 					off = entity.get(component.AnimatedSprite).tilesize/2;
-				
+
 				var t = new component.Transformation(transformation.pos.add(new kha.math.Vector2(off,off)));
 				t.angle = transformation.angle;
 				particle.set(t);

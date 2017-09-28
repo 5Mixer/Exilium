@@ -62,8 +62,13 @@ class EntityFactory {
 
 		// p.get(component.Inventory).putIntoInventory(component.Inventory.Item.CastSheild);
 		p.get(Inventory).putIntoInventory(component.Inventory.Item.Blaster);
-		for (i in 0...999)
-			p.get(Inventory).putIntoInventory(component.Inventory.Item.Gold);
+		p.get(Inventory).putIntoInventory(component.Inventory.Item.LaserGun);
+		p.get(Inventory).putIntoInventory(component.Inventory.Item.Bow);
+		p.get(Inventory).putIntoInventory(component.Inventory.Item.CastSheild);
+		p.get(Inventory).putIntoInventory(component.Inventory.Item.GrapplingHook);
+		p.get(Inventory).putIntoInventory(component.Inventory.Item.Key);
+		p.get(Inventory).putIntoInventory(component.Inventory.Item.Bomb,100);
+		p.get(Inventory).putIntoInventory(component.Inventory.Item.Gold,999);
 		// p.get(component.Inventory).putIntoInventory(component.Inventory.Item.Bow);
 
 		return p;
@@ -142,7 +147,7 @@ class EntityFactory {
 		torch.set(new AnimatedSprite(cast states.Play.spriteData.entity.torch));
 		torch.get(AnimatedSprite).playAnimation("flicker");
 		torch.set(new Light());
-		torch.set(new ParticleTrail(1,component.VisualParticle.Effect.Smoke));
+		// torch.set(new ParticleTrail(1,component.VisualParticle.Effect.Smoke));
 		torch.get(Light).colour = kha.Color.Red;
 		torch.get(Light).strength = .4;
 
@@ -292,4 +297,30 @@ class EntityFactory {
 		spikes.set(new Collisions([],CollisionGroup.createAll(),new component.Collisions.Rect(0,0,16,16),false)); 
 		return spikes; 
 	} 
+	public static function createBomb(entities:eskimo.EntityManager,x,y,vx,vy){
+		var bomb = entities.create();
+		bomb.set(new Name("Bomb"));
+		bomb.set(new Transformation(new kha.math.Vector2(x,y)));
+		bomb.set(new component.Physics());
+		bomb.get(component.Physics).velocity = new kha.math.Vector2(vx,vy);
+		bomb.set(new component.Sprite(states.Play.spriteData.entity.bomb));
+		bomb.set(new component.Colour());
+		bomb.set(new Collisions([CollisionGroup.Friendly],[CollisionGroup.Friendly],new component.Collisions.Rect(1,1,6,7),false)); 
+		bomb.set(new component.TimedLife(1.5));
+		bomb.get(component.TimedLife).explode = true;
+		return bomb;
+	}
+	public static function createExplosion(entities:eskimo.EntityManager,pos:kha.math.Vector2){
+		var explosion = entities.create();
+		kha.audio1.Audio.play(kha.Assets.sounds.explosion);
+		explosion.set(new Name("Explosion"));
+		explosion.set(new Transformation(pos.sub(new kha.math.Vector2(16-5,30-4))));
+		explosion.set(new AnimatedSprite(states.Play.spriteData.entity.explosion));
+		explosion.get(AnimatedSprite).playAnimation("explode","").setSpeed(2);
+		explosion.set(new component.TimedLife(.3));
+		explosion.set(new component.Light());
+		explosion.get(component.Light).strength = .3;
+		explosion.get(component.Light).colour = kha.Color.White;
+		return explosion;
+	}
 }

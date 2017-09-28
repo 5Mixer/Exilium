@@ -53,6 +53,8 @@ class Inventory extends System {
 					}
 				}
 
+				
+
 				if (activeItem.item == component.Inventory.Item.DefensivePotion){
 					if (entity.has(component.PotionAffected)){
 						kha.audio1.Audio.play(kha.Assets.sounds.DrinkPotion);

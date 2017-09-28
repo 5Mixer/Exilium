@@ -19,9 +19,17 @@ typedef Room = {
 	@:optional var structure:Array<Tile>;
 }
 
+typedef Region = {
+	var x:Int;
+	var y:Int;
+	var width:Int;
+	var height:Int;
+}
+
 class DungeonWorldGenerator extends WorldGenerator {
 	public var rooms = new Array<Room>();
 	var probabilityForTreasureInRoom = .3;
+	public var difficulty = 5;
 	
 	var tileInfo = {
 		"empty":0,
@@ -69,18 +77,29 @@ class DungeonWorldGenerator extends WorldGenerator {
 	}
 	function placeThingInRoom (room:Room){
 		if (room.id < 1) return; //Don't place in start room
-		var thing = {x:room.x+Math.floor(room.width/2),y:room.y+Math.floor(room.height/2)};
-		entities.push({type: worldgen.WorldGenerator.EntityType.Bat,x:thing.x+2,y:thing.y});
-		entities.push({type: worldgen.WorldGenerator.EntityType.Mummy,x:thing.x,y:thing.y+2});
-		entities.push({type: worldgen.WorldGenerator.EntityType.Bat,x:thing.x,y:thing.y-2});
+
+		var possibleLocations:Region = {x: room.x + 1, y: room.y + 1, width: room.width - 2, height: room.height - 2}
+		var centre = {x:room.x+Math.floor(room.width/2),y:room.y+Math.floor(room.height/2)};
+		var chestLocation = {x: centre.x-1+Math.round(Math.random()*2), y: centre.y-1+Math.round(Math.random()*2)};
+
+		var enemyCount = Math.floor(Math.max(0,difficulty - 3)) + Math.floor(Math.random()*difficulty);
+		for (i in 0...enemyCount){
+			var x = Math.round(Math.random()*possibleLocations.width) + possibleLocations.x;
+			var y = Math.round(Math.random()*possibleLocations.height) + possibleLocations.y;
+			if (Math.random() < .6){
+				entities.push({type: worldgen.WorldGenerator.EntityType.Bat,x:x,y:y});
+			}else{
+				entities.push({type: worldgen.WorldGenerator.EntityType.Mummy,x:x,y:y});
+			}
+		}
 
 		//entities.push({type:EntityType.Lava, x: thing.x+3,y:thing.y});
 		
 		if (random.generate() > probabilityForTreasureInRoom)
-			entities.push({type:EntityType.Treasure,x:thing.x,y:thing.y});
+			entities.push({type:EntityType.Treasure,x:chestLocation.x,y:chestLocation.y});
 
 		var enemy = {x: room.x+2+Math.floor(random.generate()*(room.width-4)),y: room.y+2+Math.floor(random.generate()*(room.height-4))};
-		if (thing.x != enemy.x && thing.y != enemy.y)
+		if (centre.x != enemy.x && centre.y != enemy.y)
 			// if (Math.random()>.5){
 				entities.push({type:EntityType.Enemy,x:enemy.x,y:enemy.y});
 			// }else{
@@ -177,6 +196,7 @@ class DungeonWorldGenerator extends WorldGenerator {
 		for (room in rooms){
 			placeThingInRoom(room);
 		}
+		//Place key in random room.
 		var room = Math.floor(Math.random()*(rooms.length-1));
 		var pos = middleOfRoom(rooms[room]);
 		entities.push({type:worldgen.WorldGenerator.EntityType.Item(component.Inventory.Item.Key),x:pos.x+1,y:pos.y});

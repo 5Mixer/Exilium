@@ -137,9 +137,14 @@ class Play extends states.State {
 		// mapCollisions.get(component.Collisions).fixed = true;
 		(cast systems.get(system.AI)).map = map;
 
-		var worldSize = 60;
+		var difficulty = (dungeonLevel + 1)*2;
+		var worldSize = Math.floor(Math.min(70,40+difficulty*3));
 		generator = dungeonLevel == 1 ? new worldgen.TiledStructure(worldSize,worldSize) : new worldgen.DungeonWorldGenerator(worldSize,worldSize);
 		
+		if (dungeonLevel != 1){
+			(cast generator).difficulty = difficulty;
+		}
+
 		map.tiles = generator.tiles;
 		map.width = generator.width;
 		map.height = generator.height;

@@ -156,6 +156,7 @@ class EntityFactory {
 		var particle = entities.create();
 		particle.set(new component.VisualParticle(component.VisualParticle.Effect.Blood));
 		particle.set(new component.Zindex(-1));
+		particle.set(new component.ObeyLighting());
 		particle.set(new component.Transformation(new kha.math.Vector2(x,y)));
 		var phys = new component.Physics();
 		var speed = Math.random()*6;
@@ -204,12 +205,12 @@ class EntityFactory {
 		goblin.set(new Name("Goblin"));
 		goblin.set(new Transformation(new kha.math.Vector2(x,y)));
 		goblin.set(new AnimatedSprite(states.Play.spriteData.entity.goblin));
-		goblin.set(new Health(15));
+		goblin.set(new Health(30));
 		goblin.set(new ReleaseOnDeath([].pushx(component.Inventory.Item.Gold,Math.floor(Math.random()*6)),[CollisionGroup.Friendly]));
 		goblin.get(AnimatedSprite).speed = 13;
 		goblin.set(new Physics());
-		goblin.set(new component.ai.AI(component.ai.AI.AIMode.Goblin));
-		goblin.set(new Collisions([CollisionGroup.Enemy,CollisionGroup.Chest],[], new component.Collisions.Rect(2,1,6,9)));
+		goblin.set(new component.ai.GoblinAI());
+		goblin.set(new Collisions([CollisionGroup.Enemy],[], new component.Collisions.Rect(2,1,6,9)));
 		return goblin;
 	}
 	public static function createBat (entities:eskimo.EntityManager,x:Int, y:Int){

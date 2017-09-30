@@ -93,6 +93,7 @@ class Play extends states.State {
 		systems.add(new system.AI(entities,null));
 		systems.add(new system.CorruptSoulAI(entities,null));
 		systems.add(new system.MummyAI(entities,null));
+		systems.add(new system.GoblinAI(entities,null));
 		systems.add(new system.BatAI(entities));
 		systems.add(new system.Magnets(entities,p));
 		systems.add(new system.TimedShoot(entities));
@@ -168,6 +169,9 @@ class Play extends states.State {
 			i++;
 		}
 
+		cast (systems.get(system.Renderer),system.Renderer).tilemap = map;
+		cast (systems.get(system.ParticleRenderer),system.ParticleRenderer).tilemap = map;
+
 		if (dungeonLevel == 4){
 			EntityFactory.createSign(entities,(generator.spawnPoint.x+1)*16,generator.spawnPoint.y*16,"Beware, a corrupt evil/nlives in this realm.");
 			EntityFactory.createCorruptSoul(entities,(generator.exitPoint.x+1)*16,generator.exitPoint.y*16);
@@ -187,6 +191,7 @@ class Play extends states.State {
 				case worldgen.WorldGenerator.EntityType.Sign(message): EntityFactory.createSign(entities,e.x*16,e.y*16,message);
 				case worldgen.WorldGenerator.EntityType.Bat: EntityFactory.createBat(entities,e.x*16,e.y*16);
 				case worldgen.WorldGenerator.EntityType.Mummy: EntityFactory.createMummy(entities,e.x*16+10,e.y*16);
+				case worldgen.WorldGenerator.EntityType.Goblin: EntityFactory.createGoblin(entities,e.x*16+10,e.y*16);
 			}
 		}
 

@@ -7,6 +7,7 @@ class Renderer extends System {
 	var animatedView:eskimo.views.View;
 	var entities:Array<eskimo.Entity> = [];
 	var needRefresh = true;
+	public var tilemap:world.Tilemap = null;
 	public function new (entities:eskimo.EntityManager){
 		view = new eskimo.views.View(new eskimo.filters.Filter([component.Sprite,component.Transformation]), entities);
 		animatedView = new eskimo.views.View(new eskimo.filters.Filter([component.AnimatedSprite,component.Transformation]), entities);
@@ -60,10 +61,20 @@ class Renderer extends System {
 			var colour = kha.Color.White;
 			if (entity.has(component.Colour))
 				colour = entity.get(component.Colour).colour;
+
+			var transformation:component.Transformation = entity.get(component.Transformation);
+			if (entity.has(component.ObeyLighting)){
+				if (tilemap != null){
+					var tile = tilemap.get(Math.floor(transformation.pos.x/16),Math.floor(transformation.pos.y/16));
+					if (tile != null)
+						colour = tile.colour;
+					
+					if (colour == null) colour = kha.Color.White;
+				}
+			}
 			
 			if (entity.has(component.Sprite)){
 				var sprite:component.Sprite = entity.get(component.Sprite);
-				var transformation:component.Transformation = entity.get(component.Transformation);
 
 				
 				var tilesize = sprite.tilesize;

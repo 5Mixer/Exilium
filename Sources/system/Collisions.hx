@@ -192,30 +192,6 @@ class Collisions extends System {
 				var damager = otherShapeEntity.get(component.Damager);
 				if (damager.active){
 					shapeEntity.get(component.Health).addToHealth(-damager.damage);
-
-					// if (damager.causesBlood && frame % 5 == 0){
-					// 	for (i in 0...1){
-					// 		var particle = entities.create();
-					// 		particle.set(new component.VisualParticle(component.VisualParticle.Effect.Blood));
-					// 		particle.set(new component.Zindex(-1));
-					// 		var w = 5;
-					// 		var h = 5;
-					// 		if (shapeEntity.has(component.Collisions)){
-					// 			var aabb = shapeEntity.get(component.Collisions).AABB;
-					// 			w = aabb.width;
-					// 			h = aabb.height;
-					// 		}
-							
-					// 		particle.set(new component.Transformation(shapeEntity.get(component.Transformation).pos.add(new kha.math.Vector2(Math.random()*w,Math.random()*h))));
-					// 		var phys = new component.Physics();
-					// 		var speed = Math.random()*6;
-					// 		phys.friction = 0.7;
-					// 		var particleAngle = Math.random()*360;
-					// 		phys.velocity = new kha.math.Vector2(Math.cos(particleAngle * (Math.PI / 180)) * speed,Math.sin(particleAngle * (Math.PI / 180)) * speed);		
-					// 		particle.set(phys);
-					// 		particle.set(new component.TimedLife(5+Math.random()*5));
-					// 	}
-					// }
 				}
 			}
 		}

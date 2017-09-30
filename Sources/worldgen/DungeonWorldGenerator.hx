@@ -88,8 +88,11 @@ class DungeonWorldGenerator extends WorldGenerator {
 			var y = Math.round(Math.random()*possibleLocations.height) + possibleLocations.y;
 			if (Math.random() < .6){
 				entities.push({type: worldgen.WorldGenerator.EntityType.Bat,x:x,y:y});
-			}else{
+			}else if (Math.random() < .5){
 				entities.push({type: worldgen.WorldGenerator.EntityType.Mummy,x:x,y:y});
+			}else{
+				entities.push({type: worldgen.WorldGenerator.EntityType.Goblin,x:x,y:y});
+
 			}
 		}
 

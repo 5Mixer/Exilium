@@ -80,6 +80,7 @@ class TilemapRenderer  {
 				var max = Math.max(Math.max(c.r,1),Math.max(c.g,c.b));
 				//Now actually apply the tint, again, within a range.
 				g.color = kha.Color.fromFloats(c.r/max,c.g/max,c.b/max,1);
+				tile.colour = g.color;
 								
 				var id = tileData.id + tile.zone.getIndex() * 5;
 				var sourcePos = { x: (id%Math.floor(kha.Assets.images.Dungeonsets.width/tilesize))*tilesize, y:Math.floor(id/Math.floor(kha.Assets.images.Dungeonsets.width/tilesize))*tilesize };

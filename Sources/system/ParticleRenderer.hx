@@ -4,6 +4,7 @@ import component.VisualParticle.Effect;
 
 class ParticleRenderer extends System {
 	var view:eskimo.views.View;
+	public var tilemap:world.Tilemap;
 	public function new (entities:eskimo.EntityManager){
 		super();
 		view = new eskimo.views.View(new eskimo.filters.Filter([component.Transformation,component.VisualParticle]),entities);
@@ -15,9 +16,22 @@ class ParticleRenderer extends System {
 		for (entity in view.entities){
 			var transform = entity.get(component.Transformation);
 			var particle = entity.get(component.VisualParticle);
+			var colour = kha.Color.White;
+
+			if (entity.has(component.ObeyLighting)){
+				if (tilemap != null){
+					var tile = tilemap.get(Math.floor(transform.pos.x/16),Math.floor(transform.pos.y/16));
+					if (tile != null)
+						colour = tile.colour;
+					
+					if (colour == null) colour = kha.Color.White;
+				}
+			}
+
 			particle.life++;
 			switch(particle.effect){
 				case Effect.Blood: {
+					g.color = colour;
 					var variant = Math.floor(particle.rand*5);
 					g.drawSubImage(kha.Assets.images.Blood,transform.pos.x,transform.pos.y,8*variant,0,8,8);
 				}

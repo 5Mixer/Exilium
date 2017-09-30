@@ -9,6 +9,7 @@ class Gun extends System {
 	var view:eskimo.views.View;
 	var entities:eskimo.EntityManager;
 	var spriteData = CompileTime.parseJsonFile('../assets/spriteData.json').entity.bullet_basic;
+	var n =0; //Frame but not based on delta, goofed a little.
 
 	override public function new (input:Input,camera:Camera,entities:eskimo.EntityManager){
 		this.input = input;
@@ -17,7 +18,6 @@ class Gun extends System {
 		view = new eskimo.views.View(new eskimo.filters.Filter([component.Inventory,component.Gun,component.Transformation]),entities);
 		super();
 	}
-var n =0;
 	override public function onUpdate (delta:Float){
 		super.onUpdate(delta);
 		frame+=delta;

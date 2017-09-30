@@ -53,30 +53,8 @@ class AI extends System {
 			dir.normalize();
 			entity.get(component.Physics).velocity = dir.mult(-1.7);
 		}
-		goblinWalkAnimation(entity);
 	}
-	function goblinWalkAnimation (entity:eskimo.Entity){
-		var angle = Math.atan2(entity.get(component.Physics).velocity.x,entity.get(component.Physics).velocity.y);
-		var angleDeg = angle * (180/Math.PI);
-		
-		var normalVelocity = entity.get(component.Physics).velocity.mult(1);
-		normalVelocity.normalize();
-		
-		var animation = "walk";
-
-		if (normalVelocity.y < -.4)
-			animation += "_up";
-		if (normalVelocity.y > .4)
-			animation += "_down";
-			
-		if (normalVelocity.x < -.4)
-			animation += "_left";
-		if (normalVelocity.x > .4)
-			animation += "_right";
-
-		if (entity.has(component.AnimatedSprite))
-			entity.get(component.AnimatedSprite).playAnimation(animation);
-	}
+	
 
 
 	public function slimeAIMode(entity:eskimo.Entity,transformation:component.Transformation,physics:component.Physics,AI:component.ai.AI){

@@ -13,6 +13,7 @@ enum EntityType {
 	Sign(message:String);
 	Bat;
 	Mummy;
+	Goblin;
 }
 
 enum Side {

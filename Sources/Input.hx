@@ -3,7 +3,7 @@ package;
 import kha.input.KeyCode;
 
 typedef Listener = {
-	var key : String;
+	var key : kha.input.KeyCode;
 	var callback:Void->Void;
 }
 
@@ -27,7 +27,7 @@ class Input {
 	
 
 	public var listeners:Array<Listener> = [];
-	public function listenToKeyRelease(char:String,listener:Void->Void){
+	public function listenToKeyRelease(char:kha.input.KeyCode,listener:Void->Void){
 		listeners.push({key:char,callback:listener});
 	}
 
@@ -86,6 +86,9 @@ class Input {
 		// if (key == KeyCode.R)
 		// 	if (onRUp != null)
 		// 		onRUp();
+		for (listener in listeners)
+			if (listener.key == key)
+				listener.callback();
 		
 		if(key == KeyCode.Left || key == KeyCode.A)
 			left = false;

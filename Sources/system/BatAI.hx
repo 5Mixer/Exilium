@@ -30,79 +30,36 @@ class BatAI extends System {
 					closestTarget = target;
 				}
 			}
-
+			
 			if (closestTarget == null)
 				continue;
 	
+			var closestTransform = closestTarget.get(component.Transformation);
+
+			entity.get(component.AnimatedSprite).playAnimation("fly");
 
 			if (distanceToTarget < 16){
 				//Attack
-			}else if (distanceToTarget < 80){
-				//Chase						
-				var dir = closestTarget.get(component.Transformation).pos.add(new kha.math.Vector2(-10+Math.random()*20,-10+Math.random()*20)).sub(entity.get(component.Transformation).pos);
-				dir.normalize();
-				entity.get(component.Physics).velocity = dir.mult(60);
+				closestTarget.get(component.Health).addToHealth(-1);
 				
-				slitherAnimation(entity);
+			}else if (distanceToTarget < 80){
+				//Swoop						
+				var dir = closestTransform.pos.add(new kha.math.Vector2(-10+Math.random()*20,-10+Math.random()*20)).sub(transformation.pos);
+				dir.normalize();
+				physics.velocity = physics.velocity.add(dir.mult(20));
+				
 			}else{
 				//Idle
-				var angle = Math.atan2(entity.get(component.Physics).velocity.y,entity.get(component.Physics).velocity.x);
+				var angle = Math.atan2(physics.velocity.y,physics.velocity.x);
 
 				if (AI.life % AI.moveRate == 0){
-					angle += (-180+ Math.random()*360) * Math.PI/180;
-
+					angle += (-10+ Math.random()*20) * Math.PI/180;
 				}
 				
-				entity.get(component.Physics).velocity.x = Math.cos(angle)*AI.speed;
-				entity.get(component.Physics).velocity.y = Math.sin(angle)*AI.speed;
-
-				slitherAnimation(entity);
-				
+				physics.velocity.x = Math.cos(angle)*AI.speed;
+				physics.velocity.y = Math.sin(angle)*AI.speed;				
 			}
 		}
-	}
-
-	public function slitherAnimation (entity:eskimo.Entity){
-		var angle = Math.atan2(entity.get(component.Physics).velocity.x,entity.get(component.Physics).velocity.y);
-		var angleDeg = angle * (180/Math.PI);
-		
-		var normalVelocity = entity.get(component.Physics).velocity.mult(1);
-		normalVelocity.normalize();
-		
-		var animation = "";
-
-		if (normalVelocity.y < -.4)
-			animation += "u";
-		if (normalVelocity.y > .4)
-			animation += "d";
-			
-		if (normalVelocity.x < -.4)
-			animation += "l";
-		if (normalVelocity.x > .4)
-			animation += "r";
-
-		entity.get(component.AnimatedSprite).playAnimation(animation);
-	}
-	public function attackAnimation (entity:eskimo.Entity){
-		var angle = Math.atan2(entity.get(component.Physics).velocity.x,entity.get(component.Physics).velocity.y);
-		var angleDeg = angle * (180/Math.PI);
-		
-		var normalVelocity = entity.get(component.Physics).velocity.mult(1);
-		normalVelocity.normalize();
-		
-		var animation = "attack ";
-
-		if (normalVelocity.y < -.4)
-			animation += "u";
-		if (normalVelocity.y > .4)
-			animation += "d";
-			
-		if (normalVelocity.x < -.4)
-			animation += "l";
-		if (normalVelocity.x > .4)
-			animation += "r";
-
-		entity.get(component.AnimatedSprite).playAnimation(animation);
 	}
 	
 }

@@ -68,7 +68,8 @@ var n =0;
 							// bomb.set(new component.Light());
 							// bomb.get(component.Light).colour = kc;
 							// bomb.get(component.Light).strength = .1;
-			
+							
+							pinv.takeFromInventory(component.Inventory.Item.Bomb);
 						}
 					}
 				

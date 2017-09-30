@@ -94,11 +94,9 @@ class Physics extends System {
 								reflectx = physics.reflect;
 
 								onCollision(collider.AABB,otherShape);
-								onCollision(otherShape,collider.AABB);
-							}
-								
+								// onCollision(otherShape,collider.AABB);
+							}				
 						}
-						
 					}
 					
 					transformation.pos.y += physics.velocity.y*sampleMultiplier*localDelta;
@@ -127,7 +125,7 @@ class Physics extends System {
 								reflecty = physics.reflect;
 
 								onCollision(collider.AABB,otherShape);
-								onCollision(otherShape,collider.AABB);
+								// onCollision(otherShape,collider.AABB);
 
 							}
 						}

@@ -6,6 +6,8 @@ class Camera {
 	public var offset:kha.math.Vector2; //For screenshake etc.
 	public var offsetRestore:Float = .3; //Smaller is faster.
 	public var scale = {x : 4.0, y : 4.0};
+	var shakeAmount = 0.;
+	var shakeDuration = 0.;
 	public function new (){
 		pos = new kha.math.Vector2(-kha.System.windowWidth()/2,-kha.System.windowHeight()/2);
 		offset = new kha.math.Vector2();
@@ -27,6 +29,16 @@ class Camera {
 
 		offset = offset.mult(offsetRestore);
 	} 
+	public function shake(amount = 5., duration = 1.){
+		shakeAmount = Math.max(shakeAmount,amount);
+		shakeDuration = Math.max(shakeDuration, duration);
+	}
+	public function update(delta:Float){
+		if (shakeDuration > 0){
+			shakeDuration -= delta;
+			offset = new kha.math.Vector2(Math.random()*shakeAmount,Math.random()*shakeAmount);
+		}
+	}
 	public function restore (g:kha.graphics2.Graphics) {
 		g.popTransformation();
 	}

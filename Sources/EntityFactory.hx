@@ -67,8 +67,8 @@ class EntityFactory {
 		p.get(Inventory).putIntoInventory(component.Inventory.Item.CastSheild);
 		p.get(Inventory).putIntoInventory(component.Inventory.Item.GrapplingHook);
 		p.get(Inventory).putIntoInventory(component.Inventory.Item.Key);
-		p.get(Inventory).putIntoInventory(component.Inventory.Item.Bomb,99);
-		p.get(Inventory).putIntoInventory(component.Inventory.Item.Gold,999);
+		p.get(Inventory).putIntoInventory(component.Inventory.Item.Bomb,20);
+		p.get(Inventory).putIntoInventory(component.Inventory.Item.Gold,50);
 
 		return p;
 	}
@@ -77,7 +77,7 @@ class EntityFactory {
 		slime.set(new Name("Slime"));
 		slime.set(new Transformation(new kha.math.Vector2(x,y)));
 		slime.set(new AnimatedSprite(states.Play.spriteData.entity.slime));
-		slime.set(new Health(5));
+		slime.set(new Health(15));
 		slime.set(new Light());
 		slime.get(Light).colour = kha.Color.Green;
 		slime.get(Light).strength = .2;
@@ -97,7 +97,7 @@ class EntityFactory {
 		mummy.set(new Name("Mummy"));
 		mummy.set(new Transformation(new kha.math.Vector2(x,y)));
 		mummy.set(new AnimatedSprite(states.Play.spriteData.entity.mummy));
-		mummy.set(new Health(20));
+		mummy.set(new Health(25));
 		mummy.get(AnimatedSprite).speed = 5;
 		mummy.set(new Physics());
 		mummy.set(new ReleaseOnDeath([].pushx(component.Inventory.Item.Gold,Math.floor(Math.random()*10)),[CollisionGroup.Friendly]));
@@ -151,6 +151,19 @@ class EntityFactory {
 		torch.get(Light).strength = .4;
 
 		return torch;
+	}
+	public static function createBlood(entities:eskimo.EntityManager,x:Float,y:Float){
+		var particle = entities.create();
+		particle.set(new component.VisualParticle(component.VisualParticle.Effect.Blood));
+		particle.set(new component.Zindex(-1));
+		particle.set(new component.Transformation(new kha.math.Vector2(x,y)));
+		var phys = new component.Physics();
+		var speed = Math.random()*6;
+		phys.friction = 0.7;
+		var particleAngle = Math.random()*360;
+		phys.velocity = new kha.math.Vector2(Math.cos(particleAngle * (Math.PI / 180)) * speed,Math.sin(particleAngle * (Math.PI / 180)) * speed);		
+		particle.set(phys);
+		particle.set(new component.TimedLife(5+Math.random()*5));
 	}
 	public static function createLockedDoor(entities:eskimo.EntityManager,x:Int,y:Int){
 		var door = entities.create();
@@ -211,7 +224,7 @@ class EntityFactory {
 		bat.get(AnimatedSprite).speed = 5;
 		bat.set(new Physics());
 		bat.set(new component.ai.BatAI());
-		bat.set(new Collisions([CollisionGroup.Enemy],[],new Collisions.Rect(1,1,6,6)));
+		bat.set(new Collisions([CollisionGroup.Enemy],[],new Collisions.Rect(1,1,6,6),false));
 		return bat;
 	}
 	public static function createCorruptSoul (entities:eskimo.EntityManager,x:Int, y:Int){
@@ -293,7 +306,7 @@ class EntityFactory {
 		spikes.set(new Zindex(-1));
 		spikes.set(new AnimatedSprite(states.Play.spriteData.entity.spikes));
 		spikes.get(AnimatedSprite).playAnimation("raise","up").setSpeed(2);
-		spikes.set(new Collisions([],CollisionGroup.createAll(),new component.Collisions.Rect(0,0,16,16),false)); 
+		spikes.set(new Collisions([],[],new component.Collisions.Rect(0,0,16,16),false)); 
 		return spikes; 
 	} 
 	public static function createBomb(entities:eskimo.EntityManager,x,y,vx,vy){

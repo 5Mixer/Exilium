@@ -41,41 +41,39 @@ class Collisions extends System {
 		frame++;
 		
 		for (entity in view.entities){
-			//if (entity.get(component.Collisions).fixed && !processFixedEntities) continue;
+			// if (entity.get(component.Collisions).fixed && !processFixedEntities) continue;
 			entity.get(component.Collisions).AABB.ofEntity = entity;
 			grid.addCollider(entity.get(component.Collisions).AABB,entity.get(component.Transformation).pos);
 		}
 		
-		for (entity in view.entities){
-			var collider = entity.get(component.Collisions);
-			var transformation = entity.get(component.Transformation);
-			if (entity.has(component.Damager) != true) continue;
+		// for (entity in view.entities){
+		// 	var collider = entity.get(component.Collisions);
+		// 	var transformation = entity.get(component.Transformation);
+		// 	if (entity.has(component.Damager) != true) continue;
 			
-			for (otherShape in grid.findContacts(collider.AABB)){
-				//if (!validCollision(shape,otherShape)) continue;
-				//if (!otherShape.ofEntity.has(component.Transformation)) continue;
-				if (!entity.has(component.Transformation) || !otherShape.ofEntity.has(component.Transformation)) continue;
-				var otherTransform = otherShape.ofEntity.get(component.Transformation).pos;
+		// 	for (otherShape in grid.findContacts(collider.AABB)){
+		// 		//if (!validCollision(shape,otherShape)) continue;
+		// 		//if (!otherShape.ofEntity.has(component.Transformation)) continue;
+		// 		if (!entity.has(component.Transformation) || !otherShape.ofEntity.has(component.Transformation)) continue;
+		// 		var otherTransform = otherShape.ofEntity.get(component.Transformation).pos;
 
-				var c = differ.Collision.shapeWithShape(
-					differ.shapes.Polygon.rectangle(collider.AABB.x+transformation.pos.x,collider.AABB.y+transformation.pos.y,collider.AABB.width,collider.AABB.height,false),
-					differ.shapes.Polygon.rectangle(otherShape.x+otherTransform.x,otherShape.y+otherTransform.y,otherShape.width,otherShape.height,false));
+		// 		var c = differ.Collision.shapeWithShape(
+		// 			differ.shapes.Polygon.rectangle(collider.AABB.x+transformation.pos.x,collider.AABB.y+transformation.pos.y,collider.AABB.width,collider.AABB.height,false),
+		// 			differ.shapes.Polygon.rectangle(otherShape.x+otherTransform.x,otherShape.y+otherTransform.y,otherShape.width,otherShape.height,false));
 				
-				if (c != null && c.separationX != 0){
+		// 		if (c != null && c.separationX != 0){
 
-					onCollision(collider.AABB,otherShape);
+		// 			onCollision(collider.AABB,otherShape);
 						
-				}
-			}
-		}
+		// 		}
+		// 	}
+		// }
 
 		processFixedEntities = false;
 	}
 	public function onCollision(shape:component.Collisions.Rect,otherShape:component.Collisions.Rect){
 		if (!validCollision(shape,otherShape)) return;
 
-		var shapeEntity = shape.ofEntity;
-		var otherShapeEntity = otherShape.ofEntity;
 
 		CollectHandler(shape,otherShape);
 		CustomCollisionHandler(shape,otherShape);
@@ -91,13 +89,19 @@ class Collisions extends System {
 		DieHandler(shape,otherShape);
 		DieHandler(otherShape,shape);
 
-		if (shapeEntity.has(component.Message)){
+		SignHandler(shape,otherShape);
+		SignHandler(otherShape,shape);
+		
+		
+	}
+	function SignHandler(shape:component.Collisions.Rect,otherShape:component.Collisions.Rect){
+		var shapeEntity = shape.ofEntity;
+		var otherShapeEntity = otherShape.ofEntity;
+
+		if (shapeEntity.has(component.Message))
 			if (otherShapeEntity.has(component.Collisions))
 				if (otherShapeEntity.get(component.Collisions).collisionGroups.indexOf(component.Collisions.CollisionGroup.Player) != -1)
 					shapeEntity.get(component.Message).shown = true;
-		}
-		
-		
 	}
 	function validCollision(shape:component.Collisions.Rect,otherShape:component.Collisions.Rect){
 		//If both shapes are ignoring nothing, they should collide.

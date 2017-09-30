@@ -50,6 +50,8 @@ class Inventory extends System {
 						particle.set(phys);
 						particle.set(new component.TimedLife(.75));
 
+						
+						inventory.takeFromInventory(component.Inventory.Item.HealthPotion);
 					}
 				}
 
@@ -60,12 +62,14 @@ class Inventory extends System {
 						kha.audio1.Audio.play(kha.Assets.sounds.DrinkPotion);
 						entity.get(component.PotionAffected).effects.set(component.PotionAffected.EntityModifier.Defence,15);
 					}
+					inventory.takeFromInventory(component.Inventory.Item.DefensivePotion);
 				}
 				if (activeItem.item == component.Inventory.Item.SpeedPotion){
 					if (entity.has(component.PotionAffected)){
 						kha.audio1.Audio.play(kha.Assets.sounds.DrinkPotion);
 						entity.get(component.PotionAffected).effects.set(component.PotionAffected.EntityModifier.Speed,15);
 					}
+					inventory.takeFromInventory(component.Inventory.Item.SpeedPotion);
 				}
 				if (activeItem.item == component.Inventory.Item.MayhamPotion){
 					if (entity.has(component.PotionAffected)){
@@ -74,6 +78,7 @@ class Inventory extends System {
 						entity.get(component.PotionAffected).effects.set(component.PotionAffected.EntityModifier.Defence,8);
 						entity.get(component.PotionAffected).effects.set(component.PotionAffected.EntityModifier.FireRate,8);
 					}
+					inventory.takeFromInventory(component.Inventory.Item.MayhamPotion);
 				}
 			}
 		}

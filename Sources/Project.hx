@@ -31,7 +31,7 @@ class Project {
 			mainMusicChannel = kha.audio1.Audio.play(kha.Assets.sounds.Synthwave_Beta_4,true);
 			mainMusicChannel.volume = .6;
 
-			states.push(new states.Play());
+			states.push(new states.Menu());
 		});
 	}
 

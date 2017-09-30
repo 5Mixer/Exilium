@@ -88,7 +88,7 @@ class Play extends states.State {
 		systems.add(new system.KeyMovement(input,entities));
 		systems.add(new system.Physics(entities,collisionSys.grid,collisionSys));
 		systems.add(new system.Inventory(input,entities));
-		systems.add(new system.TimedLife(entities));
+		systems.add(new system.TimedLife(entities,camera));
 		systems.add(new system.ParticleTrails(entities));
 		systems.add(new system.AI(entities,null));
 		systems.add(new system.CorruptSoulAI(entities,null));
@@ -102,18 +102,18 @@ class Play extends states.State {
 
 		zuiInstance = new Zui({font: kha.Assets.fonts.OpenSans});
 		debugInterface = new ui.DebugInterface(zuiInstance,p);
-		debugInterface.visible = false;
 		audioInterface = new ui.AudioInterface(zuiInstance);		
+		debugInterface.visible = false;
 		
-		input.listenToKeyRelease('r', descend);
-		input.listenToKeyRelease('t',function (){
+		input.listenToKeyRelease(kha.input.KeyCode.R, descend);
+		input.listenToKeyRelease(kha.input.KeyCode.T,function (){
 			debugInterface.visible = !debugInterface.visible;
 			audioInterface.visible = debugInterface.visible;
 		});
-		input.listenToKeyRelease('m', function (){
+		input.listenToKeyRelease(kha.input.KeyCode.M, function (){
 			mapShown = !mapShown;
 		});
-		input.listenToKeyRelease("esc", function (){
+		input.listenToKeyRelease(kha.input.KeyCode.Escape, function (){
 			kha.audio1.Audio.play(kha.Assets.sounds.button_click);
 			paused = !paused;
 		});
@@ -192,7 +192,8 @@ class Play extends states.State {
 
 		//Place ladder
 		EntityFactory.createLadder(entities,generator.exitPoint.x*16,generator.exitPoint.y*16,function (collider){
-			descend();
+			if (openShop == null)
+				descend();
 		});
 
 		//Place cactus boss
@@ -431,6 +432,7 @@ class Play extends states.State {
 	override public function update(delta:Float){
 		debugInterface.fpsGraph.pushValue(1/delta/debugInterface.fpsGraph.size.y);
 		input.startUpdate();
+		camera.update(delta);
 		if (input.keysReleased.get(kha.input.KeyCode.V)){
 			if (openShop == null){ openShop = new ui.PotionShop(input,p.get(component.Inventory)); }
 			else { openShop = null; }
@@ -453,6 +455,12 @@ class Play extends states.State {
 		if (input.keysReleased.get(kha.input.KeyCode.P)) descend();
 			
 		(cast systems.get(system.Physics)).grid = (cast systems.get(system.Collisions)).grid;
+
+		//  var physsys:system.Physics = systems.get(system.Physics); 
+		// var colsys:system.Collisions = systems.get(system.Collisions); 
+		// physsys.grid = colsys.grid; 
+	 
+		cast (systems.get(system.Magnets),system.Magnets).p = p; 
 
 
 		// (input.mousePos.x - kha.System.windowWidth() / 2)

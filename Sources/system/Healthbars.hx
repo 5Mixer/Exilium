@@ -35,6 +35,11 @@ class Healthbars extends System {
 		super.onUpdate(delta);
 		for (entity in view.entities){
 			var health:component.Health = entity.get(component.Health);
+			if (health.healthDelta < 0){
+				var pos = entity.get(component.Transformation).pos;
+				EntityFactory.createBlood(entities,pos.x+(5*Math.random()),pos.y+(5*Math.random()));
+			}
+			health.healthDelta = 0;
 			if (health.current <= 0){
 				if (entity.has(component.Events)){
 					entity.get(component.Events).callEvent(component.Events.Event.Death,null);
@@ -45,7 +50,7 @@ class Healthbars extends System {
 					var release = entity.get(component.ReleaseOnDeath);
 					for (item in release.release){
 						var droppedItem = EntityFactory.createItem(entities,item,entity.get(component.Transformation).pos.x,entity.get(component.Transformation).pos.y);
-						droppedItem.set(new component.Physics().setVelocity(new kha.math.Vector2(-20+Math.random()*40,-20+Math.random()*40)));
+						droppedItem.set(new component.Physics().setVelocity(new kha.math.Vector2(-25+Math.random()*50,-25+Math.random()*45)));
 					}
 				}
 

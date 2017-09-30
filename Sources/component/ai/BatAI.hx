@@ -9,6 +9,6 @@ class BatAI extends Component{
 		super();
 		speed = 40 + Math.floor(Math.random()*10);
 		life = Math.floor(Math.random()*60);
-		moveRate = 30 + Math.floor ( Math.random() * 10);
+		moveRate = 5 + Math.floor ( Math.random() * 10);
 	}
 }

@@ -40,9 +40,10 @@ class MummyAI extends System {
 			if (distanceToTarget < 16){
 				//Attack
 				attackAnimation(entity);
-				if (entity.get(component.AnimatedSprite).frame == 2){
-					closestTarget.get(component.Health).current -= 1;
-				}
+				// if (entity.get(component.AnimatedSprite).frame == 2){
+				if (frame % 20 == 0)
+					closestTarget.get(component.Health).addToHealth(-8);
+				// }
 			}else if (distanceToTarget < AI.visionLength){
 				//Chase						
 				var dir = closestTarget.get(component.Transformation).pos.add(new kha.math.Vector2(-10+Math.random()*20,-10+Math.random()*20)).sub(entity.get(component.Transformation).pos);

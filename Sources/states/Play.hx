@@ -263,7 +263,11 @@ class Play extends states.State {
 	}
 	function actuallyDescend(){
 		track.stop();
-		track = kha.audio1.Audio.play(kha.Assets.sounds.track_5);
+		if (Math.random() > .5){
+			track = kha.audio1.Audio.play(kha.Assets.sounds.track_5,true);
+		}else{
+			track = kha.audio1.Audio.play(kha.Assets.sounds.track_2,true);
+		}
 		createMap();
 		p.get(component.Inventory).putIntoInventory(component.Inventory.Item.Key);
 		descending = false;

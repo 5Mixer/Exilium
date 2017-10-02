@@ -38,9 +38,6 @@ class Shop {
 				y += 20;
 			}
 		}
-
-		if (input.keysReleased.get(kha.input.KeyCode.Escape))
-			close();
 		
 	}
 	public function render(g:kha.graphics2.Graphics){
@@ -57,7 +54,7 @@ class Shop {
 		g.font = kha.Assets.fonts.trenco;
 		g.fontSize = 38;
 
-		g.drawString(name,2*4,0);
+		g.drawString(name+" [esc to close]",2*4,0);
 		
 		g.transformation._00 = 4;
 		g.transformation._11 = 4;

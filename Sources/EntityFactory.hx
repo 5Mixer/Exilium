@@ -125,7 +125,7 @@ class EntityFactory {
 		
 		return treasure;
 	}
-	public static function createShop (entities:eskimo.EntityManager, input:Input, playerInventory:component.Inventory, play:states.Play, x:Int,y:Int){
+	public static function createShop (entities:eskimo.EntityManager, input:Input, playerInventory:component.Inventory, x:Int,y:Int){
 		var shop = entities.create();
 		shop.set(new Name("Shop"));
 		shop.set(new Transformation(new kha.math.Vector2(x,y)));

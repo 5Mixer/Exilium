@@ -121,6 +121,7 @@ class Play extends states.State {
 		});
 		input.listenToKeyRelease(kha.input.KeyCode.Escape, function (){
 			if (openShop != null){
+				kha.audio1.Audio.play(kha.Assets.sounds.close_shop);
 				openShop.close();
 				openShop = null;
 				return;
@@ -204,7 +205,7 @@ class Play extends states.State {
 				case worldgen.WorldGenerator.EntityType.Bat: EntityFactory.createBat(entities,e.x*16,e.y*16);
 				case worldgen.WorldGenerator.EntityType.Mummy: EntityFactory.createMummy(entities,e.x*16+10,e.y*16);
 				case worldgen.WorldGenerator.EntityType.Goblin: EntityFactory.createGoblin(entities,e.x*16+10,e.y*16);
-				case worldgen.WorldGenerator.EntityType.PotionSeller: EntityFactory.createShop(entities,input,p.get(component.Inventory),this,e.x*16,e.y*16);
+				case worldgen.WorldGenerator.EntityType.PotionSeller: EntityFactory.createShop(entities,input,p.get(component.Inventory),e.x*16,e.y*16);
 			}
 		}
 
@@ -264,6 +265,7 @@ class Play extends states.State {
 		track.stop();
 		track = kha.audio1.Audio.play(kha.Assets.sounds.track_5);
 		createMap();
+		p.get(component.Inventory).putIntoInventory(component.Inventory.Item.Key);
 		descending = false;
 		save();
 	}

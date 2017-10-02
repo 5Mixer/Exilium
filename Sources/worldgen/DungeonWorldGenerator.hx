@@ -83,6 +83,7 @@ class DungeonWorldGenerator extends WorldGenerator {
 			// entities.push({type: worldgen.WorldGenerator.EntityType.PotionSeller,x:centre.x-2,y:centre.y+1});
 			entities.push({type: worldgen.WorldGenerator.EntityType.PotionSeller,x:centre.x,y:centre.y+1});
 			// entities.push({type: worldgen.WorldGenerator.EntityType.PotionSeller,x:centre.x+2,y:centre.y+1});
+			entities.push({type:worldgen.WorldGenerator.EntityType.Door,x:rooms[1].doorways[0].x, y:rooms[1].doorways[0].y});
 		}
 
 		if (room.id < 1) return; //Don't place enemies, treasure etc. in start room
@@ -133,8 +134,8 @@ class DungeonWorldGenerator extends WorldGenerator {
 		}
 
 		
-		var width = 8+Math.floor(random.generate()*6);
-		var height = 8+Math.floor(random.generate()*6);
+		var width = 8+Math.floor(random.generate()*5);
+		var height = 8+Math.floor(random.generate()*5);
 		
 		var doorx = room.x+Math.floor(Math.min(room.width/2,width/2));
 		var doory = room.y+Math.floor(Math.min(room.height/2,height/2));

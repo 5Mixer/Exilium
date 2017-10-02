@@ -45,6 +45,26 @@ class Renderer extends System {
 		});
 	}
 
+	override public function onUpdate (delta:Float){
+		super.onUpdate(delta);
+
+		for (entity in entities){
+			if (entity.has(component.AnimatedSprite)){
+				var animation = entity.get(component.AnimatedSprite);
+				if (animation.currentAnimation != ""){
+				
+					animation.currentFrameTime += 1;
+					if (animation.currentFrameTime > animation.speed){
+						animation.frame+=delta > 0 ? 1 : 0;
+						animation.currentFrameTime = 0;	
+					}
+
+					
+				}
+			}
+		}
+	}
+
 	override public function render (g:kha.graphics2.Graphics){
 		super.render(g);
 
@@ -105,15 +125,6 @@ class Renderer extends System {
 				var transformation = entity.get(component.Transformation);
 				var animation = entity.get(component.AnimatedSprite);
 				if (animation.currentAnimation != ""){
-				
-					animation.currentFrameTime += 1;
-					if (animation.currentFrameTime > animation.speed){
-						animation.frame++;
-						animation.currentFrameTime = 0;
-
-						
-					}
-
 					var baseFrame = 0;
 					if (animation.spriteData.animations != null && Reflect.field(animation.spriteData.animations,animation.currentAnimation) != null){
 						if (animation.frame >= Std.int(Reflect.field(animation.spriteData.animations,animation.currentAnimation).length)){
@@ -125,7 +136,7 @@ class Renderer extends System {
 					}else{
 						animation.frame = 0;
 					}
-					
+				
 					var tilesize = animation.tilesize;
 					var originX = Math.floor(tilesize/2);
 					var originY = Math.floor(tilesize/2);

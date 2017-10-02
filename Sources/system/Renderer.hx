@@ -1,20 +1,26 @@
 package system;
 
 import kha.math.FastMatrix3;
+using kha.graphics2.GraphicsExtension;
+import component.VisualParticle.Effect;
 
 class Renderer extends System {
 	var view:eskimo.views.View;
 	var animatedView:eskimo.views.View;
+	var particleView:eskimo.views.View;
 	var entities:Array<eskimo.Entity> = [];
 	var needRefresh = true;
 	public var tilemap:world.Tilemap = null;
 	public function new (entities:eskimo.EntityManager){
 		view = new eskimo.views.View(new eskimo.filters.Filter([component.Sprite,component.Transformation]), entities);
 		animatedView = new eskimo.views.View(new eskimo.filters.Filter([component.AnimatedSprite,component.Transformation]), entities);
+		particleView = new eskimo.views.View(new eskimo.filters.Filter([component.VisualParticle,component.Transformation]), entities);
 		view.onAdd = resort;
 		view.onRemove = resort;
 		animatedView.onAdd = resort;
 		animatedView.onRemove = resort;
+		particleView.onAdd = resort;
+		particleView.onRemove = resort;
 		super();
 	}
 	function resort(e){
@@ -24,7 +30,10 @@ class Renderer extends System {
 		needRefresh = false;
 		entities = view.entities.entities;
 		entities = entities.concat(animatedView.entities.entities);
-		entities.sort(function(a:eskimo.Entity,b:eskimo.Entity){
+		entities = entities.concat(particleView.entities.entities);
+
+		//Use haxe.ds sort as entities.sort is not stable (blood has equel z, causes reshuffling glitchyness)
+		haxe.ds.ArraySort.sort(entities,function(a:eskimo.Entity,b:eskimo.Entity){
 			var az = 0.0;
 			var bz = 0.0;
 			az = a.get(component.Transformation).pos.y;
@@ -121,6 +130,56 @@ class Renderer extends System {
 				g.drawScaledSubImage(sprite.spriteMap,Math.floor((sprite.textureId%Math.floor(sprite.spriteMap.width/tilesize))*tilesize)+inset,Math.floor(Math.floor(sprite.textureId/Math.floor(sprite.spriteMap.width/tilesize))*tilesize)+inset,tilesize-(inset*2),tilesize-(inset*2),x,y-zoff,tilesize,tilesize);
 				
 				if (angle != 0) g.popTransformation();
+			}else if (entity.has(component.VisualParticle)){
+				var transform = entity.get(component.Transformation);
+				var particle = entity.get(component.VisualParticle);
+				var colour = kha.Color.White;
+
+				particle.life++;
+				switch(particle.effect){
+					case Effect.Blood: {
+						g.color = colour;
+						var variant = Math.floor(particle.rand*5);
+						g.drawSubImage(kha.Assets.images.Blood,transform.pos.x,transform.pos.y,8*variant,0,8,8);
+					}
+					case Effect.Spark: {
+						if (entity.has(component.TimedLife)){
+							var life = entity.get(component.TimedLife);
+
+							g.fillCircle(transform.pos.x,transform.pos.y,((life.length-life.fuse)/life.length)*2,4);
+						}else{
+							g.fillCircle(transform.pos.x,transform.pos.y,3,4);
+						}
+					}
+					case Effect.Speed(xoff,yoff): {
+						g.drawLine(transform.pos.x,transform.pos.y,transform.pos.x+xoff,transform.pos.y+yoff);
+						
+					}
+					case Effect.Smoke: {
+						g.color = kha.Color.fromBytes(200-particle.life*4,90,90,100-particle.life*3);
+						transform.pos.x += Math.floor(-1+Math.random()*2);
+						//g.fillCircle(transform.pos.x-3+(particle.life/2),transform.pos.y-particle.life,2,8);
+						var s = Math.max(0,2-(particle.life/10));
+						g.fillRect(transform.pos.x-3+(particle.life/2),transform.pos.y-particle.life,s,s);
+					}
+					case Effect.Text(t): {
+						var offx = 0.0;
+						if (entity.has(component.TimedLife)){
+							var life = entity.get(component.TimedLife);
+							offx = Math.sin((life.fuse/life.length)*5)*(((life.length-life.fuse)/life.length)*1.5);
+						}
+						g.pushTransformation(g.transformation.mult(1));
+						g.transformation._00 = 1;
+						g.transformation._11 = 1;
+						g.font = kha.Assets.fonts.trenco;
+						g.color = kha.Color.fromFloats(1,1,1,.8);
+						g.fontSize = 38;
+						g.drawString(t,(transform.pos.x+offx)*4,transform.pos.y*4);
+						g.popTransformation();
+					}
+					default : {}
+				}
+				
 			}else{
 				var transformation = entity.get(component.Transformation);
 				var animation = entity.get(component.AnimatedSprite);

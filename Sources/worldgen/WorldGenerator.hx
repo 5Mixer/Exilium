@@ -14,6 +14,7 @@ enum EntityType {
 	Bat;
 	Mummy;
 	Goblin;
+	PotionSeller;
 }
 
 enum Side {

@@ -51,7 +51,7 @@ class Play extends states.State {
 	var mapShown = true;
 	var paused = false;
 
-	var openShop:ui.Shop ;
+	public var openShop:ui.Shop ;
 
 	var overlayShade = 0.;
 
@@ -72,7 +72,7 @@ class Play extends states.State {
 		entities = new eskimo.EntityManager(components);
 		systems = new eskimo.systems.SystemManager(entities);
 
-		var collisionSys = new system.Collisions(entities);
+		var collisionSys = new system.Collisions(entities,this);
 		tilemapRender = new rendering.TilemapRenderer(camera,entities);
 		registerRenderSystem(new system.Renderer(entities));
 		registerRenderSystem(new system.CactusBoss(entities));
@@ -120,6 +120,11 @@ class Play extends states.State {
 			mapShown = !mapShown;
 		});
 		input.listenToKeyRelease(kha.input.KeyCode.Escape, function (){
+			if (openShop != null){
+				openShop.close();
+				openShop = null;
+				return;
+			}
 			kha.audio1.Audio.play(kha.Assets.sounds.button_click);
 			paused = !paused;
 		});
@@ -199,6 +204,7 @@ class Play extends states.State {
 				case worldgen.WorldGenerator.EntityType.Bat: EntityFactory.createBat(entities,e.x*16,e.y*16);
 				case worldgen.WorldGenerator.EntityType.Mummy: EntityFactory.createMummy(entities,e.x*16+10,e.y*16);
 				case worldgen.WorldGenerator.EntityType.Goblin: EntityFactory.createGoblin(entities,e.x*16+10,e.y*16);
+				case worldgen.WorldGenerator.EntityType.PotionSeller: EntityFactory.createShop(entities,input,p.get(component.Inventory),this,e.x*16,e.y*16);
 			}
 		}
 
@@ -455,11 +461,12 @@ class Play extends states.State {
 		// }
 		if (openShop != null)
 			openShop.update();
+			
 		p.get(component.GhostMode).enabled = input.keys.get(kha.input.KeyCode.Shift);
 		frame++;
 		var globalMultiplier = input.keys.get(kha.input.KeyCode.F) ? 1/100 : 1/60;
 		if (openShop != null) globalMultiplier = 0;
-		if (!paused)
+		if (!paused && openShop == null)
 			systems.update(globalMultiplier);
 
 		//Q/E Inventory slide.

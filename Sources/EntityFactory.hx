@@ -41,7 +41,7 @@ class EntityFactory {
 		p.set(new Events());
 		p.set(new AnimatedSprite(states.Play.spriteData.entity.ghost));
 		p.set(new component.ai.AITarget());
-		p.set(new Health(150));
+		p.set(new Health(300));
 		p.get(AnimatedSprite).spriteMap = kha.Assets.images.Ghost;
 		p.get(AnimatedSprite).tilesize = 10;
 		p.set(new KeyMovement());
@@ -112,6 +112,7 @@ class EntityFactory {
 		treasure.set(new Transformation(new kha.math.Vector2(x,y)));
 		treasure.set(new component.AnimatedSprite(cast states.Play.spriteData.entity.chest));
 		treasure.get(AnimatedSprite).speed = 2;
+		// treasure.set(new component.ObeyLighting());
 		treasure.set(new Collisions([CollisionGroup.Chest],[],new component.Collisions.Rect(2,3,8,8)));
 		
 		var contents = [];
@@ -123,6 +124,17 @@ class EntityFactory {
 		treasure.set(new ReleaseOnCollision(contents,[CollisionGroup.Friendly]));
 		
 		return treasure;
+	}
+	public static function createShop (entities:eskimo.EntityManager, input:Input, playerInventory:component.Inventory, play:states.Play, x:Int,y:Int){
+		var shop = entities.create();
+		shop.set(new Name("Shop"));
+		shop.set(new Transformation(new kha.math.Vector2(x,y)));
+		shop.set(new Collisions([CollisionGroup.Level],[],new component.Collisions.Rect(0,0,16,16)));
+		shop.set(new Light());
+		shop.set(new Sprite(states.Play.spriteData.entity.potionSeller));
+		var shopComponent = new Shop(new ui.PotionShop(input,playerInventory));
+		shopComponent.shop.close = function () { shop.destroy(); };
+		shop.set(shopComponent);
 	}
 	public static function createLava(entities:eskimo.EntityManager,x:Int,y:Int){
 		var treasure = entities.create();

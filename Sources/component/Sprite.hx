@@ -24,6 +24,7 @@ class Sprite extends Component {
 				case "objects": spriteMap = kha.Assets.images.Objects; tilesize = 8;
 				case "chest": spriteMap = kha.Assets.images.Chest; tilesize = 11;
 				case "tileset": {spriteMap = kha.Assets.images.Tileset; tilesize = 16;}
+				case "sellers": {spriteMap = kha.Assets.images.Sellers; tilesize = 16;}
 				case "explosions": {spriteMap = kha.Assets.images.Explosion; tilesize = 32; }
 				default : {
 					throw "unrecognised tileset?";

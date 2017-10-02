@@ -6,11 +6,13 @@ class Collisions extends System {
 	public var grid:util.SpatialHash;
 	public var processFixedEntities = true;
 	public var frame = 0;
+	var play:states.Play;
 	var entities:eskimo.EntityManager;
-	override public function new (entities:eskimo.EntityManager){
+	override public function new (entities:eskimo.EntityManager,play:states.Play){
 		this.entities = entities;
 		view = new eskimo.views.View(new eskimo.filters.Filter([component.Collisions]),entities);
 		grid = new util.SpatialHash(60*16,60*16,16);
+		this.play = play;
 		super();
 	}
 	public function fireRay(ray:differ.shapes.Ray,ignoreGroups:Array<component.Collisions.CollisionGroup>){
@@ -74,7 +76,6 @@ class Collisions extends System {
 	public function onCollision(shape:component.Collisions.Rect,otherShape:component.Collisions.Rect){
 		if (!validCollision(shape,otherShape)) return;
 
-
 		CollectHandler(shape,otherShape);
 		CustomCollisionHandler(shape,otherShape);
 		ReleaseHandler(shape,otherShape);
@@ -91,6 +92,9 @@ class Collisions extends System {
 
 		SignHandler(shape,otherShape);
 		SignHandler(otherShape,shape);
+
+		ShopHandler(shape,otherShape);
+		ShopHandler(otherShape,shape);
 		
 		
 	}
@@ -211,6 +215,15 @@ class Collisions extends System {
 					break;
 				}
 			}
+		}
+	}
+
+	public function ShopHandler(shape:component.Collisions.Rect,otherShape:component.Collisions.Rect){
+		var shapeEntity = shape.ofEntity;
+		var otherShapeEntity = otherShape.ofEntity;
+		if (shapeEntity.has(component.Shop) && otherShapeEntity.has(component.Inventory)){
+			play.openShop = shapeEntity.get(component.Shop).shop;
+			play.openShop.inventory = otherShapeEntity.get(component.Inventory);
 		}
 	}
 }

@@ -50,10 +50,12 @@ class DungeonWorldGenerator extends WorldGenerator {
 	}
 	override public function generate () {
 		createMap();
+		rooms = [];
+		roomCount = 0;
 
 		//Place root rooms
-		rooms.push({id:rooms.length, x:Std.int(width/2), y: Std.int(height/2), width: 5, height: 5, attachedFromSide: null, doorways: [], distanceToEntrance:0, zone: Zone.Friendly});
-		spawnPoint = {x:Std.int(width/2)+2, y: Std.int(height/2)+2};
+		rooms.push({id:rooms.length, x:Std.int(width/2), y: Std.int(height/2), width: 9, height: 7, attachedFromSide: null, doorways: [], distanceToEntrance:0, zone: Zone.Friendly});
+		spawnPoint = {x:Std.int(width/2)+4, y: Std.int(height/2)+3};
 		growFromRoom(rooms[0]);
 		placeExit();
 		fillRooms();
@@ -76,11 +78,18 @@ class DungeonWorldGenerator extends WorldGenerator {
 		}
 	}
 	function placeThingInRoom (room:Room){
-		if (room.id < 1) return; //Don't place in start room
+		var centre = {x:room.x+Math.floor(room.width/2),y:room.y+Math.floor(room.height/2)};
+		if (room.id < 1){
+			// entities.push({type: worldgen.WorldGenerator.EntityType.PotionSeller,x:centre.x-2,y:centre.y+1});
+			entities.push({type: worldgen.WorldGenerator.EntityType.PotionSeller,x:centre.x,y:centre.y+1});
+			// entities.push({type: worldgen.WorldGenerator.EntityType.PotionSeller,x:centre.x+2,y:centre.y+1});
+		}
+
+		if (room.id < 1) return; //Don't place enemies, treasure etc. in start room
 
 		var possibleLocations:Region = {x: room.x + 1, y: room.y + 1, width: room.width - 2, height: room.height - 2}
-		var centre = {x:room.x+Math.floor(room.width/2),y:room.y+Math.floor(room.height/2)};
 		var chestLocation = {x: centre.x-1+Math.round(Math.random()*2), y: centre.y-1+Math.round(Math.random()*2)};
+
 
 		var enemyCount = Math.floor(Math.max(0,difficulty - 3)) + Math.floor(Math.random()*difficulty);
 		for (i in 0...enemyCount){
@@ -132,6 +141,12 @@ class DungeonWorldGenerator extends WorldGenerator {
 		
 		var dte = room.distanceToEntrance+1;
 
+		var singleSide = -1;
+		if (roomCount == 1){
+			//The first room can have only one exit.
+			singleSide = [0,2,3][ Math.floor(Math.random()*3)]; // The second room will extend from the left, right of top of the first.
+		 }
+
 		if (false){
 			//place room by structure
 			/*var data = haxe.xml.Parser.parse(kha.Assets.blobs.passageway_tmx.toString());
@@ -157,7 +172,7 @@ class DungeonWorldGenerator extends WorldGenerator {
 			}
 			*/
 		}else{
-			if (random.generate() > .25) {
+			if ((random.generate() > .25 && singleSide == -1) || singleSide == 0) {
 				var newRoom = {id:rooms.length, attachedFromSide: Side.Left, distanceToEntrance:dte, doorways:[{x:room.x+room.width-1,y:doory}], x: room.x+room.width-1, y: room.y, width:width, height:height,zone:thisZone};
 				if (roomPlacementValid(newRoom)){
 					rooms.push(newRoom);
@@ -166,7 +181,7 @@ class DungeonWorldGenerator extends WorldGenerator {
 					growFromRoom(room);
 				}
 			}
-			if (random.generate() > .25) {
+			if ((random.generate() > .25 && singleSide == -1) || singleSide == 1) {
 				var newRoom = {id:rooms.length, attachedFromSide: Side.Top, distanceToEntrance:dte, doorways:[{x:doorx,y:room.y+room.height-1}], x: room.x, y: room.y+room.height-1, width:width, height:height,zone:thisZone};
 				if (roomPlacementValid(newRoom)){
 					rooms.push(newRoom);
@@ -175,7 +190,7 @@ class DungeonWorldGenerator extends WorldGenerator {
 					growFromRoom(room);
 				}
 			}
-			if (random.generate() > .25) {
+			if ((random.generate() > .25 && singleSide == -1) || singleSide == 2) {
 				var newRoom = {id:rooms.length, attachedFromSide: Side.Right, distanceToEntrance:dte, doorways:[{x:room.x,y:doory}], x: room.x-width+1, y: room.y, width:width, height:height,zone:thisZone};
 				if (roomPlacementValid(newRoom)){
 					rooms.push(newRoom);
@@ -184,7 +199,7 @@ class DungeonWorldGenerator extends WorldGenerator {
 					growFromRoom(room);
 				}
 			}
-			if (random.generate() > .25) {
+			if ((random.generate() > .25 && singleSide == -1) || singleSide == 3) {
 				var newRoom = {id:rooms.length, attachedFromSide: Side.Bottom, distanceToEntrance:dte, doorways:[{x:doorx,y:room.y}], x: room.x, y: room.y-height+1, width:width, height:height,zone:thisZone};
 				if (roomPlacementValid(newRoom)){
 					rooms.push(newRoom);

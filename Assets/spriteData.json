@@ -291,6 +291,12 @@
 			"id":5,
 			"width": 8,
 			"height":8
+		},
+		"potionSeller" : {
+			"tileset":"sellers",
+			"id":6,
+			"width":16,
+			"height":16
 		}
 	}
 }

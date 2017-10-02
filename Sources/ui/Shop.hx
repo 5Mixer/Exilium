@@ -15,12 +15,13 @@ class Shop {
 	var name = "Shop";
 	var input:Input;
 	public var close:Void->Void;
-	var inventory:component.Inventory;
+	public var inventory:component.Inventory;
 	public function new (input:Input,inventory:component.Inventory){
 		this.input = input;
 		this.inventory = inventory;
 	}
 	public function update (){
+		if(inventory == null) return;
 		if (input.mouseReleased){
 			var y = 10;
 			for (item in items){
@@ -43,6 +44,7 @@ class Shop {
 		
 	}
 	public function render(g:kha.graphics2.Graphics){
+		if(inventory == null) return;
 		g.pushTranslation(200,200);
 
 		g.color = kha.Color.fromBytes(220,190,160);

@@ -204,6 +204,9 @@ class Collisions extends System {
 			for (killingGroup in shapeEntity.get(component.DieOnCollision).collisionGroups){
 				
 				if (otherShape.group == null || otherShape.group.indexOf(killingGroup) != -1){
+					if (shapeEntity.get(component.DieOnCollision).explode){
+						EntityFactory.createExplosion(entities,shapeEntity.get(component.Transformation).pos.add(new kha.math.Vector2(5,5)));
+					}
 					shapeEntity.destroy();
 					break;
 				}

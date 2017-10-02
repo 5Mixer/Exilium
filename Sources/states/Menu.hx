@@ -6,6 +6,7 @@ class Menu extends states.State {
 	override public function new (){
 		super();
 		input = new Input();
+
 	}
 	override public function update (delta:Float){
 		
@@ -41,11 +42,9 @@ class Menu extends states.State {
 		g.fontSize = 38*2;
 		var y = Math.round(20+(g.font.height(38*4)+5));
 		if (button(g,"New game.",20,y)){
-			trace("Starting up game.");
 			//var promise = thx.promise.Promise.create(function(resolve : states.Play -> Void, reject : thx.Error -> Void) {
-				
 				var p = new states.Play();
-				kha.audio1.Audio.play(kha.Assets.sounds.button_click);
+				// kha.audio1.Audio.play(kha.Assets.sounds.button_click);
 				Project.states.push(p);
 				//resolve(p);
 				

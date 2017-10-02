@@ -64,11 +64,11 @@ class EntityFactory {
 		p.get(Inventory).putIntoInventory(component.Inventory.Item.Blaster);
 		p.get(Inventory).putIntoInventory(component.Inventory.Item.LaserGun);
 		p.get(Inventory).putIntoInventory(component.Inventory.Item.Bow);
-		p.get(Inventory).putIntoInventory(component.Inventory.Item.CastSheild);
-		p.get(Inventory).putIntoInventory(component.Inventory.Item.GrapplingHook);
+		// p.get(Inventory).putIntoInventory(component.Inventory.Item.CastSheild);
+		// p.get(Inventory).putIntoInventory(component.Inventory.Item.GrapplingHook);
 		p.get(Inventory).putIntoInventory(component.Inventory.Item.Key);
-		p.get(Inventory).putIntoInventory(component.Inventory.Item.Bomb,20);
-		p.get(Inventory).putIntoInventory(component.Inventory.Item.Gold,50);
+		p.get(Inventory).putIntoInventory(component.Inventory.Item.Bomb,25);
+		p.get(Inventory).putIntoInventory(component.Inventory.Item.Gold,70);
 
 		return p;
 	}
@@ -115,10 +115,11 @@ class EntityFactory {
 		treasure.set(new Collisions([CollisionGroup.Chest],[],new component.Collisions.Rect(2,3,8,8)));
 		
 		var contents = [];
-		contents.pushx(component.Inventory.Item.Gold,Math.floor(Math.random()*20));
+		contents.pushx(component.Inventory.Item.Gold,Math.floor(Math.random()*40));
 		contents.pushx(component.Inventory.Item.HealthPotion,Math.floor(Math.random()*2));
-		if (Math.random() > .6) contents.push(component.Inventory.Item.LaserGun);
-		if (Math.random() > .75) contents.push(component.Inventory.Item.GrapplingHook);
+		contents.pushx(component.Inventory.Item.SpeedPotion,Math.floor(Math.random()*1));
+		// if (Math.random() > .6) contents.push(component.Inventory.Item.LaserGun);
+		// if (Math.random() > .75) contents.push(component.Inventory.Item.GrapplingHook);
 		treasure.set(new ReleaseOnCollision(contents,[CollisionGroup.Friendly]));
 		
 		return treasure;
@@ -319,7 +320,10 @@ class EntityFactory {
 		bomb.set(new component.Sprite(states.Play.spriteData.entity.bomb));
 		bomb.set(new component.Colour());
 		bomb.set(new Collisions([CollisionGroup.Friendly],[CollisionGroup.Friendly],new component.Collisions.Rect(1,1,6,7),false)); 
-		bomb.set(new component.TimedLife(1.5));
+		bomb.set(new component.TimedLife(1));
+		bomb.set(new component.DieOnCollision([CollisionGroup.Enemy]));
+
+		bomb.get(component.DieOnCollision).explode = true;
 		bomb.get(component.TimedLife).explode = true;
 		return bomb;
 	}

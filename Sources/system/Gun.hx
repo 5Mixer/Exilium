@@ -34,13 +34,13 @@ class Gun extends System {
 
 					if (selectedItem == component.Inventory.Item.SlimeGun){
 						gun.gun = component.Gun.GunType.SlimeGun;
-						gun.fireRate = .1;
+						gun.fireRate = .12;
 					}else if (selectedItem == component.Inventory.Item.LaserGun) {
 						gun.gun = component.Gun.GunType.LaserGun;
-						gun.fireRate = .25;
+						gun.fireRate = .2;
 					}else if (selectedItem == component.Inventory.Item.Blaster) {
 						gun.gun = component.Gun.GunType.BlasterGun;
-						gun.fireRate = .3;
+						gun.fireRate = .15;
 					}else if (selectedItem == component.Inventory.Item.Bow) {
 						gun.gun = component.Gun.GunType.Bow;
 						if (gun.charge < 3)
@@ -79,7 +79,7 @@ class Gun extends System {
 						var dir = transformation.pos.sub(camera.screenToWorld(input.mousePos.sub(new kha.math.Vector2(24,24))));
 						var a = Math.round(Math.atan2(-dir.y,-dir.x)*(180/Math.PI));
 
-						if (gun.gun != null && gun.gun != component.Gun.GunType.Bow){
+						if (gun.gun != null && gun.gun != component.Gun.GunType.Bow && gun.gun != component.Gun.GunType.LaserGun){
 							var camOffset = dir.mult(1);
 							camOffset.normalize();
 							camOffset = camOffset.mult(6+Math.random()*2);
@@ -152,9 +152,9 @@ class Gun extends System {
 						var dist = 1;//max-(Math.pow(.99,gun.charge)*max);//-Math.log(gun.charge)/Math.log(.9);
 						var a = dir.mult(1);
 						//a.normalize();
-						g.color = kha.Color.fromBytes(140,140,240,100);
+						g.color = kha.Color.fromBytes(140,140,240,70);
 						
-						g.drawLine(offx,offy,offx-(a.x * dist),offy-(a.y * dist),4);
+						g.drawLine(offx,offy,offx-(a.x * dist),offy-(a.y * dist),1);
 					}
 					
 				}
@@ -260,7 +260,7 @@ class Gun extends System {
 
 		kha.audio1.Audio.play(kha.Assets.sounds.shoot3);
 		
-		var spread = 7;
+		var spread = 5;
 		var density = .1;
 		for (offseta in 0...spread){
 			var bullet = entities.create();
@@ -270,9 +270,13 @@ class Gun extends System {
 			bullet.set(t);
 			
 			var p = new component.Physics();
-			var speed = 140;
+			var speed = 190;
 			p.friction = 0.98;
 			p.velocity = new kha.math.Vector2(Math.cos(angle * (Math.PI / 180)) * speed,Math.sin(angle * (Math.PI / 180)) * speed);
+			var shooterPhys = parent.get(component.Physics);
+			var knockback = p.velocity.mult(1);
+			knockback.normalize();
+			shooterPhys.velocity = shooterPhys.velocity.sub(knockback.mult(8  ));
 			bullet.set(p);
 			bullet.set(new component.Sprite(states.Play.spriteData.entity.bullet_small));
 
@@ -329,8 +333,10 @@ class Gun extends System {
 		bullet.set(new component.Sprite(states.Play.spriteData.entity.arrow_blue));
 		
 		//Death
-		bullet.set(new component.TimedLife(3));
+		bullet.set(new component.TimedLife(1));
+		bullet.get(component.TimedLife).explode = true;
 		bullet.set(new component.DieOnCollision([component.Collisions.CollisionGroup.Enemy,component.Collisions.CollisionGroup.Level]));
+		bullet.get(component.DieOnCollision).explode = true;
 		
 		//Damage and collisions
 		bullet.set(new component.Damager(30));

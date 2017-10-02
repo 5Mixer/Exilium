@@ -45,7 +45,7 @@ class MummyAI extends System {
 					closestTarget.get(component.Health).addToHealth(-8);
 				// }
 			}else if (distanceToTarget < AI.visionLength){
-				//Chase						
+				//Chase
 				var dir = closestTarget.get(component.Transformation).pos.add(new kha.math.Vector2(-10+Math.random()*20,-10+Math.random()*20)).sub(entity.get(component.Transformation).pos);
 				dir.normalize();
 				entity.get(component.Physics).velocity = dir.mult(60);

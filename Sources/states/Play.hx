@@ -24,6 +24,7 @@ class Play extends states.State {
 	public var entities:eskimo.EntityManager;
 	var p:eskimo.Entity;
 	public var camera:Camera;
+	public var track:kha.audio1.AudioChannel;
 
 	var systems:eskimo.systems.SystemManager;
 	var renderSystems = new Array<System>();
@@ -54,8 +55,12 @@ class Play extends states.State {
 
 	var overlayShade = 0.;
 
+	var playlist = [2,3,4,5];
+	var soundFiles:Array<kha.Sound> = [];
+
 	override public function new (){
 		super();
+
 
 		input = new Input();
 		camera = new Camera();
@@ -121,6 +126,8 @@ class Play extends states.State {
 		input.wheelListeners.push(offsetInventorySelection);
 
 		lastRenderTime = kha.Scheduler.time();
+
+		track = kha.audio1.Audio.play(kha.Assets.sounds.track_3);
 	}
 	function registerRenderSystem(system:System){
 		renderSystems.push(system);
@@ -213,6 +220,7 @@ class Play extends states.State {
 		p = EntityFactory.createPlayer(entities,{x:generator.spawnPoint.x, y:generator.spawnPoint.y});
 		p.get(component.Inventory).putIntoInventory(component.Inventory.Item.SlimeGun);
 		p.get(component.Events).listenToEvent(component.Events.Event.Death,function (args){
+			track.stop();
 			Project.states = [new states.Dead()];
 		});
 
@@ -229,25 +237,28 @@ class Play extends states.State {
 
 		return map;
 	}
-	function descend (){
-		kha.audio1.Audio.play(kha.Assets.sounds.new_level_descend);
 
+	var descending = false;
+	function descend (){
+		if (descending) return;
+		descending = true;
 		dungeonLevel++;
 		// if (dungeonLevel == 5)
 		// 	Project.states = [new End()];
 		save();
-		openShop = new ui.PotionShop(input,p.get(component.Inventory));
-		openShop.close = function () {
-			openShop = null;
+
+		kha.audio1.Audio.play(kha.Assets.sounds.new_level_descend);
+		
+		motion.Actuate.tween (track, 1, { volume: 0 }, true).ease (motion.easing.Quad.easeInOut).reflect(true).repeat(1);
+		motion.Actuate.tween (this, 1, {overlayShade: 1}, true).ease (motion.easing.Quad.easeInOut).reflect(true).repeat(1);
+		motion.Actuate.timer(1).onComplete(actuallyDescend);
 			
-			motion.Actuate.tween (Project.mainMusicChannel, 1, { volume: 0 }, true).ease (motion.easing.Quad.easeInOut).reflect(true).repeat(1);
-			motion.Actuate.tween (this, 1, {overlayShade: 1}, true).ease (motion.easing.Quad.easeInOut).reflect(true).repeat(1);
-			motion.Actuate.timer(1).onComplete(actuallyDescend);
-		}		
 	}
 	function actuallyDescend(){
+		track.stop();
+		track = kha.audio1.Audio.play(kha.Assets.sounds.track_5);
 		createMap();
-
+		descending = false;
 		save();
 	}
 	
@@ -418,7 +429,7 @@ class Play extends states.State {
 				g.transformation._00 = camera.scale.x;
 				g.transformation._11 = camera.scale.y;
 				var off = n == pinv.activeIndex ? 1 : 0;
-				system.Renderer.renderSpriteData(g,p.get(component.Inventory).itemData.get(stack.item).sprite,8+off,n*10);
+				system.Renderer.renderSpriteData(g,p.get(component.Inventory).itemData.get(stack.item).sprite,2+off,n*10);
 				
 				g.color = kha.Color.fromBytes(112,107,137);
 				if (n == pinv.activeIndex)
@@ -427,7 +438,7 @@ class Play extends states.State {
 				g.transformation._00 = 1;
 				g.transformation._11 = 1;
 				g.color = kha.Color.fromBytes(234,211,220);
-				g.drawString(stack.quantity+"",(3*4), (n*10*4)-8);
+				g.drawString(stack.quantity+"",(12*4)+off, (n*10*4)-8);
 				
 				n++;
 			}
@@ -438,10 +449,10 @@ class Play extends states.State {
 		debugInterface.fpsGraph.pushValue(1/delta/debugInterface.fpsGraph.size.y);
 		input.startUpdate();
 		camera.update(delta);
-		if (input.keysReleased.get(kha.input.KeyCode.V)){
-			if (openShop == null){ openShop = new ui.PotionShop(input,p.get(component.Inventory)); }
-			else { openShop = null; }
-		}
+		// if (input.keysReleased.get(kha.input.KeyCode.V)){
+		// 	if (openShop == null){ openShop = new ui.PotionShop(input,p.get(component.Inventory)); }
+		// 	else { openShop = null; }
+		// }
 		if (openShop != null)
 			openShop.update();
 		p.get(component.GhostMode).enabled = input.keys.get(kha.input.KeyCode.Shift);
@@ -456,15 +467,9 @@ class Play extends states.State {
 			offsetInventorySelection(-1);
 		if (input.keys.get(kha.input.KeyCode.E) && frame%7==0)
 			offsetInventorySelection(1);
-
-		if (input.keysReleased.get(kha.input.KeyCode.P)) descend();
 			
 		(cast systems.get(system.Physics)).grid = (cast systems.get(system.Collisions)).grid;
 
-		//  var physsys:system.Physics = systems.get(system.Physics); 
-		// var colsys:system.Collisions = systems.get(system.Collisions); 
-		// physsys.grid = colsys.grid; 
-	 
 		cast (systems.get(system.Magnets),system.Magnets).p = p; 
 
 

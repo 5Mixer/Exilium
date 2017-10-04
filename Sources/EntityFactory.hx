@@ -78,6 +78,7 @@ class EntityFactory {
 		slime.set(new Transformation(new kha.math.Vector2(x,y)));
 		slime.set(new AnimatedSprite(states.Play.spriteData.entity.slime));
 		slime.set(new Health(15));
+		slime.set(new BloodColour(kha.Color.fromBytes(45,150,45)));
 		slime.set(new Light());
 		slime.get(Light).colour = kha.Color.Green;
 		slime.get(Light).strength = .2;
@@ -92,7 +93,7 @@ class EntityFactory {
 
 		return slime;
 	}
-	public static function createMummy(entities:eskimo.EntityManager,x:Int,y:Int){
+	public static function createMummy(entities:eskimo.EntityManager,x:Float,y:Float){
 		var mummy = entities.create();
 		mummy.set(new Name("Mummy"));
 		mummy.set(new Transformation(new kha.math.Vector2(x,y)));
@@ -100,9 +101,28 @@ class EntityFactory {
 		mummy.set(new Health(25));
 		mummy.get(AnimatedSprite).speed = 5;
 		mummy.set(new Physics());
+		mummy.set(new component.CreateMummyCoffin());
 		mummy.set(new ReleaseOnDeath([].pushx(component.Inventory.Item.Gold,Math.floor(Math.random()*10)),[CollisionGroup.Friendly]));
 
 		mummy.set(new component.ai.MummyAI());
+		mummy.set(new Collisions([CollisionGroup.Enemy,CollisionGroup.Chest],[],new Collisions.Rect(0,0,8,8)));
+		return mummy;
+	}
+	public static function createDeadMummy(entities:eskimo.EntityManager,x:Float,y:Float){
+		var mummy = entities.create();
+		mummy.set(new Name("Dead Mummy"));
+		mummy.set(new Transformation(new kha.math.Vector2(x,y)));
+		mummy.set(new AnimatedSprite(states.Play.spriteData.entity.mummy));
+		mummy.get(AnimatedSprite).playAnimation("die");
+		mummy.set(new Health(25));
+		mummy.get(AnimatedSprite).speed = 5;
+		mummy.set(new Physics());
+		mummy.set(new TimedCall(5,function (){
+			EntityFactory.createMummy(entities,x,y);
+			mummy.destroy();
+		}));
+		mummy.set(new ReleaseOnDeath([].pushx(component.Inventory.Item.Gold,Math.floor(Math.random()*10)),[CollisionGroup.Friendly]));
+
 		mummy.set(new Collisions([CollisionGroup.Enemy,CollisionGroup.Chest],[],new Collisions.Rect(0,0,8,8)));
 		return mummy;
 	}
@@ -165,11 +185,12 @@ class EntityFactory {
 
 		return torch;
 	}
-	public static function createBlood(entities:eskimo.EntityManager,x:Float,y:Float){
+	public static function createBlood(entities:eskimo.EntityManager,colour:kha.Color=kha.Color.Red,x:Float,y:Float){
 		var particle = entities.create();
 		particle.set(new component.VisualParticle(component.VisualParticle.Effect.Blood));
 		particle.set(new component.Zindex(-1));
 		particle.set(new component.ObeyLighting());
+		particle.set(new component.Colour(colour));
 		particle.set(new component.Transformation(new kha.math.Vector2(x,y)));
 		var phys = new component.Physics();
 		var speed = Math.random()*6;
@@ -298,7 +319,8 @@ class EntityFactory {
 		ladder.set(new Name("Ladder")); 
 		ladder.set(new Transformation(new kha.math.Vector2(x,y))); 
 		ladder.set(new Sprite(states.Play.spriteData.entity.ladder)); 
-		ladder.set(new Collisions([CollisionGroup.Level],[],new Collisions.Rect(0,0,16,16)));
+		ladder.set(new Collisions([CollisionGroup.Level],[],new Collisions.Rect(0,0,16,16),false));
+		ladder.set(new Zindex(0));
 		ladder.set(new CustomCollisionHandler([CollisionGroup.Player],onCollide)); 
 		return ladder; 
 	}

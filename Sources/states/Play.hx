@@ -102,6 +102,7 @@ class Play extends states.State {
 		systems.add(new system.BatAI(entities));
 		systems.add(new system.Magnets(entities,p));
 		systems.add(new system.TimedShoot(entities));
+		systems.add(new system.TimedCalls(entities));
 		systems.add(new system.Spinner(entities));
 		
 		map = createMap();
@@ -395,9 +396,9 @@ class Play extends states.State {
 	function watermark (g:kha.graphics2.Graphics){
 		g.transformation = kha.math.FastMatrix3.identity();
 		g.font = kha.Assets.fonts.OpenSans;
-		g.color = kha.Color.fromFloats(1,1,1,.4);
+		g.color = kha.Color.fromFloats(1,1,1,.3);
 		g.fontSize = 20;
-		g.drawString("Exilium 0.1.0. @5mixer, @BU773RH4ND5, @gas1312_AGD",10,kha.System.windowHeight()-30);
+		g.drawString("Exilium 0.2.0. @5mixer, @BU773RH4ND5, @gas1312_AGD",10,kha.System.windowHeight()-30);
 	}
 
 	function pauseOverlay (g:kha.graphics2.Graphics){
@@ -412,7 +413,7 @@ class Play extends states.State {
 			g.color = kha.Color.White;
 			g.font = kha.Assets.fonts.trenco;
 			g.fontSize = 38*4;
-			g.drawString("Paused",20,20);
+			g.drawString("Paused [esc]",20,20);
 
 		}
 	}

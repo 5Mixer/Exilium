@@ -151,10 +151,18 @@ class Gun extends System {
 						var max = 200;
 						var dist = 1;//max-(Math.pow(.99,gun.charge)*max);//-Math.log(gun.charge)/Math.log(.9);
 						var a = dir.mult(1);
-						//a.normalize();
+						a.normalize();
 						g.color = kha.Color.fromBytes(140,140,240,70);
 						
-						g.drawLine(offx,offy,offx-(a.x * dist),offy-(a.y * dist),1);
+						var seperation = 4; //* (3/Math.ceil(gun.charge));
+						var dots = Math.floor(dir.length/seperation);
+						var multiplier = dir.length/seperation;
+						for (i in 0...dots){
+							g.color = kha.Color.White;
+							g.fillRect(offx-(a.x*seperation*i),offy-(a.y*seperation*i),1,1);
+						}
+
+						// g.drawLine(offx,offy,offx-(a.x * dist),offy-(a.y * dist),1);
 					}
 					
 				}

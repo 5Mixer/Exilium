@@ -88,14 +88,14 @@ class DungeonWorldGenerator extends WorldGenerator {
 
 		if (room.id < 1) return; //Don't place enemies, treasure etc. in start room
 
-		var possibleLocations:Region = {x: room.x + 1, y: room.y + 1, width: room.width - 2, height: room.height - 2}
+		var possibleLocations:Region = {x: room.x + 2, y: room.y + 2, width: room.width - 4, height: room.height - 4};
 		var chestLocation = {x: centre.x-1+Math.round(Math.random()*2), y: centre.y-1+Math.round(Math.random()*2)};
 
 
 		var enemyCount = Math.floor(Math.max(0,difficulty - 3)) + Math.floor(Math.random()*difficulty);
 		for (i in 0...enemyCount){
-			var x = Math.round(Math.random()*possibleLocations.width) + possibleLocations.x;
-			var y = Math.round(Math.random()*possibleLocations.height) + possibleLocations.y;
+			var x = Math.floor(Math.random()*possibleLocations.width) + possibleLocations.x;
+			var y = Math.floor(Math.random()*possibleLocations.height) + possibleLocations.y;
 			if (Math.random() < .6){
 				entities.push({type: worldgen.WorldGenerator.EntityType.Bat,x:x,y:y});
 			}else if (Math.random() < .5){

@@ -95,12 +95,22 @@ class Renderer extends System {
 			if (entity.has(component.ObeyLighting)){
 				if (tilemap != null){
 					var tile = tilemap.get(Math.floor(transformation.pos.x/16),Math.floor(transformation.pos.y/16));
+					var tileColour = null;
 					if (tile != null)
-						colour = tile.colour;
+						tileColour = tile.colour;
+
+					if (colour != kha.Color.White && tileColour != null){
+						var a = hxColorToolkit.ColorToolkit.toRGB(colour.value);
+						var b = hxColorToolkit.ColorToolkit.toRGB(tileColour.value);
+						var merge = new hxColorToolkit.spaces.RGB((a.red * b.red)/255, (a.green * b.green)/255, (a.blue * b.blue)/255);
+						colour = kha.Color.fromBytes(Math.round(merge.red), Math.round(merge.green), Math.round(merge.blue));
+					}else{
+						colour = tileColour;
+					}
 					
-					if (colour == null) colour = kha.Color.White;
 				}
 			}
+			if (colour == null) colour = kha.Color.White;
 			
 			if (entity.has(component.Sprite)){
 				var sprite:component.Sprite = entity.get(component.Sprite);
@@ -133,7 +143,6 @@ class Renderer extends System {
 			}else if (entity.has(component.VisualParticle)){
 				var transform = entity.get(component.Transformation);
 				var particle = entity.get(component.VisualParticle);
-				var colour = kha.Color.White;
 
 				particle.life++;
 				switch(particle.effect){

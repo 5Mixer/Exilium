@@ -10,8 +10,35 @@ class TilemapRenderer  {
 		lights = new eskimo.views.View(new eskimo.filters.Filter([component.Light,component.Transformation]),entities);
 	}
 
-	public function render (g:kha.graphics2.Graphics,map:world.Tilemap){
+	public function renderHidden (g:kha.graphics2.Graphics,map:world.Tilemap){
+		var camtiley:Int = cast Math.max(Math.floor((camera.pos.y)/tilesize),0);
+		var camtilex:Int = cast Math.max(Math.floor((camera.pos.x)/tilesize),0);
+		var windoww = Math.ceil(kha.System.windowWidth()/(16*4))+1;
+		var windowh = Math.ceil(kha.System.windowHeight()/(16*4))+1;
 
+		//Loop through every visible tile.
+		for (y in camtiley ... cast Math.min(camtiley+windowh,map.height)){
+			for (x in camtilex ... cast Math.min(camtilex+windoww,map.width)){
+
+				g.color = kha.Color.White;
+				var tile = map.tiles[Math.floor(y*map.width)+x];
+				var tileData = map.tileInfo.get(tile.id);
+
+				if (!tile.visible && tileData.id != -1){
+					var c = Math.min(1,Math.abs((Math.cos((x+(frame/10))/2)+Math.sin(y/2)) / 4));
+					g.color = kha.Color.fromFloats(c,c,c);
+					g.fillRect(x*tilesize,y*tilesize,tilesize,tilesize);
+					var f = Math.floor(((frame/10)+x)%9);
+					g.drawScaledSubImage(kha.Assets.images.Hidden,f*16,0,16,16,x*tilesize,y*tilesize,tilesize,tilesize);					
+				}
+			}
+		}
+		g.color = kha.Color.White;
+	}
+
+	var frame = 1;
+	public function render (g:kha.graphics2.Graphics,map:world.Tilemap){
+		frame++;
 
 		var camtiley:Int = cast Math.max(Math.floor((camera.pos.y)/tilesize),0);
 		var camtilex:Int = cast Math.max(Math.floor((camera.pos.x)/tilesize),0);
@@ -26,9 +53,17 @@ class TilemapRenderer  {
 				var tile = map.tiles[Math.floor(y*map.width)+x];
 				var tileData = map.tileInfo.get(tile.id);
 
-				if (tileData.id == -1)
-					continue;
+				// if (!tile.visible && tileData.id != -1){
+				// 	var c = Math.min(1,.25+ Math.abs((Math.cos(x)+Math.sin(y)) / 4));
+				// 	g.color = kha.Color.fromFloats(c,c,c);
+				// 	g.fillRect(x*tilesize,y*tilesize,tilesize,tilesize);
+				// 	var f = Math.floor(((frame/30)+x)%9);
+				// 	g.drawScaledSubImage(kha.Assets.images.Hidden,f*16,0,16,16,x*tilesize,y*tilesize,tilesize,tilesize);					
+				// }
 
+				if (!tile.visible || tileData.id == -1)
+					continue;
+				
 				var spec = tileData.specularity==null ? 1.0 : tileData.specularity;
 				
 				//In the rendering loop of tilemaps, where x,y is tile location.

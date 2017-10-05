@@ -66,7 +66,7 @@ class EntityFactory {
 		p.get(Inventory).putIntoInventory(component.Inventory.Item.Bow);
 		// p.get(Inventory).putIntoInventory(component.Inventory.Item.CastSheild);
 		// p.get(Inventory).putIntoInventory(component.Inventory.Item.GrapplingHook);
-		p.get(Inventory).putIntoInventory(component.Inventory.Item.Key);
+		p.get(Inventory).putIntoInventory(component.Inventory.Item.Key,10);
 		p.get(Inventory).putIntoInventory(component.Inventory.Item.Bomb,25);
 		p.get(Inventory).putIntoInventory(component.Inventory.Item.Gold,70);
 
@@ -212,6 +212,32 @@ class EntityFactory {
 				if (collider.get(Inventory).getStack(component.Inventory.Item.Key) != null){
 					collider.get(Inventory).takeFromInventory(component.Inventory.Item.Key);
 					door.destroy();
+				}
+			}
+		}));
+
+		return door;
+	}
+	public static function createRoomDoor(entities:eskimo.EntityManager,map:world.Tilemap,room:worldgen.DungeonWorldGenerator.Room,x:Int,y:Int){
+		var door = entities.create();
+		door.set(new Name("Room Door"));
+		door.set(new Transformation(new kha.math.Vector2(x,y)));
+		door.set(new Sprite(cast states.Play.spriteData.entity.door));
+		door.set(new Collisions([CollisionGroup.Level],[],new Collisions.Rect(0,0,16,16)));
+		door.set(new Message("Door","One must find a/ngolden key to pass here."));
+		door.set(new CustomCollisionHandler(null,function (collider) {
+			if (collider.has(Inventory)){
+				if (collider.get(Inventory).getStack(component.Inventory.Item.Key) != null){
+					collider.get(Inventory).takeFromInventory(component.Inventory.Item.Key);
+					door.destroy();
+
+					for (x in -1...room.width+2){
+						for (y in -1...room.height+2){
+							if (map.get(room.x+x,room.y+y) == null)
+								continue;
+							map.get(room.x+x,room.y+y).visible = true;
+						}
+					}
 				}
 			}
 		}));

@@ -33,7 +33,7 @@ class TiledStructure extends WorldGenerator {
 				if (dezonedId > 6)
 					throw "wat.";
 				var zone = worldgen.Zone.createByIndex(Math.floor((t-1)/5));
-				set(x,y,{id:dezonedId,zone:zone});
+				set(x,y,{id:dezonedId,zone:zone, visible:true});
 				n++;
 			}
 		}

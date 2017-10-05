@@ -40,7 +40,8 @@ class BatAI extends System {
 
 			if (distanceToTarget < 16){
 				//Attack
-				closestTarget.get(component.Health).addToHealth(-1);
+				if (frame % 3 == 0)
+					closestTarget.get(component.Health).addToHealth(-.5);
 				
 			}else if (distanceToTarget < 80){
 				//Swoop						

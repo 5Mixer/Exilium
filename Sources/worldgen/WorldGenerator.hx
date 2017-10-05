@@ -9,6 +9,7 @@ enum EntityType {
 	CorruptSoulBoss;
 	Item(type:component.Inventory.Item);
 	Door;
+	RoomDoor(room:worldgen.DungeonWorldGenerator.Room);
 	Torch;
 	Sign(message:String);
 	Bat;

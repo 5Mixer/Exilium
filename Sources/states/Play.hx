@@ -201,6 +201,7 @@ class Play extends states.State {
 				case worldgen.WorldGenerator.EntityType.CorruptSoulBoss: EntityFactory.createCorruptSoul(entities,e.x*16,e.y*16);
 				case worldgen.WorldGenerator.EntityType.Item(item): EntityFactory.createItem(entities,item,e.x*16,e.y*16);
 				case worldgen.WorldGenerator.EntityType.Door: EntityFactory.createLockedDoor(entities,e.x*16,e.y*16);
+				case worldgen.WorldGenerator.EntityType.RoomDoor(room): EntityFactory.createRoomDoor(entities,map,room,e.x*16,e.y*16);
 				case worldgen.WorldGenerator.EntityType.Torch: EntityFactory.createTorch(entities,e.x*16,e.y*16);
 				case worldgen.WorldGenerator.EntityType.Sign(message): EntityFactory.createSign(entities,e.x*16,e.y*16,message);
 				case worldgen.WorldGenerator.EntityType.Bat: EntityFactory.createBat(entities,e.x*16,e.y*16);
@@ -337,6 +338,7 @@ class Play extends states.State {
 		tilemapRender.render(g,map);
 		for (system in renderSystems)
 			system.render(g);
+		tilemapRender.renderHidden(g,map);
 		camera.restore(g);
 		
 		if (openShop != null)
